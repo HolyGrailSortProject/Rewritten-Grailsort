@@ -59,4 +59,5 @@ Now, there *are* some glaring flaws with Grailsort, but they're now easier than 
 
 # Dedicated to Mr. Andrey Astrelin, 1969 - 2017
 http://superliminal.com/andrey/biography.html
+
 Rest in Peace
