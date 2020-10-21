@@ -6,7 +6,7 @@ A diverse array of heavily refactored versions of Andrey Astrelin's GrailSort.h,
 * *more to come!*
 
 # What is Grailsort?
-* TL;DR: Grailsort is a complicated variant of Mergesort that manages to cram all the extra space usually needed by Mergesorts *inside* the array with a bit of magic involving square roots and unequal numbers!
+__TL;DR__: Grailsort is a complicated variant of Mergesort that manages to cram all the extra space usually needed by Mergesorts *inside* the array with a bit of magic involving square roots and unequal numbers!
 
 **The full story**: Grailsort is an *in-place, stable, worst-case O(n log n) time* variant of Mergesort and implementation of 'Block Merge Sort'.
 
