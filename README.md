@@ -2,7 +2,7 @@
 A diverse array of heavily refactored versions of Andrey Astrelin's GrailSort.h, aiming to be as readable and intuitive as possible. *Owned and maintained by (name-of-holy-grail-project).*
 
 # Current implementations featured in our repo:
-* Summer Dragonfly et al.'s Rewritten Grailsort for **Java** (CURRENTLY BROKEN -- we just finished the rough draft and we're actively debugging it now!) 
+* Summer Dragonfly et al.'s Rewritten Grailsort for **Java** (In-place version POTENTIALLY FIXED; Out-of-place versions NOT YET TESTED!!) 
 * *more to come!*
 
 # What is Grailsort?
