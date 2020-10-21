@@ -22,7 +22,11 @@ But then you might ask, "why bother with Grailsort? We've already found the best
 
 Well hold on, now! When has it ever been a bad idea to "think deeply about simple things"? Our team has learned a lot about sorting and algorithms in general by spending many hours collectively uncovering the secrets behind Grailsort, some of which are extremely clever and deep. It's a passion project for us, after all, and we would like to share it with other programmers and computer enthusiasts out there.
 
-Not only that, our team has found a ton of potential in Grailsort, and so did the researchers who wrote its original paper back in the late 1980s! According to *Fast Stable Merging and Sorting in Constant Extra Space* written by Huang and Langston, "...[Grailsort guarantees] a worst-case key-comparison and record-exchange grand total not greater than 2.5*n*log2*n*. [Grailsort's] worst-case total compares favourably with *average-case* key-comparison and record-exchange totals for popular *unstable* methods: quick-sort's average-case figure is a little more than 1.4*n*log2*n*; heap-sort's is about 2.3*n*log2*n*." The paper is linked in this repo for reference.
+Not only that, our team has found a ton of potential in Grailsort, and so did the researchers who wrote its original paper back in the late 1980s! According to *Fast Stable Merging and Sorting in Constant Extra Space* written by Huang and Langston,
+
+  "...[Grailsort guarantees] a worst-case key-comparison and record-exchange grand total not greater than 2.5*n*log2*n*. [Grailsort's] worst-case total compares favourably with   *average-case* key-comparison and record-exchange totals for popular *unstable* methods: quick-sort's average-case figure is a little more than 1.4*n*log2*n*; heap-sort's is     about 2.3*n*log2*n*."
+  
+The paper is linked in this repo for reference.
 
 Now, there *are* some glaring flaws with Grailsort, but they're now easier than ever to study and optimize! This is only the beginning of our little project, and we hope you enjoy our hard work. :)
 
