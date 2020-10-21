@@ -56,3 +56,7 @@ Now, there *are* some glaring flaws with Grailsort, but they're now easier than 
    * phoenixbound
    * thatsOven                    
  * Special thanks to "The Studio" Discord community!
+
+# Dedicated to Mr. Andrey Astrelin, 1969 - 2017
+http://superliminal.com/andrey/biography.html
+Rest in Peace
