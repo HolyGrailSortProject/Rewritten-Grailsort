@@ -3,6 +3,7 @@ A diverse array of heavily refactored versions of Andrey Astrelin's GrailSort.h,
 
 # Current implementations featured in our repo:
 * Summer Dragonfly et al.'s Rewritten Grailsort for **Java** (CURRENTLY BROKEN -- we just finished the rough draft and we're actively debugging it now!) 
+* *more to come!*
 
 # What is Grailsort?
 * TL;DR: Grailsort is a complicated variant of Mergesort that manages to cram all the extra space usually needed by Mergesorts *inside* the array with a bit of magic involving square roots and unequal numbers!
@@ -24,11 +25,21 @@ Well hold on, now! When has it ever been a bad idea to "think deeply about simpl
 
 Not only that, our team has found a ton of potential in Grailsort, and so did the researchers who wrote its original paper back in the late 1980s! According to *Fast Stable Merging and Sorting in Constant Extra Space* written by Huang and Langston,
 
-  "...[Grailsort guarantees] a worst-case key-comparison and record-exchange grand total not greater than 2.5*n*log2*n*. [Grailsort's] worst-case total compares favourably with   *average-case* key-comparison and record-exchange totals for popular *unstable* methods: quick-sort's average-case figure is a little more than 1.4*n*log2*n*; heap-sort's is     about 2.3*n*log2*n*."
+> "...[Grailsort guarantees] a worst-case key-comparison and record-exchange grand total not greater than 2.5*n*log2*n*. [Grailsort's] worst-case total compares favourably with   *average-case* key-comparison and record-exchange totals for popular *unstable* methods: quick-sort's average-case figure is a little more than 1.4*n*log2*n*; heap-sort's is     about 2.3*n*log2*n*."
   
 The paper is linked in this repo for reference.
 
 Now, there *are* some glaring flaws with Grailsort, but they're now easier than ever to study and optimize! This is only the beginning of our little project, and we hope you enjoy our hard work. :)
+
+# Helpful resources
+- Original implementation of Grailsort: https://github.com/Mrrl/GrailSort
+- Rough English translation of Mr. Astrelin's Grailsort blog post: https://translate.google.com/translate?sl=auto&tl=en&u=https%3A%2F%2Fhabr.com%2Fen%2Fpost%2F205290%2F
+- Academic paper that Grailsort is based off of: http://comjnl.oxfordjournals.org/content/35/6/643.full.pdf (*Also uploaded to this repo!*)
+- Grailsort animations I've made for research purposes: https://www.youtube.com/playlist?list=PL5w_-zMAJC8sF-bThVsDGthPcxJktuUNm
+- Official version of Wikisort, a similar algorithm also based off of "Block Merge Sort": https://github.com/BonzaiThePenguin/WikiSort
+- Academic paper that Wikisort is based off of: https://github.com/BonzaiThePenguin/WikiSort/blob/master/tamc2008.pdf
+- Official Wikipedia for Block (Merge) Sort: https://en.wikipedia.org/wiki/Block_sort
+- *Full documentation/educational lessons on Grailsort and Block Merge Sorting coming soon!!
 
 # (name-of-holy-grail-project)
  * Project Manager:
