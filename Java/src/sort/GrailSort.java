@@ -1115,7 +1115,9 @@ public class GrailSort<K> {
                     }
                 }
 
-                this.grailCombineBlocks(array, start, start + bufferEnd, length - bufferLen, bufferLen, currentBlockLen, scrollingBuffer);
+                // WRONG VARIABLE BUG FIXED: 4th argument should be `length - bufferEnd`, was `length - bufferLen` before.
+                // Credit to 666666t and Anonymous0726 for debugging.
+                this.grailCombineBlocks(array, start, start + bufferEnd, length - bufferEnd, bufferLen, currentBlockLen, scrollingBuffer);
             }
             
             this.grailInsertSort(array, start, bufferEnd);
