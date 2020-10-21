@@ -39,7 +39,7 @@ Now, there *are* some glaring flaws with Grailsort, but they're now easier than 
 - Official version of Wikisort, a similar algorithm also based off of "Block Merge Sort": https://github.com/BonzaiThePenguin/WikiSort
 - Academic paper that Wikisort is based off of: https://github.com/BonzaiThePenguin/WikiSort/blob/master/tamc2008.pdf
 - Official Wikipedia for Block (Merge) Sort: https://en.wikipedia.org/wiki/Block_sort
-- *Full documentation/educational lessons on Grailsort and Block Merge Sorting coming soon!!
+- *Full documentation/educational lessons on Grailsort and Block Merge Sorting coming soon!!*
 
 # (name-of-holy-grail-project)
  * Project Manager:
