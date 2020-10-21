@@ -130,39 +130,49 @@ public class Tester {
     
     public static void main(String[] args) {
         int maxLength   = 50000000;
-        int maxKeyCount = 32767;
+        int maxKeyCount = 25000000;
         
         Tester testClass = new Tester(maxLength, maxKeyCount);
         GrailComparator testCompare = new GrailComparator();
         
-        testClass.checkBoth(     15,      4, "Opti.Gnome", testCompare);
-        testClass.checkBoth(     15,      8, "Opti.Gnome", testCompare);
+        System.out.println("Warming-up the JVM...");
         
-        testClass.checkBoth(1000000,      3, "Strategy 3", testCompare);
-        testClass.checkBoth(1000000,   1023, "Strategy 2", testCompare);
-        testClass.checkBoth(1000000,   2047, "Strategy 1", testCompare);
+        for(int u = 5; u <= (maxLength / 100); u *= 10) {
+            for(int v = 2; v <= u && v <= (maxKeyCount / 100); v *= 2) {
+                testClass.checkAlgorithm(u, v - 1, true, "All Strategies", testCompare);
+            }
+        }
         
-        testClass.checkBoth(10000000,     3, "Strategy 3", testCompare);
-        testClass.checkBoth(10000000,  4095, "Strategy 2", testCompare);
-        testClass.checkBoth(10000000,  8191, "Strategy 1", testCompare);
+        System.out.println("\n*** Testing Grailsort against Timsort ***\n");
         
-        testClass.checkBoth(50000000,     3, "Strategy 3", testCompare);
-        testClass.checkBoth(50000000, 16383, "Strategy 2", testCompare);
-        testClass.checkBoth(50000000, 32767, "Strategy 1", testCompare);
+        testClass.checkBoth(     15,         4, "Opti.Gnome", testCompare);
+        testClass.checkBoth(     15,         8, "Opti.Gnome", testCompare);
         
-        testClass.checkBoth(50000000, 32767, "Strategy 1", testCompare);
-        testClass.checkBoth(50000000, 16383, "Strategy 2", testCompare);
-        testClass.checkBoth(50000000,     3, "Strategy 3", testCompare);
+        testClass.checkBoth(1000000,         3, "Strategy 3", testCompare);
+        testClass.checkBoth(1000000,      1023, "Strategy 2", testCompare);
+        testClass.checkBoth(1000000,    500000, "Strategy 1", testCompare);
         
-        testClass.checkBoth(10000000,  8191, "Strategy 1", testCompare);
-        testClass.checkBoth(10000000,  4095, "Strategy 2", testCompare);
-        testClass.checkBoth(10000000,     3, "Strategy 3", testCompare);
+        testClass.checkBoth(10000000,        3, "Strategy 3", testCompare);
+        testClass.checkBoth(10000000,     4095, "Strategy 2", testCompare);
+        testClass.checkBoth(10000000,  5000000, "Strategy 1", testCompare);
         
-        testClass.checkBoth(1000000,   2047, "Strategy 1", testCompare);
-        testClass.checkBoth(1000000,   1023, "Strategy 2", testCompare);
-        testClass.checkBoth(1000000,      3, "Strategy 3", testCompare);
+        testClass.checkBoth(50000000,        3, "Strategy 3", testCompare);
+        testClass.checkBoth(50000000,    16383, "Strategy 2", testCompare);
+        testClass.checkBoth(50000000, 25000000, "Strategy 1", testCompare);
         
-        testClass.checkBoth(     15,      8, "Opti.Gnome", testCompare);
-        testClass.checkBoth(     15,      4, "Opti.Gnome", testCompare);
+        testClass.checkBoth(50000000, 25000000, "Strategy 1", testCompare);
+        testClass.checkBoth(50000000,    16383, "Strategy 2", testCompare);
+        testClass.checkBoth(50000000,        3, "Strategy 3", testCompare);
+        
+        testClass.checkBoth(10000000,  5000000, "Strategy 1", testCompare);
+        testClass.checkBoth(10000000,     4095, "Strategy 2", testCompare);
+        testClass.checkBoth(10000000,        3, "Strategy 3", testCompare);
+        
+        testClass.checkBoth(1000000,    500000, "Strategy 1", testCompare);
+        testClass.checkBoth(1000000,      1023, "Strategy 2", testCompare);
+        testClass.checkBoth(1000000,         3, "Strategy 3", testCompare);
+        
+        testClass.checkBoth(     15,         8, "Opti.Gnome", testCompare);
+        testClass.checkBoth(     15,         4, "Opti.Gnome", testCompare);
     }
 }

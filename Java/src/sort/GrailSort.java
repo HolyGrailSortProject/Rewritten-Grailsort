@@ -356,17 +356,21 @@ public class GrailSort<K> {
     
     // Swaps Grailsort's "scrolling buffer" from the right side of the array all the way back to 'start'.
     // Costs O(n) operations.
+    //
+    // OFF-BY-ONE BUG FIXED: used to be `int index = start + resetLen`; credit to 666666t for debugging
     private void grailInPlaceBufferReset(K[] array, int start, int resetLen, int bufferLen) {
-        for(int index = start + resetLen; index >= start; index--) {
+        for(int index = start + resetLen - 1; index >= start; index--) {
             this.grailSwap(array, index, index - bufferLen);
         }
     }
     
     // Shifts entire array over 'bufferSize' spaces to make room for the out-of-place merging buffer.
     // Costs O(n) operations.
+    //
+    // OFF-BY-ONE BUG FIXED: used to be `int index = start + resetLen`; credit to 666666t for debugging
     private void grailOutOfPlaceBufferReset(K[] array, int start, int resetLen, int bufferLen) {
-        for(int i = start + resetLen; i >= start; i--) {
-            array[i] = array[i - bufferLen];
+        for(int index = start + resetLen - 1; index >= start; index--) {
+            array[index] = array[index - bufferLen];
         }
     }
     
@@ -374,28 +378,22 @@ public class GrailSort<K> {
     // the right of the buffer. This is used to maintain stability and to continue an ongoing merge that has run out of buffer space.
     // Costs O(sqrt(n)) swaps in the *absolute* worst-case. 
     private void grailInPlaceBufferRewind(K[] array, int start, int buffer, int leftOvers) {
-        buffer--;
-        leftOvers--;
-        
         while(start < buffer) {
-            this.grailSwap(array, buffer, leftOvers);
             buffer--;
             leftOvers--;
+            this.grailSwap(array, buffer, leftOvers);
         }
     }
     
     // Rewinds Grailsort's out-of-place buffer such that any items from a left subarray block left over by a "smart merge" are moved to
     // the right of the buffer. This is used to either maintain stability and to continue an ongoing merge that has run out of buffer space.
     // Costs O(sqrt(n)) writes in the *absolute* worst-case. 
-    private void grailOutOfPlaceBufferRewind(K[] array, int start, int buffer, int leftOvers) {
-        buffer--;
-        leftOvers--;
-        
+    private void grailOutOfPlaceBufferRewind(K[] array, int start, int buffer, int leftOvers) {        
         while(start < buffer) {
-            array[buffer] = array[leftOvers];
             buffer--;
             leftOvers--;
         }
+        array[buffer] = array[leftOvers];
     }
     
     // build blocks of length 'bufferLen'
@@ -501,7 +499,7 @@ public class GrailSort<K> {
         
         int firstRightBlock = offset + (blockCount * blockLen);
         int   prevLeftBlock = firstRightBlock - blockLen;
-
+        
         while(leftBlocks < blockCount && this.grailKeys.compare(array[firstRightBlock],
                                                                 array[  prevLeftBlock]) < 0) {
             leftBlocks++;
@@ -854,9 +852,18 @@ public class GrailSort<K> {
             int medianKey = subarrayLen / blockLen;
             medianKey = this.grailBlockSelectSort(array, keys, start, medianKey, rightBlocks, blockLen);
 
+            // MISSING BOUNDS CHECK BUG FIXED: `lastFragment` *can* be 0 if the `lastSubarray` is evenly
+            //                                 divided into blocks. This prevents Grailsort from going
+            //                                 out of bounds.
             int lastFragment = lastSubarray % blockLen;
-            int leftBlocks = this.grailCountLeftBlocks(array, offset, rightBlocks, blockLen);
-
+            int leftBlocks;
+            if(lastFragment != 0) {
+                leftBlocks = this.grailCountLeftBlocks(array, offset, rightBlocks, blockLen);
+            }
+            else {
+                leftBlocks = 0;
+            }
+            
             int blockCount = rightBlocks - leftBlocks;
             
             if(blockCount == 0) {
@@ -901,8 +908,17 @@ public class GrailSort<K> {
             int medianKey = subarrayLen / blockLen;
             medianKey = this.grailBlockSelectSort(array, keys, start, medianKey, rightBlocks, blockLen);
     
+            // MISSING BOUNDS CHECK BUG FIXED: `lastFragment` *can* be 0 if the `lastSubarray` is evenly
+            //                                 divided into blocks. This prevents Grailsort from going
+            //                                 out of bounds.
             int lastFragment = lastSubarray % blockLen;
-            int leftBlocks = this.grailCountLeftBlocks(array, offset, rightBlocks, blockLen);
+            int leftBlocks;
+            if(lastFragment != 0) {
+                leftBlocks = this.grailCountLeftBlocks(array, offset, rightBlocks, blockLen);
+            }
+            else {
+                leftBlocks = 0;
+            }
     
             int blockCount = rightBlocks - leftBlocks;
             
