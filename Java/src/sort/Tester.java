@@ -41,6 +41,8 @@ public class Tester {
     private GrailPair[] testArray;
     private Integer[] valueArray;
     
+    private String failReason;
+    
     public Tester(int maxLength, int maxKeyCount) {
         this.seed       = 100000001;
         this.testArray  = new GrailPair[maxLength];
@@ -69,21 +71,23 @@ public class Tester {
         }
     }
     
-    private static boolean testArray(GrailPair[] testArray, int length, GrailComparator test) {
+    private boolean testArray(GrailPair[] testArray, int length, GrailComparator test) {
         for(int i = 1; i < length; i++) {
             int compare = test.compare(testArray[i - 1],
                                        testArray[i    ]);
             if(compare > 0) {
+                this.failReason = "testArray[" + (i - 1) + "] and testArray[" + i + "] are out-of-order\n"; 
                 return false;
             }
             else if(compare == 0 && testArray[i - 1].getValue() > testArray[i].getValue()) {
+                this.failReason = "testArray[" + (i - 1) + "] and testArray[" + i + "] are unstable\n";
                 return false;
             }
         }
         return true;
     }
     
-    private void checkAlgorithm(int length, int keyCount, boolean grailSort, String grailStrategy, GrailComparator test) {
+    private void checkAlgorithm(int length, int keyCount, boolean grailSort, String grailStrategy, GrailComparator test) throws Exception {
         this.generateTestArray(length, keyCount);
         
         if(grailSort) {
@@ -111,16 +115,17 @@ public class Tester {
         
         System.out.print("- Sorted in " + time * 1e-6d + "ms...");
         
-        boolean success = Tester.testArray(this.testArray, length, test);
+        boolean success = this.testArray(this.testArray, length, test);
         if(success) {
             System.out.print(" and the sort was successful!\n");
         }
         else {
-            System.out.print(" but the sort was NOT successful!!\n");
+            System.out.print(" but the sort was NOT successful!!\nReason: " + this.failReason);
+            throw new Exception();
         }
     }
     
-    private void checkBoth(int length, int keyCount, String grailStrategy, GrailComparator test) {
+    private void checkBoth(int length, int keyCount, String grailStrategy, GrailComparator test) throws Exception {
         int tempSeed = this.seed;
         this.checkAlgorithm(length, keyCount, true, grailStrategy, test);
         
@@ -137,42 +142,47 @@ public class Tester {
         
         System.out.println("Warming-up the JVM...");
         
-        for(int u = 5; u <= (maxLength / 100); u *= 10) {
-            for(int v = 2; v <= u && v <= (maxKeyCount / 100); v *= 2) {
-                testClass.checkAlgorithm(u, v - 1, true, "All Strategies", testCompare);
+        try {
+            for(int u = 5; u <= (maxLength / 100); u *= 10) {
+                for(int v = 2; v <= u && v <= (maxKeyCount / 100); v *= 2) {
+                    testClass.checkAlgorithm(u, v - 1, true, "All Strategies", testCompare);
+                }
             }
+
+            System.out.println("\n*** Testing Grailsort against Timsort ***\n");
+
+            testClass.checkBoth(     15,         4, "Opti.Gnome", testCompare);
+            testClass.checkBoth(     15,         8, "Opti.Gnome", testCompare);
+
+            testClass.checkBoth(1000000,         3, "Strategy 3", testCompare);
+            testClass.checkBoth(1000000,      1023, "Strategy 2", testCompare);
+            testClass.checkBoth(1000000,    500000, "Strategy 1", testCompare);
+
+            testClass.checkBoth(10000000,        3, "Strategy 3", testCompare);
+            testClass.checkBoth(10000000,     4095, "Strategy 2", testCompare);
+            testClass.checkBoth(10000000,  5000000, "Strategy 1", testCompare);
+
+            testClass.checkBoth(50000000,        3, "Strategy 3", testCompare);
+            testClass.checkBoth(50000000,    16383, "Strategy 2", testCompare);
+            testClass.checkBoth(50000000, 25000000, "Strategy 1", testCompare);
+
+            testClass.checkBoth(50000000, 25000000, "Strategy 1", testCompare);
+            testClass.checkBoth(50000000,    16383, "Strategy 2", testCompare);
+            testClass.checkBoth(50000000,        3, "Strategy 3", testCompare);
+
+            testClass.checkBoth(10000000,  5000000, "Strategy 1", testCompare);
+            testClass.checkBoth(10000000,     4095, "Strategy 2", testCompare);
+            testClass.checkBoth(10000000,        3, "Strategy 3", testCompare);
+
+            testClass.checkBoth(1000000,    500000, "Strategy 1", testCompare);
+            testClass.checkBoth(1000000,      1023, "Strategy 2", testCompare);
+            testClass.checkBoth(1000000,         3, "Strategy 3", testCompare);
+
+            testClass.checkBoth(     15,         8, "Opti.Gnome", testCompare);
+            testClass.checkBoth(     15,         4, "Opti.Gnome", testCompare);
         }
-        
-        System.out.println("\n*** Testing Grailsort against Timsort ***\n");
-        
-        testClass.checkBoth(     15,         4, "Opti.Gnome", testCompare);
-        testClass.checkBoth(     15,         8, "Opti.Gnome", testCompare);
-        
-        testClass.checkBoth(1000000,         3, "Strategy 3", testCompare);
-        testClass.checkBoth(1000000,      1023, "Strategy 2", testCompare);
-        testClass.checkBoth(1000000,    500000, "Strategy 1", testCompare);
-        
-        testClass.checkBoth(10000000,        3, "Strategy 3", testCompare);
-        testClass.checkBoth(10000000,     4095, "Strategy 2", testCompare);
-        testClass.checkBoth(10000000,  5000000, "Strategy 1", testCompare);
-        
-        testClass.checkBoth(50000000,        3, "Strategy 3", testCompare);
-        testClass.checkBoth(50000000,    16383, "Strategy 2", testCompare);
-        testClass.checkBoth(50000000, 25000000, "Strategy 1", testCompare);
-        
-        testClass.checkBoth(50000000, 25000000, "Strategy 1", testCompare);
-        testClass.checkBoth(50000000,    16383, "Strategy 2", testCompare);
-        testClass.checkBoth(50000000,        3, "Strategy 3", testCompare);
-        
-        testClass.checkBoth(10000000,  5000000, "Strategy 1", testCompare);
-        testClass.checkBoth(10000000,     4095, "Strategy 2", testCompare);
-        testClass.checkBoth(10000000,        3, "Strategy 3", testCompare);
-        
-        testClass.checkBoth(1000000,    500000, "Strategy 1", testCompare);
-        testClass.checkBoth(1000000,      1023, "Strategy 2", testCompare);
-        testClass.checkBoth(1000000,         3, "Strategy 3", testCompare);
-        
-        testClass.checkBoth(     15,         8, "Opti.Gnome", testCompare);
-        testClass.checkBoth(     15,         4, "Opti.Gnome", testCompare);
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

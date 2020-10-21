@@ -60,8 +60,8 @@ enum Subarray {
 // Primary author: Summer Dragonfly, with the incredible aid from the rest of
 //                 the team mentioned throughout this file!
 //
-// Current status: BROKEN (Only Strategy 3 and Opti. Gnome are working as of
-//                         10/20/2020)
+// Current status: In-place version POTENTIALLY FIXED as of 10/21/20
+//                 Out-of-place versions HAVE NOT been tested yet!!
 public class GrailSort<K> {
     private Comparator<K> grailKeys;
     
@@ -836,8 +836,9 @@ public class GrailSort<K> {
             
             this.grailInsertSort(array, keys, blockCount);
 
+            // INCORRECT PARAMETER BUG FIXED: `block select sort` should be using `offset`, not `start`
             int medianKey = subarrayLen / blockLen;
-            medianKey = this.grailBlockSelectSort(array, keys, start, medianKey, blockCount, blockLen);
+            medianKey = this.grailBlockSelectSort(array, keys, offset, medianKey, blockCount, blockLen);
             
             this.grailMergeBlocksOutOfPlace(array, keys, keys + medianKey, offset, blockCount, blockLen, 0, 0);
         }
@@ -849,8 +850,9 @@ public class GrailSort<K> {
             
             this.grailInsertSort(array, keys, rightBlocks + 1);
 
+            // INCORRECT PARAMETER BUG FIXED: `block select sort` should be using `offset`, not `start`
             int medianKey = subarrayLen / blockLen;
-            medianKey = this.grailBlockSelectSort(array, keys, start, medianKey, rightBlocks, blockLen);
+            medianKey = this.grailBlockSelectSort(array, keys, offset, medianKey, rightBlocks, blockLen);
 
             // MISSING BOUNDS CHECK BUG FIXED: `lastFragment` *can* be 0 if the `lastSubarray` is evenly
             //                                 divided into blocks. This prevents Grailsort from going
@@ -867,8 +869,9 @@ public class GrailSort<K> {
             int blockCount = rightBlocks - leftBlocks;
             
             if(blockCount == 0) {
+                // INCORRECT PARAMETER BUG FIXED: this merge should be using `offset`, not `start`
                 int leftLength = leftBlocks * blockLen;
-                this.grailOutOfPlaceMerge(array, start, leftLength, lastFragment, blockLen);
+                this.grailOutOfPlaceMerge(array, offset, leftLength, lastFragment, blockLen);
             }
             else {
                 this.grailMergeBlocksOutOfPlace(array, keys, keys + medianKey, offset, blockCount, blockLen, leftBlocks, lastFragment);
@@ -887,8 +890,9 @@ public class GrailSort<K> {
             
             this.grailInsertSort(array, keys, blockCount);
     
+            // INCORRECT PARAMETER BUG FIXED: `block select sort` should be using `offset`, not `start`
             int medianKey = subarrayLen / blockLen;
-            medianKey = this.grailBlockSelectSort(array, keys, start, medianKey, blockCount, blockLen);
+            medianKey = this.grailBlockSelectSort(array, keys, offset, medianKey, blockCount, blockLen);
             
             if(buffer) {
                 this.grailMergeBlocks(array, keys, keys + medianKey, offset, blockCount, blockLen, 0, 0);
@@ -904,9 +908,10 @@ public class GrailSort<K> {
             int rightBlocks = lastSubarray / blockLen;
             
             this.grailInsertSort(array, keys, rightBlocks + 1);
-    
+            
+            // INCORRECT PARAMETER BUG FIXED: `block select sort` should be using `offset`, not `start`
             int medianKey = subarrayLen / blockLen;
-            medianKey = this.grailBlockSelectSort(array, keys, start, medianKey, rightBlocks, blockLen);
+            medianKey = this.grailBlockSelectSort(array, keys, offset, medianKey, rightBlocks, blockLen);
     
             // MISSING BOUNDS CHECK BUG FIXED: `lastFragment` *can* be 0 if the `lastSubarray` is evenly
             //                                 divided into blocks. This prevents Grailsort from going
@@ -925,11 +930,13 @@ public class GrailSort<K> {
             //TODO: Double-check if this micro-optimization works correctly like the original
             if(blockCount == 0) {
                 int leftLength = leftBlocks * blockLen;
+                
+                // INCORRECT PARAMETER BUG FIXED: these merges should be using `offset`, not `start`
                 if(buffer) {
-                    this.grailMergeForwards(array, start, leftLength, lastFragment, blockLen);
+                    this.grailMergeForwards(array, offset, leftLength, lastFragment, blockLen);
                 }
                 else {
-                    this.grailLazyMerge(array, start, leftLength, lastFragment);
+                    this.grailLazyMerge(array, offset, leftLength, lastFragment);
                 }
             }
             else {
