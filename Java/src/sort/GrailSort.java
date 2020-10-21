@@ -51,11 +51,17 @@ enum Subarray {
     RIGHT;
 }
 
-// REWRITTEN GRAILSORT - A heavily refactored C/C++-to-Java version of Andrey
-//                       Astrelin's GrailSort.h, aiming to be as readable and
-//                       intuitive as possible.
+// REWRITTEN GRAILSORT FOR JAVA - A heavily refactored C/C++-to-Java version of
+//                                Andrey Astrelin's GrailSort.h, aiming to be as
+//                                readable and intuitive as possible.
 //
 // ** Written and maintained by <name-of-holy-grail-project>
+//
+// Primary author: Summer Dragonfly, with the incredible aid from the rest of
+//                 the team mentioned throughout this file!
+//
+// Current status: BROKEN (Only Strategy 3 and Opti. Gnome are working as of
+//                         10/20/2020)
 public class GrailSort<K> {
     private Comparator<K> grailKeys;
     
