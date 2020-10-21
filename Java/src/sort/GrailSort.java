@@ -844,6 +844,7 @@ public class GrailSort<K> {
             this.grailMergeBlocksOutOfPlace(array, keys, keys + medianKey, offset, blockCount, blockLen, 0, 0);
         }
 
+        // INCORRECT CONDITIONAL/PARAMETER BUG FIXED: Credit to 666666t for debugging.
         if(lastSubarray != 0) {
             int offset = start + (mergeCount * (2 * subarrayLen));
             int rightBlocks = lastSubarray / blockLen;
@@ -856,12 +857,14 @@ public class GrailSort<K> {
             int lastFragment = lastSubarray % blockLen;
             int leftBlocks = this.grailCountLeftBlocks(array, offset, rightBlocks, blockLen);
 
-            if(rightBlocks == 0) {
+            int blockCount = rightBlocks - leftBlocks;
+            
+            if(blockCount == 0) {
                 int leftLength = leftBlocks * blockLen;
                 this.grailOutOfPlaceMerge(array, start, leftLength, lastFragment, blockLen);
             }
             else {
-                this.grailMergeBlocksOutOfPlace(array, keys, keys + medianKey, offset, rightBlocks - leftBlocks, blockLen, leftBlocks, lastFragment);
+                this.grailMergeBlocksOutOfPlace(array, keys, keys + medianKey, offset, blockCount, blockLen, leftBlocks, lastFragment);
             }
         }
 
@@ -888,6 +891,7 @@ public class GrailSort<K> {
             }
         }
     
+        // INCORRECT CONDITIONAL/PARAMETER BUG FIXED: Credit to 666666t for debugging.
         if(lastSubarray != 0) {
             int offset = start + (mergeCount * (2 * subarrayLen));
             int rightBlocks = lastSubarray / blockLen;
@@ -900,8 +904,10 @@ public class GrailSort<K> {
             int lastFragment = lastSubarray % blockLen;
             int leftBlocks = this.grailCountLeftBlocks(array, offset, rightBlocks, blockLen);
     
+            int blockCount = rightBlocks - leftBlocks;
+            
             //TODO: Double-check if this micro-optimization works correctly like the original
-            if(rightBlocks == 0) {
+            if(blockCount == 0) {
                 int leftLength = leftBlocks * blockLen;
                 if(buffer) {
                     this.grailMergeForwards(array, start, leftLength, lastFragment, blockLen);
@@ -912,10 +918,10 @@ public class GrailSort<K> {
             }
             else {
                 if(buffer) {
-                    this.grailMergeBlocks(array, keys, keys + medianKey, offset, rightBlocks - leftBlocks, blockLen, leftBlocks, lastFragment);
+                    this.grailMergeBlocks(array, keys, keys + medianKey, offset, blockCount, blockLen, leftBlocks, lastFragment);
                 }
                 else {
-                    this.grailLazyMergeBlocks(array, keys, keys + medianKey, offset, rightBlocks - leftBlocks, blockLen, leftBlocks, lastFragment);
+                    this.grailLazyMergeBlocks(array, keys, keys + medianKey, offset, blockCount, blockLen, leftBlocks, lastFragment);
                 }
             }
         }
