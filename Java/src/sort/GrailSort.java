@@ -392,8 +392,8 @@ public class GrailSort<K> {
         while(start < buffer) {
             buffer--;
             leftOvers--;
+            array[buffer] = array[leftOvers];
         }
-        array[buffer] = array[leftOvers];
     }
     
     // build blocks of length 'bufferLen'
