@@ -376,7 +376,7 @@ public class GrailSort<K> {
     
     // Rewinds Grailsort's "scrolling buffer" such that any items from a left subarray block left over by a "smart merge" are moved to
     // the right of the buffer. This is used to maintain stability and to continue an ongoing merge that has run out of buffer space.
-    // Costs O(sqrt(n)) swaps in the *absolute* worst-case. 
+    // Costs O(sqrt n) swaps in the *absolute* worst-case. 
     private void grailInPlaceBufferRewind(K[] array, int start, int buffer, int leftOvers) {
         while(start < buffer) {
             buffer--;
@@ -386,8 +386,8 @@ public class GrailSort<K> {
     }
     
     // Rewinds Grailsort's out-of-place buffer such that any items from a left subarray block left over by a "smart merge" are moved to
-    // the right of the buffer. This is used to either maintain stability and to continue an ongoing merge that has run out of buffer space.
-    // Costs O(sqrt(n)) writes in the *absolute* worst-case. 
+    // the right of the buffer. This is used to maintain stability and to continue an ongoing merge that has run out of buffer space.
+    // Costs O(sqrt n) writes in the *absolute* worst-case. 
     private void grailOutOfPlaceBufferRewind(K[] array, int start, int buffer, int leftOvers) {        
         while(start < buffer) {
             buffer--;
@@ -819,7 +819,9 @@ public class GrailSort<K> {
             lastSubarray = 0;
         }
 
-        if(this.externalBuffer != null) {
+        // INCOMPLETE CONDITIONAL BUG FIXED: In order to combine blocks out-of-place, we must check if a full-sized
+        //                                   block fits into our external buffer.
+        if(buffer && blockLen <= this.externalBufferLength) {
             this.grailCombineOutOfPlace(array, keys, start, length, subarrayLen, blockLen, mergeCount, lastSubarray);
         }
         else {

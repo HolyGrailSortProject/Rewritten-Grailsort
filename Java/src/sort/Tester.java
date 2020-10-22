@@ -39,7 +39,8 @@ public class Tester {
     private int seed;
     
     private GrailPair[] testArray;
-    private Integer[] valueArray;
+    private GrailPair[] referenceArray;
+    private Integer[]   valueArray;
     
     private String failReason;
     
@@ -71,16 +72,20 @@ public class Tester {
         }
     }
     
-    private boolean testArray(GrailPair[] testArray, int length, GrailComparator test) {
+    private boolean testArray(int length, GrailComparator test) {
         for(int i = 1; i < length; i++) {
-            int compare = test.compare(testArray[i - 1],
-                                       testArray[i    ]);
+            int compare = test.compare(this.testArray[i - 1],
+                                       this.testArray[i    ]);
             if(compare > 0) {
                 this.failReason = "testArray[" + (i - 1) + "] and testArray[" + i + "] are out-of-order\n"; 
                 return false;
             }
-            else if(compare == 0 && testArray[i - 1].getValue() > testArray[i].getValue()) {
+            else if(compare == 0 && this.testArray[i - 1].getValue() > this.testArray[i].getValue()) {
                 this.failReason = "testArray[" + (i - 1) + "] and testArray[" + i + "] are unstable\n";
+                return false;
+            }
+            else if(!this.testArray[i - 1].equals(this.referenceArray[i - 1])) {
+                this.failReason = "testArray[" + (i - 1) + "] does not match the reference array\n";
                 return false;
             }
         }
@@ -89,6 +94,7 @@ public class Tester {
     
     private void checkAlgorithm(int length, int keyCount, boolean grailSort, String grailStrategy, GrailComparator test) throws Exception {
         this.generateTestArray(length, keyCount);
+        this.referenceArray = Arrays.copyOf(this.testArray, length);
         
         if(grailSort) {
             System.out.println("\n* Grailsort, " + grailStrategy + " - length = " + length + ", unique items = " + keyCount);
@@ -114,8 +120,9 @@ public class Tester {
         }
         
         System.out.print("- Sorted in " + time * 1e-6d + "ms...");
+        Arrays.sort(this.referenceArray, 0, length, test);
         
-        boolean success = this.testArray(this.testArray, length, test);
+        boolean success = this.testArray(length, test);
         if(success) {
             System.out.print(" and the sort was successful!\n");
         }
