@@ -60,15 +60,15 @@ enum Subarray {
 // Primary author: Summer Dragonfly, with the incredible aid from the rest of
 //                 the team mentioned throughout this file!
 //
-// Current status: In-place version POTENTIALLY FIXED as of 10/21/20
-//                 Out-of-place versions HAVE NOT been tested yet!!
+// Current status: EVERY VERSION PASSING ALL TESTS / POTENTIALLY FIXED as of
+//                 10/23/20
 public class GrailSort<K> {
     private Comparator<K> grailKeys;
     
     private K[] externalBuffer;
     private int externalBufferLength;
 
-    private int staticExternalBufferLen;
+    protected int staticExternalBufferLen;
     
     private int currentBlockLen;
     private Subarray currentBlockOrigin;
@@ -377,21 +377,25 @@ public class GrailSort<K> {
     // Rewinds Grailsort's "scrolling buffer" such that any items from a left subarray block left over by a "smart merge" are moved to
     // the right of the buffer. This is used to maintain stability and to continue an ongoing merge that has run out of buffer space.
     // Costs O(sqrt n) swaps in the *absolute* worst-case. 
-    private void grailInPlaceBufferRewind(K[] array, int start, int buffer, int leftOvers) {
-        while(start < buffer) {
-            buffer--;
+    //
+    // NAMING IMPROVED: the left over items are in the middle of the middle while the buffer is at the end
+    private void grailInPlaceBufferRewind(K[] array, int start, int leftOvers, int buffer) {
+        while(leftOvers > start) {
             leftOvers--;
+            buffer--;
             this.grailSwap(array, buffer, leftOvers);
         }
     }
     
     // Rewinds Grailsort's out-of-place buffer such that any items from a left subarray block left over by a "smart merge" are moved to
     // the right of the buffer. This is used to maintain stability and to continue an ongoing merge that has run out of buffer space.
-    // Costs O(sqrt n) writes in the *absolute* worst-case. 
-    private void grailOutOfPlaceBufferRewind(K[] array, int start, int buffer, int leftOvers) {        
-        while(start < buffer) {
-            buffer--;
+    // Costs O(sqrt n) writes in the *absolute* worst-case.
+    //
+    // INCORRECT ORDER OF PARAMETERS BUG FIXED: `leftOvers` should be the middle, and `buffer` should be the end
+    private void grailOutOfPlaceBufferRewind(K[] array, int start, int leftOvers, int buffer) {
+        while(leftOvers > start) {
             leftOvers--;
+            buffer--;
             array[buffer] = array[leftOvers];
         }
     }
@@ -1058,7 +1062,7 @@ public class GrailSort<K> {
         return minKeys; 
      }
     
-    private void grailCommonSort(K[] array, int start, int length, K[] extBuf, int extBufLen) {
+    protected void grailCommonSort(K[] array, int start, int length, K[] extBuf, int extBufLen) {
         if(length < 16) {
             this.grailInsertSort(array, start, length);
             return;
