@@ -1,5 +1,5 @@
 # The Rewritten Grailsort repo
-A diverse array of heavily refactored versions of Andrey Astrelin's GrailSort.h, aiming to be as readable and intuitive as possible. *Owned and maintained by (name-of-holy-grail-project).*
+A diverse array of heavily refactored versions of Andrey Astrelin's GrailSort.h, aiming to be as readable and intuitive as possible. *Owned and maintained by The Holy Grail Sort Project.*
 
 # Current implementations featured in our repo:
 * Summer Dragonfly et al.'s Rewritten Grailsort for **Java** (ALL TESTS PASSING / POTENTIALLY FIXED) 
@@ -42,7 +42,7 @@ Now, there *are* some glaring flaws with Grailsort, but they're now easier than 
 - Official Wikipedia for Block (Merge) Sort: https://en.wikipedia.org/wiki/Block_sort
 - *Full documentation/educational lessons on Grailsort and Block Merge Sorting coming soon!!*
 
-# (name-of-holy-grail-project)
+# The Holy Grail Sort Project
  * Project Manager:
    * Summer Dragonfly / MusicTheorist
  * Project Contributors:
