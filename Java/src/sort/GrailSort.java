@@ -7,7 +7,7 @@ import java.util.Comparator;
  * MIT License
  * 
  * Copyright (c) 2013 Andrey Astrelin
- * Copyright (c) 2020 <name-of-holy-grail-project>
+ * Copyright (c) 2020 The Holy Grail Sort Project
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ import java.util.Comparator;
  */
 
 /*
- * <name-of-holy-grail-project>
+ * The Holy Grail Sort Project
  * Project Manager:      Summer Dragonfly
  * Project Contributors: 666666t
  *                       Anonymous0726
@@ -55,7 +55,7 @@ enum Subarray {
 //                                Andrey Astrelin's GrailSort.h, aiming to be as
 //                                readable and intuitive as possible.
 //
-// ** Written and maintained by <name-of-holy-grail-project>
+// ** Written and maintained by The Holy Grail Sort Project
 //
 // Primary author: Summer Dragonfly, with the incredible aid from the rest of
 //                 the team mentioned throughout this file!
