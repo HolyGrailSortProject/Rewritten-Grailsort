@@ -123,8 +123,8 @@ public class Tester {
 
             // Grailsort with static buffer
             if(grailBufferType == 1) {
-                buffer    = (GrailPair[]) Array.newInstance(this.keyArray[0].getClass(), grail.staticExternalBufferLen);
-                bufferLen = grail.staticExternalBufferLen;
+                buffer    = (GrailPair[]) Array.newInstance(this.keyArray[0].getClass(), GrailSort.GRAIL_STATIC_EXT_BUF_LEN);
+                bufferLen = GrailSort.GRAIL_STATIC_EXT_BUF_LEN;
             }
             // Grailsort with dynamic buffer
             else if(grailBufferType == 2) {
@@ -158,7 +158,7 @@ public class Tester {
         }
         
         // Sometimes the garbage collector wasn't cooperating.
-        Arrays.fill(this.keyArray,      null);
+        Arrays.fill(this.keyArray,       null);
         Arrays.fill(this.valueArray,     null);
         Arrays.fill(this.referenceArray, null);
         System.gc();
