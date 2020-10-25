@@ -90,7 +90,8 @@ class GrailSort {
         if (srcArray === destArray) {
             srcArray.copyWithin(destPos, srcPos, srcPos + copyLen);
         } else {
-            if (srcPos === 0 && copyLen === srcArray.copyLen) {
+            // FIXED INCORRECT MEMBER NAME BUG 'srcArray.copyLen': should be -> srcArray.length
+            if (srcPos === 0 && copyLen === srcArray.length) {
                 destArray = srcArray.slice();
             } else {
                 for (let i = 0; i < copyLen; i++) {
