@@ -52,7 +52,7 @@ const GrailSort = require('./GrailSort');
 //
 // Primary author: Enver
 //
-// Current status: Finished. Potentially 100% working... Passing all most tests, some tests capped by V8 Engine memory allocation limits
+// Current status: Finished. Potentially 100% working... Passing most tests, some tests capped by V8 Engine memory allocation limits
 
 const getTimestamp = function () {
   return new Date().getTime();

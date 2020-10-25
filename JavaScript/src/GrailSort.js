@@ -55,7 +55,7 @@ const Subarray = {
 //
 // Primary author: Enver
 //
-// Current status: Finished. Potentially 100% working... Passing all most tests, some tests capped by V8 Engine memory allocation limits
+// Current status: Finished. Potentially 100% working... Passing most tests, some tests capped by V8 Engine memory allocation limits
 
 class GrailSort {
     static GRAIL_STATIC_EXT_BUF_LEN = 512;
