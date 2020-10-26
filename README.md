@@ -6,6 +6,7 @@ A diverse array of heavily refactored versions of Andrey Astrelin's GrailSort.h,
 * 666666t's Rewritten Grailsort for **Rust**
 * thatsOven's Rewritten Grailsort for **Python**
 * Enver's Rewritten Grailsort for **JavaScript**
+* Summer Dragonfly's *Simple* Rewritten Grailsort for **C**
 * *more to come!*
 
 # What is Grailsort?
