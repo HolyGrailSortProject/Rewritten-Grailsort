@@ -2,7 +2,7 @@
 def compareVal(a, b):
     return (a > b) - (a < b) 
 
-def arrayCopy(fromArray, fromIndex, toArray, toIndex, length):
+def arrayCopy(fromArray, fromIndex, toArray, toIndex, length):   # thanks to Bee Sort for improving readability on this function
     toArray[toIndex:toIndex + length] = fromArray[fromIndex:fromIndex + length]
 
 
