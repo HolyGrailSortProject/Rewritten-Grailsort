@@ -357,7 +357,7 @@ public class GrailSort<K> {
             start -= mergeLen;
         }
         
-        int fullMerge  = 2 * bufferLen; 
+        int fullMerge   = 2 * bufferLen; 
         int finalBlock  = length % fullMerge;
         int finalOffset = start + length - finalBlock;
     
@@ -839,9 +839,11 @@ public class GrailSort<K> {
 
     //TODO: Double-check "Merge Blocks" arguments
     private void grailCombineInPlace(K[] array, int keys, int start, int length, int subarrayLen, int blockLen, int mergeCount, int lastSubarray, boolean buffer) {
+        int fullMerge = 2 * subarrayLen;
+        
         for(int mergeIndex = 0; mergeIndex < mergeCount; mergeIndex++) {
-            int offset = start + (mergeIndex * (2 * subarrayLen));
-            int blockCount = (2 * subarrayLen) / blockLen;
+            int offset = start + (mergeIndex * fullMerge);
+            int blockCount = fullMerge / blockLen;
             
             this.grailInsertSort(array, keys, blockCount);
     
@@ -859,7 +861,7 @@ public class GrailSort<K> {
     
         // INCORRECT CONDITIONAL/PARAMETER BUG FIXED: Credit to 666666t for debugging.
         if(lastSubarray != 0) {
-            int offset = start + (mergeCount * (2 * subarrayLen));
+            int offset = start + (mergeCount * fullMerge);
             int rightBlocks = lastSubarray / blockLen;
             
             this.grailInsertSort(array, keys, rightBlocks + 1);
@@ -911,10 +913,12 @@ public class GrailSort<K> {
 
     private void grailCombineOutOfPlace(K[] array, int keys, int start, int length, int subarrayLen, int blockLen, int mergeCount, int lastSubarray) {
         System.arraycopy(array, start - blockLen, this.externalBuffer, 0, blockLen);
-
+        
+        int fullMerge = 2 * subarrayLen;
+        
         for(int mergeIndex = 0; mergeIndex < mergeCount; mergeIndex++) {
-            int offset = start + (mergeIndex * (2 * subarrayLen));
-            int blockCount = (2 * subarrayLen) / blockLen;
+            int offset = start + (mergeIndex * fullMerge);
+            int blockCount = fullMerge / blockLen;
             
             this.grailInsertSort(array, keys, blockCount);
 
@@ -927,7 +931,7 @@ public class GrailSort<K> {
 
         // INCORRECT CONDITIONAL/PARAMETER BUG FIXED: Credit to 666666t for debugging.
         if(lastSubarray != 0) {
-            int offset = start + (mergeCount * (2 * subarrayLen));
+            int offset = start + (mergeCount * fullMerge);
             int rightBlocks = lastSubarray / blockLen;
             
             this.grailInsertSort(array, keys, rightBlocks + 1);
@@ -967,8 +971,9 @@ public class GrailSort<K> {
     // 'keys' are on the left side of array. Blocks of length 'subarrayLen' combined. We'll combine them in pairs
     // 'subarrayLen' is a power of 2. (2 * subarrayLen / blockLen) keys are guaranteed
     private void grailCombineBlocks(K[] array, int keys, int start, int length, int subarrayLen, int blockLen, boolean buffer) {
-        int   mergeCount = length / (2 * subarrayLen);
-        int lastSubarray = length - (2 * subarrayLen * mergeCount);
+        int    fullMerge = 2 * subarrayLen;
+        int   mergeCount = length /  fullMerge;
+        int lastSubarray = length - (fullMerge * mergeCount);
     
         if(lastSubarray <= subarrayLen) {
             length -= lastSubarray;
@@ -1048,10 +1053,12 @@ public class GrailSort<K> {
             }
         }
         for(int mergeLen = 2; mergeLen < length; mergeLen *= 2) {
-            int mergeIndex;
-            int mergeEnd = length - (2 * mergeLen);
+            int fullMerge = 2 * mergeLen;
             
-            for(mergeIndex = 0; mergeIndex <= mergeEnd; mergeIndex += (2 * mergeLen)) {
+            int mergeIndex;
+            int mergeEnd = length - fullMerge;
+            
+            for(mergeIndex = 0; mergeIndex <= mergeEnd; mergeIndex += fullMerge) {
                 this.grailLazyMerge(array, start + mergeIndex, mergeLen, mergeLen);
             }
             
