@@ -335,13 +335,13 @@ public class GrailSort<K> {
 
     private void grailBuildInPlace(K[] array, int start, int length, int currentMerge, int bufferLen) {    
         for(int mergeLen = currentMerge; mergeLen < bufferLen; mergeLen *= 2) {
-            int bothMerges = 2 * mergeLen;
+            int fullMerge = 2 * mergeLen;
             
             int mergeIndex;
-            int mergeEnd = start + length - bothMerges;
+            int mergeEnd = start + length - fullMerge;
             int bufferOffset = mergeLen;
     
-            for(mergeIndex = start; mergeIndex <= mergeEnd; mergeIndex += bothMerges) {
+            for(mergeIndex = start; mergeIndex <= mergeEnd; mergeIndex += fullMerge) {
                 this.grailMergeForwards(array, mergeIndex, mergeLen, mergeLen, bufferOffset);
             }
     
@@ -357,8 +357,8 @@ public class GrailSort<K> {
             start -= mergeLen;
         }
         
-        int bothMerges  = 2 * bufferLen; 
-        int finalBlock  = length % bothMerges;
+        int fullMerge  = 2 * bufferLen; 
+        int finalBlock  = length % fullMerge;
         int finalOffset = start + length - finalBlock;
     
         if(finalBlock <= bufferLen) {
@@ -368,7 +368,7 @@ public class GrailSort<K> {
             this.grailMergeBackwards(array, finalOffset, bufferLen, finalBlock - bufferLen, bufferLen);
         }
     
-        for(int mergeIndex = finalOffset - bothMerges; mergeIndex >= start; mergeIndex -= bothMerges) {
+        for(int mergeIndex = finalOffset - fullMerge; mergeIndex >= start; mergeIndex -= fullMerge) {
             this.grailMergeBackwards(array, mergeIndex, bufferLen, bufferLen, bufferLen);
         }
     }
@@ -381,13 +381,13 @@ public class GrailSort<K> {
         
         int mergeLen;
         for(mergeLen = 2; mergeLen < externLen; mergeLen *= 2) {
-            int bothMerges = 2 * mergeLen;
+            int fullMerge = 2 * mergeLen;
             
             int mergeIndex;
-            int mergeEnd = start + length - bothMerges;
+            int mergeEnd = start + length - fullMerge;
             int bufferOffset = mergeLen;
     
-            for(mergeIndex = start; mergeIndex <= mergeEnd; mergeIndex += bothMerges) {
+            for(mergeIndex = start; mergeIndex <= mergeEnd; mergeIndex += fullMerge) {
                 this.grailMergeOutOfPlace(array, mergeIndex, mergeLen, mergeLen, bufferOffset);
             }
     
