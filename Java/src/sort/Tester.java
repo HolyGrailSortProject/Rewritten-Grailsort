@@ -109,12 +109,12 @@ public class Tester {
         return (int) (((long) (this.seed & 0x7fffffff) * key) >> 31);
     }
     
-    private void generateTestArray(int length, int keyCount) {
+    private void generateTestArray(int start, int length, int keyCount) {
         for(int i = 0; i < keyCount; i++) {
             this.valueArray[i] = 0;
         }
         
-        for(int i = 0; i < length; i++) {
+        for(int i = start; i < start + length; i++) {
             if(keyCount != 0) {
                 int key = this.getRandomNumber(keyCount);
                 this.keyArray[i] = new GrailPair(key, this.valueArray[key]);
@@ -126,8 +126,8 @@ public class Tester {
         }
     }
     
-    private boolean testArray(int length, GrailComparator test) {
-        for(int i = 1; i < length; i++) {
+    private boolean testArray(int start, int length, GrailComparator test) {
+        for(int i = start + 1; i < start + length; i++) {
             int compare = test.compare(this.keyArray[i - 1],
                                        this.keyArray[i    ]);
             if(compare > 0) {
@@ -146,9 +146,9 @@ public class Tester {
         return true;
     }
     
-    private void checkAlgorithm(int length, int keyCount, boolean grailSort, int grailBufferType, String grailStrategy, GrailComparator test) throws Exception {
-        this.generateTestArray(length, keyCount);
-        this.referenceArray = Arrays.copyOf(this.keyArray, length);
+    private void checkAlgorithm(int start, int length, int keyCount, boolean grailSort, int grailBufferType, String grailStrategy, GrailComparator test) throws Exception {
+        this.generateTestArray(start, length, keyCount);
+        this.referenceArray = Arrays.copyOf(this.keyArray, start + length);
         
         String grailType = "w/o External Buffer";
         if(grailBufferType == 1) {
@@ -159,13 +159,13 @@ public class Tester {
         }
         
         if(grailSort) {
-            System.out.println("\n* Grailsort " + grailType + ", " + grailStrategy + " \n* length = " + length + ", unique items = " + keyCount);
+            System.out.println("\n* Grailsort " + grailType + ", " + grailStrategy + " \n* start = " + start + ", length = " + length + ", unique items = " + keyCount);
         }
         else {
-            System.out.println("\n* Arrays.sort (Timsort)  \n* length = " + length + ", unique items = " + keyCount);
+            System.out.println("\n* Arrays.sort (Timsort)  \n* start = " + start + ", length = " + length + ", unique items = " + keyCount);
         }
         
-        long start;
+        long begin;
         long time;
         
         if(grailSort) {
@@ -176,7 +176,7 @@ public class Tester {
 
             // Grailsort with static buffer
             if(grailBufferType == 1) {
-                buffer    = (GrailPair[]) Array.newInstance(this.keyArray[0].getClass(), GrailSort.GRAIL_STATIC_EXT_BUF_LEN);
+                buffer    = (GrailPair[]) Array.newInstance(this.keyArray.getClass().getComponentType(), GrailSort.GRAIL_STATIC_EXT_BUF_LEN);
                 bufferLen = GrailSort.GRAIL_STATIC_EXT_BUF_LEN;
             }
             // Grailsort with dynamic buffer
@@ -185,23 +185,23 @@ public class Tester {
                 while((bufferLen * bufferLen) < length) {
                     bufferLen *= 2;
                 }
-                buffer = (GrailPair[]) Array.newInstance(this.keyArray[0].getClass(), bufferLen);
+                buffer = (GrailPair[]) Array.newInstance(this.keyArray.getClass().getComponentType(), bufferLen);
             }
             
-            start = System.nanoTime();
-            grail.grailCommonSort(this.keyArray, 0, length, buffer, bufferLen);
-            time = System.nanoTime() - start;
+            begin = System.nanoTime();
+            grail.grailCommonSort(this.keyArray, start, length, buffer, bufferLen);
+            time = System.nanoTime() - begin;
         }
         else {
-            start = System.nanoTime();
-            Arrays.sort(this.keyArray, 0, length, test);
-            time = System.nanoTime() - start;
+            begin = System.nanoTime();
+            Arrays.sort(this.keyArray, start, start + length, test);
+            time = System.nanoTime() - begin;
         }
         
         System.out.print("- Sorted in " + time * 1e-6d + "ms...");
-        Arrays.sort(this.referenceArray, 0, length, test);
+        Arrays.sort(this.referenceArray, start, start + length, test);
         
-        boolean success = this.testArray(length, test);
+        boolean success = this.testArray(start, length, test);
         if(success) {
             System.out.print(" and the sort was successful!\n");
         }
@@ -217,14 +217,20 @@ public class Tester {
         System.gc();
     }
     
-    private void checkBoth(int length, int keyCount, String grailStrategy, GrailComparator test) throws Exception {
+    private void checkBoth(int start, int length, int keyCount, String grailStrategy, GrailComparator test) throws Exception {
         int tempSeed = this.seed;
-        for(int i = 0; i < 3; i++) {
-            this.checkAlgorithm(length, keyCount, true, i, grailStrategy, test);
+        if(!grailStrategy.equals("Opti.Gnome")) {
+            for(int i = 0; i < 3; i++) {
+                this.checkAlgorithm(start, length, keyCount, true, i, grailStrategy, test);
+                this.seed = tempSeed;
+            }
+        }
+        else {
+            this.checkAlgorithm(start, length, keyCount, true, 0, grailStrategy, test);
             this.seed = tempSeed;
         }
 
-        this.checkAlgorithm(length, keyCount, false, 0, null, test);
+        this.checkAlgorithm(start, length, keyCount, false, 0, null, test);
     }
     
     public static void main(String[] args) {
@@ -240,42 +246,63 @@ public class Tester {
             for(int u = 5; u <= (maxLength / 100); u *= 10) {
                 for(int v = 2; v <= u && v <= (maxKeyCount / 100); v *= 2) {
                     for(int i = 0; i < 3; i++) {
-                        testClass.checkAlgorithm(u, v - 1, true, i, "All Strategies", testCompare);
+                        testClass.checkAlgorithm(0, u, v - 1, true, i, "All Strategies", testCompare);
                     }
                 }
             }
 
             System.out.println("\n*** Testing Grailsort against Timsort ***");
 
-            testClass.checkBoth(      15,        4, "Opti.Gnome", testCompare);
-            testClass.checkBoth(      15,        8, "Opti.Gnome", testCompare);
+            testClass.checkBoth(       0,       15,        4, "Opti.Gnome", testCompare);
+            testClass.checkBoth(       0,       15,        8, "Opti.Gnome", testCompare);
+            testClass.checkBoth(       7,        8,        4, "Opti.Gnome", testCompare);
+            
+            testClass.checkBoth(       0,  1000000,        3, "Strategy 3", testCompare);
+            testClass.checkBoth(       0,  1000000,     1023, "Strategy 2", testCompare);
+            testClass.checkBoth(       0,  1000000,   500000, "Strategy 1", testCompare);
+            testClass.checkBoth(  500000,   500000,        3, "Strategy 3", testCompare);
+            testClass.checkBoth(  500000,   500000,      511, "Strategy 2", testCompare);
+            testClass.checkBoth(  500000,   500000,   250000, "Strategy 1", testCompare);
 
-            testClass.checkBoth( 1000000,        3, "Strategy 3", testCompare);
-            testClass.checkBoth( 1000000,     1023, "Strategy 2", testCompare);
-            testClass.checkBoth( 1000000,   500000, "Strategy 1", testCompare);
+            testClass.checkBoth(       0, 10000000,        3, "Strategy 3", testCompare);
+            testClass.checkBoth(       0, 10000000,     4095, "Strategy 2", testCompare);
+            testClass.checkBoth(       0, 10000000,  5000000, "Strategy 1", testCompare);
+            testClass.checkBoth( 5000000,  5000000,        3, "Strategy 3", testCompare);
+            testClass.checkBoth( 5000000,  5000000,     2047, "Strategy 2", testCompare);
+            testClass.checkBoth( 5000000,  5000000,  2500000, "Strategy 1", testCompare);
 
-            testClass.checkBoth(10000000,        3, "Strategy 3", testCompare);
-            testClass.checkBoth(10000000,     4095, "Strategy 2", testCompare);
-            testClass.checkBoth(10000000,  5000000, "Strategy 1", testCompare);
+            testClass.checkBoth(       0, 50000000,        3, "Strategy 3", testCompare);
+            testClass.checkBoth(       0, 50000000,    16383, "Strategy 2", testCompare);
+            testClass.checkBoth(       0, 50000000, 25000000, "Strategy 1", testCompare);
+            testClass.checkBoth(25000000, 25000000,        3, "Strategy 3", testCompare);
+            testClass.checkBoth(25000000, 25000000,     8191, "Strategy 2", testCompare);
+            testClass.checkBoth(25000000, 25000000, 12500000, "Strategy 1", testCompare);
+            
 
-            testClass.checkBoth(50000000,        3, "Strategy 3", testCompare);
-            testClass.checkBoth(50000000,    16383, "Strategy 2", testCompare);
-            testClass.checkBoth(50000000, 25000000, "Strategy 1", testCompare);
+            testClass.checkBoth(25000000, 25000000, 12500000, "Strategy 1", testCompare);
+            testClass.checkBoth(25000000, 25000000,     8191, "Strategy 2", testCompare);
+            testClass.checkBoth(25000000, 25000000,        3, "Strategy 3", testCompare);
+            testClass.checkBoth(       0, 50000000, 25000000, "Strategy 1", testCompare);
+            testClass.checkBoth(       0, 50000000,    16383, "Strategy 2", testCompare);
+            testClass.checkBoth(       0, 50000000,        3, "Strategy 3", testCompare);
 
-            testClass.checkBoth(50000000, 25000000, "Strategy 1", testCompare);
-            testClass.checkBoth(50000000,    16383, "Strategy 2", testCompare);
-            testClass.checkBoth(50000000,        3, "Strategy 3", testCompare);
+            testClass.checkBoth( 5000000,  5000000,  2500000, "Strategy 1", testCompare);
+            testClass.checkBoth( 5000000,  5000000,     2047, "Strategy 2", testCompare);
+            testClass.checkBoth( 5000000,  5000000,        3, "Strategy 3", testCompare);
+            testClass.checkBoth(       0, 10000000,  5000000, "Strategy 1", testCompare);
+            testClass.checkBoth(       0, 10000000,     4095, "Strategy 2", testCompare);
+            testClass.checkBoth(       0, 10000000,        3, "Strategy 3", testCompare);
 
-            testClass.checkBoth(10000000,  5000000, "Strategy 1", testCompare);
-            testClass.checkBoth(10000000,     4095, "Strategy 2", testCompare);
-            testClass.checkBoth(10000000,        3, "Strategy 3", testCompare);
+            testClass.checkBoth(  500000,   500000,   250000, "Strategy 1", testCompare);
+            testClass.checkBoth(  500000,   500000,      511, "Strategy 2", testCompare);
+            testClass.checkBoth(  500000,   500000,        3, "Strategy 3", testCompare);
+            testClass.checkBoth(       0,  1000000,   500000, "Strategy 1", testCompare);
+            testClass.checkBoth(       0,  1000000,     1023, "Strategy 2", testCompare);
+            testClass.checkBoth(       0,  1000000,        3, "Strategy 3", testCompare);
 
-            testClass.checkBoth( 1000000,   500000, "Strategy 1", testCompare);
-            testClass.checkBoth( 1000000,     1023, "Strategy 2", testCompare);
-            testClass.checkBoth( 1000000,        3, "Strategy 3", testCompare);
-
-            testClass.checkBoth(      15,        8, "Opti.Gnome", testCompare);
-            testClass.checkBoth(      15,        4, "Opti.Gnome", testCompare);
+            testClass.checkBoth(       7,        8,        4, "Opti.Gnome", testCompare);
+            testClass.checkBoth(       0,       15,        8, "Opti.Gnome", testCompare);
+            testClass.checkBoth(       0,       15,        4, "Opti.Gnome", testCompare);
             
             System.out.println("\nAll tests passed successfully!!");
         }
