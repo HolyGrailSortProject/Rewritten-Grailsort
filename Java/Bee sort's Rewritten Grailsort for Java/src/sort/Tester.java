@@ -42,7 +42,8 @@ import java.util.Comparator;
  *                       MP
  *                       phoenixbound
  *                       thatsOven
- *                       
+ *                       Bee sort
+ *
  * Special thanks to "The Studio" Discord community!
  */
 
