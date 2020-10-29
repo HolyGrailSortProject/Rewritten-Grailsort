@@ -424,11 +424,18 @@ public class GrailSort<K> {
                 externLen = bufferLen;
             }
             else {
+                //TODO: Test if this is faster than the original
                 // max power of 2 -- just in case
-                externLen = 1;
-                while((externLen * 2) <= this.externalBufferLen) {
-                    externLen *= 2;
-                }
+                // Find max power where it is less or equal to this.externalBufferLen
+                // Original version:
+                // externLen = 1;
+                // while((externLen * 2) <= this.externalBufferLen) {
+                //     externLen *= 2;
+                // }
+                // Optimized version:
+                externLen = (int) Math.log(this.externalBufferLen);
+                externLen /= Math.log(2);
+                externLen = (int) Math.pow(2,externLen);
             }
             
             this.grailBuildOutOfPlace(array, start, length, bufferLen, externLen);
