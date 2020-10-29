@@ -44,7 +44,7 @@ use std::cmp::Ordering;
  */
 
 #[derive(PartialEq)]
-enum Subarray {
+pub enum Subarray {
     Right,
     Left,
 }
@@ -73,13 +73,13 @@ pub fn grail_sort_with_dynamic_buffer<T: Sortable + Default>(set: &mut [T], len:
     grail_common_sort(set, 0, len, &mut container);
 }
 
-fn grail_block_swap<T: Sortable>(set: &mut [T], point_a: usize, point_b: usize, block_len: usize) {
+pub fn grail_block_swap<T: Sortable>(set: &mut [T], point_a: usize, point_b: usize, block_len: usize) {
     for i in 0..block_len {
         set.swap(point_a + i, point_b + i);
     }
 }
 
-fn grail_rotate<T: Sortable>(
+pub fn grail_rotate<T: Sortable>(
     set: &mut [T],
     mut start: usize,
     mut left_len: usize,
@@ -102,7 +102,7 @@ fn grail_rotate<T: Sortable>(
     }
 }
 
-fn grail_binary_search_left<T: Sortable>(
+pub fn grail_binary_search_left<T: Sortable>(
     set: &[T],
     start: usize,
     length: usize,
@@ -121,7 +121,7 @@ fn grail_binary_search_left<T: Sortable>(
     left
 }
 
-fn grail_binary_search_right<T: Sortable>(
+pub fn grail_binary_search_right<T: Sortable>(
     set: &[T],
     start: usize,
     length: usize,
@@ -140,7 +140,7 @@ fn grail_binary_search_right<T: Sortable>(
     right
 }
 
-fn grail_collect_keys<T: Sortable>(
+pub fn grail_collect_keys<T: Sortable>(
     set: &mut [T],
     start: usize,
     length: usize,
@@ -185,7 +185,7 @@ fn grail_collect_keys<T: Sortable>(
     keys_found
 }
 
-fn grail_pairwise_swaps<T: Sortable>(set: &mut [T], start: usize, length: usize) {
+pub fn grail_pairwise_swaps<T: Sortable>(set: &mut [T], start: usize, length: usize) {
     let mut index = 1;
     while index < length {
         let left = start + index - 1;
@@ -208,7 +208,7 @@ fn grail_pairwise_swaps<T: Sortable>(set: &mut [T], start: usize, length: usize)
     }
 }
 
-fn grail_pairwise_writes<T: Sortable>(set: &mut [T], start: usize, length: usize) {
+pub fn grail_pairwise_writes<T: Sortable>(set: &mut [T], start: usize, length: usize) {
     let mut index = 1;
     while index < length {
         let left = start + index - 1;
@@ -231,7 +231,7 @@ fn grail_pairwise_writes<T: Sortable>(set: &mut [T], start: usize, length: usize
     }
 }
 
-fn grail_block_select_sort<T: Sortable>(
+pub fn grail_block_select_sort<T: Sortable>(
     set: &mut [T],
     keys: usize,
     start: usize,
@@ -276,7 +276,7 @@ fn grail_block_select_sort<T: Sortable>(
     median_key
 }
 
-fn grail_merge_forwards<T: Sortable>(
+pub fn grail_merge_forwards<T: Sortable>(
     set: &mut [T],
     start: usize,
     left_len: usize,
@@ -305,7 +305,7 @@ fn grail_merge_forwards<T: Sortable>(
     }
 }
 
-fn grail_merge_backwards<T: Sortable>(
+pub fn grail_merge_backwards<T: Sortable>(
     set: &mut [T],
     start: usize,
     left_len: usize,
@@ -337,7 +337,7 @@ fn grail_merge_backwards<T: Sortable>(
     }
 }
 
-fn grail_out_of_place_merge<T: Sortable>(
+pub fn grail_out_of_place_merge<T: Sortable>(
     set: &mut [T],
     start: usize,
     left_len: usize,
@@ -371,7 +371,7 @@ fn grail_out_of_place_merge<T: Sortable>(
 }
 
 #[allow(dead_code)]
-fn grail_in_place_buffer_reset<T: Sortable>(
+pub fn grail_in_place_buffer_reset<T: Sortable>(
     set: &mut [T],
     start: usize,
     reset_len: usize,
@@ -385,7 +385,7 @@ fn grail_in_place_buffer_reset<T: Sortable>(
 }
 
 #[allow(dead_code)]
-fn grail_out_of_place_buffer_reset<T: Sortable>(
+pub fn grail_out_of_place_buffer_reset<T: Sortable>(
     set: &mut [T],
     start: usize,
     reset_len: usize,
@@ -399,7 +399,7 @@ fn grail_out_of_place_buffer_reset<T: Sortable>(
 }
 
 #[allow(dead_code)]
-fn grail_in_place_buffer_rewind<T: Sortable>(
+pub fn grail_in_place_buffer_rewind<T: Sortable>(
     set: &mut [T],
     start: usize,
     mut left_overs: usize,
@@ -413,7 +413,7 @@ fn grail_in_place_buffer_rewind<T: Sortable>(
 }
 
 #[allow(dead_code)]
-fn grail_out_of_place_buffer_rewind<T: Sortable>(
+pub fn grail_out_of_place_buffer_rewind<T: Sortable>(
     set: &mut [T],
     start: usize,
     mut left_overs: usize,
@@ -426,7 +426,7 @@ fn grail_out_of_place_buffer_rewind<T: Sortable>(
     }
 }
 
-fn grail_build_blocks<T: Sortable>(
+pub fn grail_build_blocks<T: Sortable>(
     set: &mut [T],
     buffer: &mut Option<&mut [T]>,
     start: usize,
@@ -454,7 +454,7 @@ fn grail_build_blocks<T: Sortable>(
     }
 }
 
-fn grail_build_out_of_place<T: Sortable>(
+pub fn grail_build_out_of_place<T: Sortable>(
     set: &mut [T],
     buffer: &mut [T],
     mut start: usize,
@@ -470,12 +470,13 @@ fn grail_build_out_of_place<T: Sortable>(
     let mut merge_len = 2;
     while merge_len < extern_len {
         let mut merge_index = start;
-        let merge_end = start + length - (2 * merge_len);
+        let both_merges = 2 * merge_len;
+        let merge_end = start + length - both_merges;
         let buffer_offset: isize = merge_len as isize;
 
         while merge_index <= merge_end {
             grail_out_of_place_merge(set, merge_index, merge_len, merge_len, buffer_offset);
-            merge_index += 2 * merge_len;
+            merge_index += both_merges;
         }
         let left_over = length - (merge_index - start);
 
@@ -502,7 +503,7 @@ fn grail_build_out_of_place<T: Sortable>(
     grail_build_in_place(set, start, length, merge_len, buffer_len);
 }
 
-fn grail_build_in_place<T: Sortable>(
+pub fn grail_build_in_place<T: Sortable>(
     set: &mut [T],
     mut start: usize,
     length: usize,
@@ -512,12 +513,13 @@ fn grail_build_in_place<T: Sortable>(
     let mut merge_len = current_merge;
     while merge_len < buffer_len {
         let mut merge_index = start;
-        let merge_end = start + length - (2 * merge_len);
+        let both_merges = 2 * merge_len;
+        let merge_end = start + length - both_merges;
         let buffer_offset: isize = merge_len as isize;
 
         while merge_index <= merge_end {
             grail_merge_forwards(set, merge_index, merge_len, merge_len, buffer_offset);
-            merge_index += 2 * merge_len;
+            merge_index += both_merges;
         }
 
         let left_over = length - (merge_index - start);
@@ -538,7 +540,8 @@ fn grail_build_in_place<T: Sortable>(
         merge_len *= 2;
     }
 
-    let final_block = length % (2 * buffer_len);
+    let both_merges = 2 * buffer_len;
+    let final_block = length % both_merges;
     let final_offset = start + length - final_block;
     if final_block <= buffer_len {
         grail_rotate(set, final_offset, final_block, buffer_len);
@@ -552,7 +555,7 @@ fn grail_build_in_place<T: Sortable>(
         );
     }
 
-    let mut merge_index: isize = final_offset as isize - (2 * buffer_len) as isize;
+    let mut merge_index: isize = final_offset as isize - both_merges as isize;
     while merge_index >= start as isize {
         grail_merge_backwards(
             set,
@@ -561,12 +564,12 @@ fn grail_build_in_place<T: Sortable>(
             buffer_len,
             buffer_len as isize,
         );
-        merge_index -= 2 * buffer_len as isize;
+        merge_index -= both_merges as isize;
     }
 }
 
 #[allow(dead_code)]
-fn grail_count_left_block<T: Sortable>(
+pub fn grail_count_left_block<T: Sortable>(
     set: &[T],
     offset: usize,
     block_count: usize,
@@ -584,7 +587,7 @@ fn grail_count_left_block<T: Sortable>(
     left_blocks
 }
 
-fn grail_count_left_blocks<T: Sortable>(
+pub fn grail_count_left_blocks<T: Sortable>(
     set: &[T],
     offset: usize,
     block_count: usize,
@@ -602,7 +605,7 @@ fn grail_count_left_blocks<T: Sortable>(
     left_blocks
 }
 
-fn grail_get_subarray<T: Sortable>(set: &[T], current_key: usize, median_key: usize) -> Subarray {
+pub fn grail_get_subarray<T: Sortable>(set: &[T], current_key: usize, median_key: usize) -> Subarray {
     if set[current_key] < set[median_key] {
         Subarray::Left
     } else {
@@ -610,7 +613,7 @@ fn grail_get_subarray<T: Sortable>(set: &[T], current_key: usize, median_key: us
     }
 }
 
-fn grail_smart_merge_out_of_place<T: Sortable>(
+pub fn grail_smart_merge_out_of_place<T: Sortable>(
     set: &mut [T],
     start: usize,
     left_len: &mut usize,
@@ -661,7 +664,7 @@ fn grail_smart_merge_out_of_place<T: Sortable>(
     }
 }
 
-fn grail_smart_merge<T: Sortable>(
+pub fn grail_smart_merge<T: Sortable>(
     set: &mut [T],
     start: usize,
     left_len: &mut usize,
@@ -712,7 +715,7 @@ fn grail_smart_merge<T: Sortable>(
     }
 }
 
-fn grail_smart_lazy_merge<T: Sortable>(
+pub fn grail_smart_lazy_merge<T: Sortable>(
     set: &mut [T],
     mut start: usize,
     left_len: &mut usize,
@@ -777,7 +780,7 @@ fn grail_smart_lazy_merge<T: Sortable>(
     }
 }
 
-fn grail_merge_blocks_out_of_place<T: Sortable>(
+pub fn grail_merge_blocks_out_of_place<T: Sortable>(
     set: &mut [T],
     keys: usize,
     median_key: usize,
@@ -853,7 +856,7 @@ fn grail_merge_blocks_out_of_place<T: Sortable>(
     }
 }
 
-fn internal_array_copy<T: Sortable>(
+pub fn internal_array_copy<T: Sortable>(
     set: &mut [T],
     src_position: usize,
     dest_position: usize,
@@ -864,7 +867,7 @@ fn internal_array_copy<T: Sortable>(
     }
 }
 
-fn grail_merge_blocks<T: Sortable>(
+pub fn grail_merge_blocks<T: Sortable>(
     set: &mut [T],
     keys: usize,
     median_key: usize,
@@ -949,7 +952,7 @@ fn grail_merge_blocks<T: Sortable>(
 }
 
 #[allow(dead_code)]
-fn grail_lazy_merge_blocks<T: Sortable>(
+pub fn grail_lazy_merge_blocks<T: Sortable>(
     set: &mut [T],
     keys: usize,
     median_key: usize,
@@ -1007,7 +1010,7 @@ fn grail_lazy_merge_blocks<T: Sortable>(
     }
 }
 
-fn grail_combine_blocks<T: Sortable>(
+pub fn grail_combine_blocks<T: Sortable>(
     set: &mut [T],
     buffer: &mut Option<&mut [T]>,
     keys: usize,
@@ -1018,7 +1021,7 @@ fn grail_combine_blocks<T: Sortable>(
     scrolling_buffer: bool,
 ) {
     let merge_count = length / (2 * subarray_len);
-    let mut last_subarray = length % (2 * subarray_len);
+    let mut last_subarray = length - (2 * subarray_len * merge_count);
     if last_subarray <= subarray_len {
         length -= last_subarray;
         last_subarray = 0;
@@ -1066,7 +1069,7 @@ fn grail_combine_blocks<T: Sortable>(
     }
 }
 
-fn grail_combine_out_of_place<T: Sortable>(
+pub fn grail_combine_out_of_place<T: Sortable>(
     set: &mut [T],
     buffer: &mut [T],
     keys: usize,
@@ -1109,7 +1112,7 @@ fn grail_combine_out_of_place<T: Sortable>(
         median_key =
             grail_block_select_sort(set, keys, offset, median_key, right_blocks, block_len);
 
-        let last_fragment = last_subarray % block_len;
+        let last_fragment = last_subarray - (right_blocks * block_len);
         let left_blocks = if last_fragment != 0 {
             grail_count_left_blocks(set, offset, right_blocks, block_len)
         } else {
@@ -1137,7 +1140,7 @@ fn grail_combine_out_of_place<T: Sortable>(
     set[start - block_len..start].copy_from_slice(&buffer[0..block_len]);
 }
 
-fn grail_combine_in_place<T: Sortable>(
+pub fn grail_combine_in_place<T: Sortable>(
     set: &mut [T],
     keys: usize,
     start: usize,
@@ -1192,7 +1195,7 @@ fn grail_combine_in_place<T: Sortable>(
         median_key =
             grail_block_select_sort(set, keys, offset, median_key, right_blocks, block_len);
 
-        let last_fragment = last_subarray % block_len;
+        let last_fragment = last_subarray - (right_blocks * block_len);
         let left_blocks = if last_fragment != 0 {
             grail_count_left_blocks(set, offset, right_blocks, block_len)
         } else {
@@ -1241,7 +1244,7 @@ fn grail_combine_in_place<T: Sortable>(
     }
 }
 
-fn grail_lazy_merge<T: Sortable>(
+pub fn grail_lazy_merge<T: Sortable>(
     set: &mut [T],
     mut start: usize,
     mut left_len: usize,
@@ -1295,7 +1298,7 @@ fn grail_lazy_merge<T: Sortable>(
     }
 }
 
-fn grail_lazy_stable_sort<T: Sortable>(set: &mut [T], start: usize, length: usize) {
+pub fn grail_lazy_stable_sort<T: Sortable>(set: &mut [T], start: usize, length: usize) {
     let mut index = 1;
     while index < length {
         let left = start + index - 1;
@@ -1325,7 +1328,7 @@ fn grail_lazy_stable_sort<T: Sortable>(set: &mut [T], start: usize, length: usiz
     }
 }
 
-fn grail_insertion_sort<T: Sortable>(set: &mut [T], start: usize, length: usize) {
+pub fn grail_insertion_sort<T: Sortable>(set: &mut [T], start: usize, length: usize) {
     for item in 1..length {
         let mut left: isize = (start + item - 1) as isize;
         let mut right: isize = (start + item) as isize;
@@ -1338,7 +1341,7 @@ fn grail_insertion_sort<T: Sortable>(set: &mut [T], start: usize, length: usize)
     }
 }
 
-fn calc_min_keys(num_keys: usize, mut block_keys_sum: usize) -> usize {
+pub fn calc_min_keys(num_keys: usize, mut block_keys_sum: usize) -> usize {
     let mut min_keys = 1;
     while min_keys < num_keys && block_keys_sum != 0 {
         min_keys *= 2;
@@ -1387,31 +1390,32 @@ pub fn grail_common_sort<T: Sortable>(
         }
 
         let buffer_end = block_len + key_len;
-        let mut buffer_len = if ideal_buffer { block_len } else { key_len };
+        let mut subarray_len = if ideal_buffer { block_len } else { key_len };
 
         grail_build_blocks(
             set,
             ext_buf,
             start + buffer_end,
             length - buffer_end,
-            buffer_len,
+            subarray_len,
         );
 
-        while length - buffer_end > 2 * buffer_len {
-            buffer_len *= 2;
+        while length - buffer_end > 2 * subarray_len {
+            subarray_len *= 2;
 
             let mut current_block_len = block_len;
             let mut scrolling_buffer = ideal_buffer;
 
-            if !scrolling_buffer {
-                if key_len > 4 && (key_len / 8) * key_len >= buffer_len {
-                    current_block_len = key_len / 2;
+            if !ideal_buffer {
+                let half_key_len = key_len / 2;
+                if half_key_len * half_key_len >= 2 * subarray_len {
+                    current_block_len = half_key_len;
                     scrolling_buffer = true;
                 } else {
-                    let block_keys_sum = (buffer_len * keys_found) / 2;
+                    let block_keys_sum = (subarray_len * keys_found) / 2;
                     let min_keys = calc_min_keys(key_len, block_keys_sum);
 
-                    current_block_len = (2 * buffer_len) / min_keys;
+                    current_block_len = (2 * subarray_len) / min_keys;
                 }
             }
             grail_combine_blocks(
@@ -1420,223 +1424,12 @@ pub fn grail_common_sort<T: Sortable>(
                 start,
                 start + buffer_end,
                 length - buffer_end,
-                buffer_len,
+                subarray_len,
                 current_block_len,
                 scrolling_buffer,
             );
         }
         grail_insertion_sort(set, start, buffer_end);
         grail_lazy_merge(set, start, buffer_end, length - buffer_end);
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::grailpair::GrailPair;
-    use rand::{thread_rng, Rng};
-
-    #[test]
-    fn bufferless_grail_power_of_2_sizes() {
-        for i in 8..20 {
-            let mut rng = thread_rng();
-            let len = 2usize.pow(i);
-            let mut set: Vec<GrailPair> = (0..len)
-                .map(|x| GrailPair {
-                    key: rng.gen_range(0, len as isize),
-                    value: x as isize,
-                })
-                .collect();
-            grail_sort(&mut set, len);
-            verify_sort(&set);
-        }
-    }
-    #[test]
-    fn bufferless_grail_power_of_2_plus_one_sizes() {
-        for i in 8..20 {
-            let mut rng = thread_rng();
-            let len = 2usize.pow(i) + 1;
-            let mut set: Vec<GrailPair> = (0..len)
-                .map(|x| GrailPair {
-                    key: rng.gen_range(0, len as isize),
-                    value: x as isize,
-                })
-                .collect();
-            grail_sort(&mut set, len);
-            verify_sort(&set);
-        }
-    }
-    #[test]
-    fn bufferless_grail_power_of_2_sizes_already_sorted_all_unique() {
-        for i in 8..20 {
-            let len = 2usize.pow(i) + 1;
-            let mut set: Vec<GrailPair> = (0..len)
-                .map(|x| GrailPair {
-                    key: x as isize,
-                    value: x as isize,
-                })
-                .collect();
-            grail_sort(&mut set, len);
-            verify_sort(&set);
-        }
-    }
-    #[test]
-    fn bufferless_grail_random_sizes_random_values() {
-        for _ in 0..12 {
-            let mut rng = thread_rng();
-            let len = rng.gen_range(17, 524288);
-            let mut set: Vec<GrailPair> = (0..len)
-                .map(|x| GrailPair {
-                    key: rng.gen_range(0, len as isize),
-                    value: x as isize,
-                })
-                .collect();
-            grail_sort(&mut set, len);
-            verify_sort(&set);
-        }
-    }
-
-    #[test]
-    fn static_buffer_grail_power_of_2_sizes() {
-        for i in 8..20 {
-            let mut rng = thread_rng();
-            let len = 2usize.pow(i);
-            let mut set: Vec<GrailPair> = (0..len)
-                .map(|x| GrailPair {
-                    key: rng.gen_range(0, len as isize),
-                    value: x as isize,
-                })
-                .collect();
-            grail_sort_with_static_buffer(&mut set, len);
-            verify_sort(&set);
-        }
-    }
-    #[test]
-    fn static_buffer_grail_power_of_2_plus_one_sizes() {
-        for i in 8..20 {
-            let mut rng = thread_rng();
-            let len = 2usize.pow(i) + 1;
-            let mut set: Vec<GrailPair> = (0..len)
-                .map(|x| GrailPair {
-                    key: rng.gen_range(0, len as isize),
-                    value: x as isize,
-                })
-                .collect();
-            grail_sort_with_static_buffer(&mut set, len);
-            verify_sort(&set);
-        }
-    }
-    #[test]
-    fn static_buffer_grail_power_of_2_sizes_already_sorted_all_unique() {
-        for i in 8..20 {
-            let len = 2usize.pow(i) + 1;
-            let mut set: Vec<GrailPair> = (0..len)
-                .map(|x| GrailPair {
-                    key: x as isize,
-                    value: x as isize,
-                })
-                .collect();
-            grail_sort_with_static_buffer(&mut set, len);
-            verify_sort(&set);
-        }
-    }
-    #[test]
-    fn static_buffer_grail_random_sizes_random_values() {
-        for _ in 0..12 {
-            let mut rng = thread_rng();
-            let len = rng.gen_range(17, 524288);
-            let mut set: Vec<GrailPair> = (0..len)
-                .map(|x| GrailPair {
-                    key: rng.gen_range(0, len as isize),
-                    value: x as isize,
-                })
-                .collect();
-            grail_sort_with_static_buffer(&mut set, len);
-            verify_sort(&set);
-        }
-    }
-    #[test]
-    fn dynamic_buffer_grail_power_of_2_sizes() {
-        for i in 8..20 {
-            let mut rng = thread_rng();
-            let len = 2usize.pow(i);
-            let mut set: Vec<GrailPair> = (0..len)
-                .map(|x| GrailPair {
-                    key: rng.gen_range(0, len as isize),
-                    value: x as isize,
-                })
-                .collect();
-            grail_sort_with_dynamic_buffer(&mut set, len);
-            verify_sort(&set);
-        }
-    }
-    #[test]
-    fn dynamic_buffer_grail_power_of_2_plus_one_sizes() {
-        for i in 8..20 {
-            let mut rng = thread_rng();
-            let len = 2usize.pow(i) + 1;
-            let mut set: Vec<GrailPair> = (0..len)
-                .map(|x| GrailPair {
-                    key: rng.gen_range(0, len as isize),
-                    value: x as isize,
-                })
-                .collect();
-            grail_sort_with_dynamic_buffer(&mut set, len);
-            verify_sort(&set);
-        }
-    }
-
-    #[test]
-    fn dynamic_buffer_grail_power_of_2_sizes_already_sorted_all_unique() {
-        for i in 8..20 {
-            let len = 2usize.pow(i) + 1;
-            let mut set: Vec<GrailPair> = (0..len)
-                .map(|x| GrailPair {
-                    key: x as isize,
-                    value: x as isize,
-                })
-                .collect();
-            grail_sort_with_dynamic_buffer(&mut set, len);
-            verify_sort(&set);
-        }
-    }
-
-    #[test]
-    fn dynamic_buffer_grail_random_sizes_random_values() {
-        for _ in 0..12 {
-            let mut rng = thread_rng();
-            let len = rng.gen_range(17, 524288);
-            let mut set: Vec<GrailPair> = (0..len)
-                .map(|x| GrailPair {
-                    key: rng.gen_range(0, len as isize),
-                    value: x as isize,
-                })
-                .collect();
-            grail_sort_with_dynamic_buffer(&mut set, len);
-            verify_sort(&set);
-        }
-    }
-
-    fn verify_sort(set: &[GrailPair]) {
-        for i in 1..set.len() {
-            assert!(
-                set[i].key >= set[i - 1].key,
-                "indices {} and {} out of order; ({}, {})",
-                i - 1,
-                i,
-                set[i - 1].key,
-                set[i].key
-            );
-            if set[i].key == set[i - 1].key {
-                assert!(
-                    set[i].value > set[i - 1].value,
-                    "indices {} and {} are unstable; ({}, {})",
-                    i - 1,
-                    i,
-                    set[i - 1].value,
-                    set[i].value
-                );
-            }
-        }
     }
 }
