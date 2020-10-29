@@ -433,9 +433,10 @@ public class GrailSort<K> {
                 //     externLen *= 2;
                 // }
                 // Optimized version:
-                externLen = (int) Math.log(this.externalBufferLen);
-                externLen /= Math.log(2);
+                externLen = (int) Math.ceil((double) Math.log(externalBufferLen) / Math.log(2) - 1);
                 externLen = (int) Math.pow(2,externLen);
+                if (Math.log(externalBufferLen) / Math.log(2) % 1 == 0){ externLen *= 2;}
+                if (externalBufferLen == 0 || externalBufferLen == 1) {externLen = 1;}
             }
             
             this.grailBuildOutOfPlace(array, start, length, bufferLen, externLen);
