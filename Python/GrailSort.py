@@ -44,6 +44,7 @@ def arrayCopy(fromArray, fromIndex, toArray, toIndex, length):   # thanks to Bee
  #                       phoenixbound
  #                       thatsOven
  #                       Bee sort
+ #                       _fluffyy
  #                       
  # Special thanks to "The Studio" Discord community!
  #
@@ -580,5 +581,94 @@ class GrailSort:
 
             self.grailLazyMerge(array, start + currentBlock, self.currentBlockLen, finalLen)
 
+    def grailMergeBlocksOutOfPlace(self, array, keys, medianKey, start, blockCount, blockLen, finalLeftBlocks, finalLen):
+        blockIndex = blockLen
+
+        self.currentBlockLen    = blockLen
+        self.currentBlockOrigin = self.grailGetSubarray(array, keys, medianKey)
     
+        for keyIndex in range(1, blockCount):
+            currentBlock = blockIndex - self.currentBlockLen
+
+            nextBlockOrigin = self.grailGetSubarray(array, keys + keyIndex, medianKey)
+
+            if nextBlockOrigin == self.currentBlockOrigin:
+                arrayCopy(array, start + currentBlock, array, start + currentBlock - blockLen, self.currentBlockLen)
+                currentBlock = blockIndex
+
+                self.currentBlockLen = blockLen
+
+            else:
+                self.grailSmartMergeOutOfPlace(array, start + currentBlock, self.currentBlockLen, self.currentBlockOrigin, blockLen, blockLen)
+
+            blockIndex += blockLen
+
+        currentBlock = blockIndex - self.currentBlockLen
+
+        if finalLen != 0:
+            if self.currentBlockOrigin == Subarray.RIGHT:
+                arrayCopy(array, start + currentBlock, array, start + currentBlock - blockLen, self.currentBlockLen)
+                currentBlock = blockIndex
+
+                self.currentBlockLen    = blockLen * finalLeftBlocks
+                self.currentBlockOrigin = Subarray.LEFT
+
+            else:
+                self.currentBlockLen += blockLen * finalLeftBlocks
+
+            self.grailMergeOutOfPlace(array, start + currentBlock, self.currentBlockLen, finalLen, blockLen)
+        else:
+            arrayCopy(array, start + currentBlock, array, start + currentBlock - blockLen, self.currentBlockLen)           
+
+    def grailCombineInPlace(self, array, keys, start, length, subarrayLen, blockLen, mergeCount, lastSubarray, buffer):
+        fullMerge = 2 * subarrayLen
+        blockCount = fullMerge / blockLen
         
+        for mergeIndex in range(0, mergeCount):
+            offset = start + (mergeIndex * fullMerge)
+            blockCount = fullMerge // blockLen
+
+            self.grailInsertSort(array, keys, blockCount)
+
+            medianKey = subarrayLen // blockLen
+            medianKey = self.grailBlockSelectSort(array, keys, offset, medianKey)
+
+            if buffer:
+                self.grailMergeBlocks(array, keys, keys + medianKey, offset, blockCount, blockLen, 0, 0)
+            else:
+                self.grailLazyMergeBlocks(array, keys, keys + medianKey, offset, blockCount, blockLen, 0, 0)
+
+        if lastSubarray != 0:
+            offset = start + (mergeCount * fullMerge)
+            rightBlocks = lastSubarray // blockLen
+
+            self.grailInsertSort(array, keys, rightBlocks + 1)
+
+            medianKey = subarrayLen // blockLen
+            medianKey = self.grailBlockSelectSort(array, keys, offset, medianKey, rightBlocks, blockLen)
+
+            lastFragment = lastSubarray - (rightBlocks * blockLen)
+            if lastFragment != 0:
+                leftBlocks = self.grailCountFinalLeftBlocks(array, offset, rightBlocks, blockLen)
+            else:
+                leftBlocks = 0
+
+            blockCount = rightBlocks - leftBlocks
+
+            if blockCount == 0:
+                leftLength = leftBlocks * blockLen
+
+                if buffer:
+                    self.grailMergeForwards(array, offset, leftLength, lastFragment, blockLen)
+                else:
+                    self.grailLazyMerge(array, offset, leftLength, lastFragment)
+
+            else:
+                if buffer:
+                    self.grailMergeBlocks(array, keys, keys + medianKey, offset, blockCount, blockLen, leftBlocks, lastFragment)
+                else:
+                    self.grailLazyMergeBlocks(array, keys, keys + medianKey, offset, blockCount, blockLen, leftBlocks, lastFragment)
+
+        if buffer:
+            self.grailInPlaceBufferReset(array, start, length, blockLen)
+
