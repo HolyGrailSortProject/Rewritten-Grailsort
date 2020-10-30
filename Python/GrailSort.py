@@ -50,7 +50,7 @@ def arrayCopy(fromArray, fromIndex, toArray, toIndex, length):   # thanks to Bee
  #
 class Subarray:
     LEFT = 0
-    RIGHT = 0
+    RIGHT = 1
 
 # REWRITTEN GRAILSORT FOR PYTHON - A heavily refactored C/C++-to-Python version of
 #                                  Andrey Astrelin's GrailSort.h, aiming to be as
@@ -671,4 +671,100 @@ class GrailSort:
 
         if buffer:
             self.grailInPlaceBufferReset(array, start, length, blockLen)
+
+    def grailCombineOutOfPlace(self, array, keys, start, length, subarrayLen, blockLen, mergeCount, lastSubarray):
+        arrayCopy(array, start - blockLen, self.externalBuffer, 0, blockLen)
+
+        fullMerge = 2* subarrayLen
+
+        for mergeIndex in range(0, mergeCount):
+            offset     = start + (mergeIndex * fullMerge)
+            blockCount = fullMerge // blockLen
+
+            self.grailInsertSort(array, keys, blockCount)
+
+            medianKey = subarrayLen // blockLen
+            medianKey = self.grailBlockSelectSort(array, keys, offset, medianKey, blockCount, blockLen)
+
+            self.grailMergeBlocksOutOfPlace(array, keys, keys + medianKey, offset, blockCount, blockLen, 0, 0)
+
+        if lastSubarray != 0:
+            offset = start + (mergeCount * fullMerge)
+            rightBlocks = lastSubarray // blockLen
+
+            self.grailInsertSort(array, keys, rightBlocks + 1)
+
+            medianKey = subarrayLen // blockLen
+            medianKey = self.grailBlockSelectSort(array, keys, offset, medianKey, rightBlocks, blockLen)
+
+            lastFragment = lastSubarray - (rightBlocks * blockLen)
+
+            if lastFragment != 0:
+                leftBlocks = self.grailCountFinalLeftBlocks(array, offset, rightBlocks, blockLen)
+            else:
+                leftBlocks = 0
+
+            blockCount = rightBlocks - leftBlocks
+
+            if blockCount == 0:
+                leftLength = leftBlocks * blockLen
+                self.grailMergeOutOfPlace(array, offset, leftLength, lastFragment, blockLen)
+            else:
+                self.grailMergeBlocksOutOfPlace(array, keys, keys + medianKey, offset, blockCount, blockLen, leftBlocks, lastFragment)
+        
+        self.grailOutOfPlaceBufferReset(array, start, length, blockLen)
+        arrayCopy(self.externalBuffer, 0, array, start - blockLen, blockLen)
+
+    def grailCombineBlocks(self, array, keys, start, length, subarrayLen, blockLen, buffer):
+        fullMerge    = 2 * subarrayLen
+        mergeCount   = length // fullMerge
+        lastSubarray = length - (fullMerge * mergeCount)
+
+        if lastSubarray <= subarrayLen:
+            length -= lastSubarray
+            lastSubarray = 0
+
+        if buffer and blockLen <= self.externalBufferLength:
+            self.grailCombineOutOfPlace(array, keys, start, length, subarrayLen, blockLen, mergeCount, lastSubarray)
+        else:
+            self.grailCombineInPlace(array, keys, start, length, subarrayLen, blockLen, mergeCount, lastSubarray, buffer)
+
+    def grailLazyMerge(self, array, start, leftLen, rightLen):
+        if leftLen < rightLen:
+            while leftLen != 0:
+                insertPos = self.grailBinarySearchLeft(array, start + leftLen, rightLen, array[start])
+
+                if insertPos != 0:
+                    self.grailRotate(array, start, leftLen, insertPos)
+                    start    += insertPos
+                    rightLen -= insertPos
+
+                if rightLen == 0: break
+                else:
+                    condition = True
+                    while condition:
+                        start += 1
+                        leftLen -= 1
+                        condition = leftLen != 0 and array[start] <= array[start + leftLen]
+
+        else:
+            end = start + leftLen + rightLen - 1
+            while rightLen != 0:
+                insertPos = self.grailBinarySearchRight(array, start, leftLen, array[end])
+
+                if insertPos != leftLen:
+                    self.grailRotate(array, start + insertPos, leftLen - insertPos, rightLen)
+                    end     -= leftLen - insertPos
+                    leftLen  = insertPos
+
+                if leftLen == 0: break
+                else:
+                    leftEnd = start + leftLen - 1
+                    condition = True
+                    while condition:
+                        rightLen -= 1
+                        end -= 1
+                        condition = rightLen != 0 and array[leftEnd] <= array[end]
+    
+            
 
