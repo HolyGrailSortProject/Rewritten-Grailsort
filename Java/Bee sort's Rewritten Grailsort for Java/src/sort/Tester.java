@@ -193,14 +193,13 @@ public class Tester {
             
             begin = System.nanoTime();
             grail.grailCommonSort(this.keyArray, start, length, buffer, bufferLen);
-            time = System.nanoTime() - begin;
         }
         else {
             begin = System.nanoTime();
             Arrays.sort(this.keyArray, start, start + length, test);
-            time = System.nanoTime() - begin;
         }
-        
+        time = System.nanoTime() - begin;
+
         System.out.print("- Sorted in " + time * 1e-6d + "ms...");
         Arrays.sort(this.referenceArray, start, start + length, test);
         
