@@ -61,7 +61,8 @@ Visit our **Discord guild** for **project updates** and **behind-the-scenes cont
    * MP
    * phoenixbound
    * thatsOven
-   * Bee sort                    
+   * Bee sort
+   * _fluffyy
  * Special thanks to "The Studio" Discord community!
 
 # Dedicated to Mr. Andrey Astrelin, 1969 - 2017
