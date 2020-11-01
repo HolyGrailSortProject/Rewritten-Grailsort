@@ -361,7 +361,7 @@ public class GrailSort<K> {
         }
         
         int fullMerge   = 2 * bufferLen; 
-        int finalBlock  = length % fullMerge;
+        int finalBlock  = length & (fullMerge - 1); // previous version : int finalBlock  = length % fullMerge;
         int finalOffset = start + length - finalBlock;
     
         if(finalBlock <= bufferLen) {
