@@ -435,7 +435,11 @@ public class GrailSort<K> {
                 // Optimized version:
                 externLen = (int) Math.ceil((double) Math.log(externalBufferLen) / Math.log(2) - 1);
                 externLen = (int) Math.pow(2,externLen);
-                if (Math.log(externalBufferLen) / Math.log(2) % 1 == 0){ externLen *= 2;}
+                // Line 442 Original Version:
+                // if (Math.log(externalBufferLen) / Math.log(2) % 1 == 0){ externLen *= 2;}
+                // Newer version (takes up O(1) memory, surely the garbage collector will know this):
+                double checked = Math.log(externalBufferLen) / Math.log(2);
+                if (((int) checked) == checked){ externLen *= 2;} // check if externalBufferLen is a power of 2
                 if (externalBufferLen == 0 || externalBufferLen == 1) {externLen = 1;}
             }
             
