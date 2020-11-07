@@ -4,7 +4,7 @@ use std::fmt;
 //GrailPair is a small struct which can be used for stability testing of the sort.
 #[allow(dead_code)]
 #[derive(Clone, Copy, Eq, Default)]
-pub struct GrailPair {
+pub(crate) struct GrailPair {
     pub key: isize,
     pub value: isize,
 }
