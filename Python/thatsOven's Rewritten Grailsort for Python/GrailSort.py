@@ -45,6 +45,7 @@ def arrayCopy(fromArray, fromIndex, toArray, toIndex, length):   # thanks to Bee
  #                       thatsOven
  #                       Bee sort
  #                       _fluffyy
+ #                       Morwenn
  #                       
  # Special thanks to "The Studio" Discord community!
  #
@@ -60,13 +61,15 @@ class Subarray:
 #
 # Primary author: thatsOven
 #
-# Current status: Not finished yet! 
+# Current status: Potentially working 
 
 class GrailSort:
 
     externalBuffer = [] #TODO Check these definitions
     externalBufferLength = 0
     currentBlockLen = 0
+
+    GRAIL_STATIC_EXT_BUF_LEN = 512s
 
     def __init__(self, grailKeys):
         self.grailKeys = grailKeys
@@ -765,6 +768,110 @@ class GrailSort:
                         rightLen -= 1
                         end -= 1
                         condition = rightLen != 0 and array[leftEnd] <= array[end]
-    
-            
 
+
+    def grailLazyStableSort(self, array, start, length):
+        for index in range(1, length, 2):
+            left = start + index - 1
+            right = start + index
+
+            if array[left] > array[right]:
+                self.grailSwap(array, left, right)
+
+        mergeLen = 2
+        while mergeLen < length:
+            fullMerge = 2 * mergeLen
+
+            mergeEnd = length -fullMerge
+
+            for mergeIndex in range(0, mergeEnd+1, fullMerge):
+                self.grailLazyMerge(array, start + mergeIndex, mergeLen, mergeLen)
+
+            leftOver = length - mergeIndex
+            if leftOver > mergeLen:
+                self.grailLazyMerge(array, start + mergeIndex, mergeLen, leftOver - mergeLen)
+
+    def calcMinKeys(self, numKeys, blockKeysSum):
+        minKeys = 1
+        while minKeys < numKeys and blockKeysSum != 0:
+            minKeys *= 2
+            blockKeysSum = blockKeysSum // 8
+        return minKeys
+
+    def grailCommonSort(self, array, start, length, extBuf, extBufLen):
+        if length < 16:
+            self.grailInsertSort(array, start, length)
+            return
+        else:
+            blockLen = 1
+
+            while (blockLen ** 2) < length: blockLen *= 2
+
+            keyLen = ((length - 1) / blockLen) + 1
+
+            idealKeys = keyLen + blockLen
+
+            keysFound = self.grailCollectKeys(array, start, length, idealKeys)
+
+            if keysFound < idealKeys:
+                if keysFound < 4:
+                    self.grailLazyStableSort(array, start, length)
+                    return
+                else:
+                    keyLen = blockLen
+                    blockLen = 0
+                    idealBuffer = False
+
+                    while keyLen > keysFound:
+                        keyLen = keyLen // 2
+            
+            else: idealBuffer = True
+
+            bufferEnd = blockLen + keyLen
+            if idealBuffer: subarrayLen = blockLen
+            else:           subarrayLen = keyLen
+
+            if idealBuffer and extBuf != None:
+                self.externalBuffer = extBuf
+                self.externalBufferLength = extBufLen
+
+            self.grailBuildBlocks(array, start + bufferEnd, length - bufferEnd, subarrayLen)
+
+            while (length - bufferEnd) > (2 * subarrayLen):
+                subarrayLen *= 2
+
+                currentBlockLen = blockLen
+                scrollingBuffer = idealBuffer
+
+                if not idealBuffer:
+                    halfKeyLen = keyLen // 2
+                    if halfKeyLen ** 2 >= 2 * subarrayLen:
+                        currentBlockLen = halfKeyLen
+                        scrollingBuffer = True
+
+                    else:
+                        blockKeysSum = (subarrayLen * keysFound) / 2
+                        minKeys = self.calcMinKeys(keyLen, blockKeysSum)
+
+                        currentBlockLen = (2 * subarrayLen) / minKeys
+
+                self.grailCombineBlocks(array, start, start + bufferEnd, length - bufferEnd, subarrayLen, currentBlockLen, scrollingBuffer)
+
+            self.grailInsertSort(array, start, bufferEnd)
+            self.grailLazyMerge(array, start, bufferEnd, length - bufferEnd)
+
+    def grailSortInPlace(array, start, length):
+        self.grailCommonSort(array, start, length, None, 0)
+
+    def grailSortStaticOOP(array, start, length):
+        buffer = [0 for _ in range (self.GRAIL_STATIC_EXT_BUF_LEN)]
+        self.grailCommonSort(array, start, length, buffer, self.GRAIL_STATIC_EXT_BUF_LEN)
+
+    def grailSortDynamicOOP(array, start, length):
+        bufferLen = 1
+        while (bufferLen ** 2) < length: bufferLen *= 2
+
+        buffer = [0 for _ in range(bufferLen)]
+
+        self.grailCommonSort(array, start, length, buffer, bufferLen)
+                
