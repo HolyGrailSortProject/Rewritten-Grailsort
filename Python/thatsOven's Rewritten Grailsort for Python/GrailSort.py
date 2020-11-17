@@ -790,6 +790,7 @@ class GrailSort:
             leftOver = length - mergeIndex
             if leftOver > mergeLen:
                 self.grailLazyMerge(array, start + mergeIndex, mergeLen, leftOver - mergeLen)
+            mergeLen *= 2
 
     def calcMinKeys(self, numKeys, blockKeysSum):
         minKeys = 1
