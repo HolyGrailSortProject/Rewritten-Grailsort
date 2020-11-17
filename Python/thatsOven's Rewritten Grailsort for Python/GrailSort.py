@@ -69,7 +69,7 @@ class GrailSort:
     externalBufferLength = 0
     currentBlockLen = 0
 
-    GRAIL_STATIC_EXT_BUF_LEN = 512s
+    GRAIL_STATIC_EXT_BUF_LEN = 512
 
     def __init__(self, grailKeys):
         self.grailKeys = grailKeys
