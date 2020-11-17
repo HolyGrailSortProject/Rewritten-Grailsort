@@ -71,10 +71,6 @@ class GrailSort:
 
     GRAIL_STATIC_EXT_BUF_LEN = 512
 
-    def __init__(self, grailKeys):
-        self.grailKeys = grailKeys
-        self.staticExternalBufferLen = 512
-
     def grailSwap(self, array, a, b):
         array[a], array[b] = array[b], array[a]
     
