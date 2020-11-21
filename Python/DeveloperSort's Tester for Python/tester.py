@@ -35,13 +35,13 @@
  #                       MP
  #                       phoenixbound
  #                       thatsOven
- #                       Bee sort
+ #                       DeveloperSort
  #                       _fluffyy
  #                       Morwenn
  #                       
  # Special thanks to "The Studio" Discord community!
  #
-# Editor : Bee sort
+# Editor : DeveloperSort
 
 # importing Python\thatsOven's Rewritten Grailsort for Python\GrailSort.py
 # i know, it looks messy.
