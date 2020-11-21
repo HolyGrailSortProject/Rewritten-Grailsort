@@ -42,4 +42,18 @@
  # Special thanks to "The Studio" Discord community!
  #
 # Editor : Bee sort
-# tester.py is currently empty now. I'll look on further on how to set this up.
+
+# importing Python\thatsOven's Rewritten Grailsort for Python\GrailSort.py
+# i know, it looks messy.
+import sys
+originalPath = sys.path[0]
+sys.path[0] += "\\..\\thatsOven's Rewritten Grailsort for Python\\"
+import GrailSort
+sys.path[0] = originalPath
+
+######################################################################### Back to the code
+
+from interface import implements, Interface # if you don't have python-interface, make sure to install it on pip! also, thanks https://stackoverflow.com/questions/2124190/how-do-i-implement-interfaces-in-python !
+
+class IntegerPair(Interface):
+    pass # not currently completed
