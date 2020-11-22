@@ -89,7 +89,7 @@ class GrailComparator implements Comparator<GrailPair> {
 // Primary author: Summer Dragonfly, with the incredible aid from the rest of
 //                 the team mentioned throughout this file!
 //
-// Editor: Bee sort
+// Editor: DeveloperSort
 //
 // Current status: EVERY VERSION PASSING ALL TESTS / POTENTIALLY FIXED as of
 //                 10/23/20
