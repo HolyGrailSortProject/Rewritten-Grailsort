@@ -70,3 +70,9 @@ class GrailPair(implements(IntegerPair)):
     def getValue():
         return this.value
 
+class GrailComparator:
+    def compare(o1,o2):
+        if    o1.getKey() < o2.getKey(): return -1
+        elif  o1.getKey() > o2.getKey(): return  1
+        else:                            return  0
+
