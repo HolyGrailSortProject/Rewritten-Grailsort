@@ -82,3 +82,8 @@ class Tester:
     referenceArray = []
     valueArray = []
     failReason = ""
+
+    def Tester(self,maxLength,maxKeyCount):
+        self.seed = 100000001
+        this.KeyArray = [GrailPair()] * maxLength
+        this.ValueArray = [int()] * maxKeyCount
