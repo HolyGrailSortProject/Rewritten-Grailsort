@@ -77,4 +77,8 @@ class GrailComparator:
         else:                            return  0
 
 class Tester:
-    pass
+    seed = None
+    keyArray = []
+    referenceArray = []
+    valueArray = []
+    failReason = ""
