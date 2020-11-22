@@ -56,4 +56,8 @@ sys.path[0] = originalPath
 from interface import implements, Interface # if you don't have python-interface, make sure to install it on pip! also, thanks https://stackoverflow.com/questions/2124190/how-do-i-implement-interfaces-in-python !
 
 class IntegerPair(Interface):
-    pass # not currently completed
+    def getKey():
+        pass
+    def getValue():
+        pass
+
