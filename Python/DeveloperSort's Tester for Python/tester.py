@@ -76,3 +76,5 @@ class GrailComparator:
         elif  o1.getKey() > o2.getKey(): return  1
         else:                            return  0
 
+class Tester:
+    pass
