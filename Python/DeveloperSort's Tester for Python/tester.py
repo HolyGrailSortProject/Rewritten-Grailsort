@@ -61,3 +61,12 @@ class IntegerPair(Interface):
     def getValue():
         pass
 
+class GrailPair(implements(IntegerPair)):
+    def __init__(self,key, value):
+        self.key = key
+        self.value = value
+    def getKey():
+        return this.key
+    def getValue():
+        return this.value
+
