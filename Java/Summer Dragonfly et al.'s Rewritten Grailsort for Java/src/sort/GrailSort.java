@@ -67,31 +67,31 @@ enum Subarray {
 //                 10/23/20
 final public class GrailSort<K> {
     private Comparator<K> cmp;
-    
+
     final static int GRAIL_STATIC_EXT_BUFFER_LEN = 512;
-    
+
     private K[] extBuffer;
     private int extBufferLen;
-    
+
     private int currBlockLen;
     private Subarray currBlockOrigin;
-    
+
     public GrailSort(Comparator<K> cmp) {
         this.cmp = cmp;
     }
-    
+
     private static <K> void grailSwap(K[] array, int a, int b) {
         K temp   = array[a];
         array[a] = array[b];
         array[b] = temp;
     }
-    
+
     private static <K> void grailBlockSwap(K[] array, int a, int b, int blockLen) {
         for(int i = 0; i < blockLen; i++) {
             grailSwap(array, a + i, b + i);
         }
     }
-    
+
     private static <K> void grailRotate(K[] array, int start, int leftLen, int rightLen) {
         while(leftLen > 0 && rightLen > 0) {
             if(leftLen <= rightLen) {
@@ -105,14 +105,14 @@ final public class GrailSort<K> {
             }
         }
     }
-    
+
     // Variant of Insertion Sort that utilizes swaps instead of overwrites.
     // Also known as "Optimized Gnomesort".
     private static <K> void grailInsertSort(K[] array, int start, int length, Comparator<K> cmp) {
         for(int item = 1; item < length; item++) {
             int left  = start + item - 1;
             int right = start + item;
-            
+
             while(left >= start && cmp.compare(array[ left],
                                                array[right]) > 0) {
                 grailSwap(array, left, right);
@@ -125,10 +125,10 @@ final public class GrailSort<K> {
     private static <K> int grailBinarySearchLeft(K[] array, int start, int length, K target, Comparator<K> cmp) {
         int left  = 0;
         int right = length;
-        
+
         while(left < right) {
             int middle = left + ((right - left) / 2);
-            
+
             if(cmp.compare(array[start + middle], target) < 0) {
                 left = middle + 1;
             }
@@ -142,10 +142,10 @@ final public class GrailSort<K> {
     private static <K> int grailBinarySearchRight(K[] array, int start, int length, K target, Comparator<K> cmp) {
         int left  = 0;
         int right = length;
-        
+
         while(left < right) {
             int middle = left + ((right - left) / 2);
-            
+
             if(cmp.compare(array[start + middle], target) > 0) {
                 right = middle;
             }
@@ -156,48 +156,48 @@ final public class GrailSort<K> {
         // OFF-BY-ONE BUG FIXED: used to be `return right - 1;`
         return right;
     }
-    
+
     // cost: 2 * length + idealKeys^2 / 2
     private static <K> int grailCollectKeys(K[] array, int start, int length, int idealKeys, Comparator<K> cmp) {
         int keysFound = 1; // by itself, the first item in the array is our first unique key
         int firstKey  = 0; // the first item in the array is at the first position in the array
         int currKey   = 1; // the index used for finding potentially unique items ("keys") in the array
-        
+
         while(currKey < length && keysFound < idealKeys) {
-            
+
             // Find the location in the key-buffer where our current key can be inserted in sorted order.
             // If the key at insertPos is equal to currKey, then currKey isn't unique and we move on.
             int insertPos = grailBinarySearchLeft(array, start + firstKey, keysFound, array[start + currKey], cmp);
-            
+
             // The second part of this conditional does the equal check we were just talking about; however,
             // if currKey is larger than everything in the key-buffer (meaning insertPos == keysFound),
             // then that also tells us it wasn't *equal* to anything in the key-buffer. Magic! :) 
             if(insertPos == keysFound || cmp.compare(array[start +  currKey            ],
                                                      array[start + firstKey + insertPos]) != 0) {
-                
+
                 // First, rotate the key-buffer over to currKey's immediate left...
                 // (this helps save a TON of swaps/writes!!!)
                 grailRotate(array, start + firstKey, keysFound, currKey - (firstKey + keysFound));
-                
+
                 // Update the new position of firstKey...
                 firstKey = currKey - keysFound;
-                
+
                 // Then, "insertion sort" currKey to its spot in the key-buffer!
                 grailRotate(array, start + firstKey + insertPos, keysFound - insertPos, 1);
-                
+
                 // One step closer to idealKeys.
                 keysFound++;
             }
             // Move on and test the next key...
             currKey++;
         }
-        
+
         // Bring however many keys we found back to the beginning of our array,
         // and return the number of keys collected.
         grailRotate(array, start, firstKey, keysFound);
         return keysFound;
     }
-    
+
     private static <K> void grailPairwiseSwaps(K[] array, int start, int length, Comparator<K> cmp) {
         int index;
         for(index = 1; index < length; index += 2) {
@@ -213,7 +213,7 @@ final public class GrailSort<K> {
                 grailSwap(array, right - 2, right);
             }
         }
-        
+
         int left = start + index - 1;
         if(left < start + length) {
             grailSwap(array, left - 2, left);
@@ -234,25 +234,25 @@ final public class GrailSort<K> {
                 array[right - 2] = array[right];
             }
         }
-        
+
         int left = start + index - 1;
         if(left < start + length) {
             array[left - 2] = array[left];
         }
     }
-    
+
     // array[buffer .. start - 1] <=> "scrolling buffer"
     // 
     // "scrolling buffer" + array[start, middle - 1] + array[middle, end - 1]
     // --> array[buffer, buffer + end - 1] + "scrolling buffer"
     private static <K> void grailMergeForwards(K[] array, int start, int leftLen, int rightLen,
-    		                                              int bufferOffset, Comparator<K> cmp) {
+                                                          int bufferOffset, Comparator<K> cmp) {
         int buffer = start  - bufferOffset;
-    	int   left = start;
+        int   left = start;
         int middle = start  +  leftLen;
         int  right = middle;
         int    end = middle + rightLen;
-        
+
         while(right < end) {
             if(left == middle || cmp.compare(array[ left],
                                              array[right]) > 0) {
@@ -265,7 +265,7 @@ final public class GrailSort<K> {
             }
             buffer++;
         }
-        
+
         if(buffer != left) {
             grailBlockSwap(array, buffer, left, middle - left);
         }
@@ -273,16 +273,16 @@ final public class GrailSort<K> {
 
     // credit to 666666t for thorough bug-checking/fixing
     private static <K> void grailMergeBackwards(K[] array, int start, int leftLen, int rightLen,
-    		                                               int bufferOffset, Comparator<K> cmp) {
+                                                           int bufferOffset, Comparator<K> cmp) {
         // used to be '= start'
-    	int    end = start  -  1;
-    	int   left = start  +  leftLen - 1;
+        int    end = start  -  1;
+        int   left = start  +  leftLen - 1;
         int middle = left;
         // OFF-BY-ONE BUG FIXED: used to be `int  right = middle + rightLen - 1;`
         int  right = middle + rightLen;
         // OFF-BY-ONE BUG FIXED: used to be `int buffer = right  + bufferOffset - 1;`
         int buffer = right  + bufferOffset;
-        
+
         // used to be 'left >= end'
         while(left > end) {
             if(right == middle || cmp.compare(array[ left],
@@ -296,7 +296,7 @@ final public class GrailSort<K> {
             }
             buffer--;
         }
-        
+
         if(right != buffer) {
             while(right > middle) {
                 grailSwap(array, buffer, right);
@@ -313,13 +313,13 @@ final public class GrailSort<K> {
     //
     // FUNCTION RENAMED: More consistent with "out-of-place" being at the end
     private static <K> void grailMergeOutOfPlace(K[] array, int start, int leftLen, int rightLen,
-    		         										int bufferOffset, Comparator<K> cmp) {
+                                                            int bufferOffset, Comparator<K> cmp) {
         int buffer = start  - bufferOffset;
-    	int   left = start;
+        int   left = start;
         int middle = start  +  leftLen;
         int  right = middle;
         int    end = middle + rightLen;
-        
+
         while(right < end) {
             if(left == middle || cmp.compare(array[ left],
                                              array[right]) > 0) {
@@ -332,7 +332,7 @@ final public class GrailSort<K> {
             }
             buffer++;
         }
-        
+
         if(buffer != left) {
             while(left < middle) {
                 array[buffer] = array[left];
@@ -345,38 +345,38 @@ final public class GrailSort<K> {
     private static <K> void grailBuildInPlace(K[] array, int start, int length, int currentLen, int bufferLen, Comparator<K> cmp) {
         for(int mergeLen = currentLen; mergeLen < bufferLen; mergeLen *= 2) {
             int fullMerge = 2 * mergeLen;
-            
+
             int mergeIndex;
             int mergeEnd = start + length - fullMerge;
             int bufferOffset = mergeLen;
-    
+
             for(mergeIndex = start; mergeIndex <= mergeEnd; mergeIndex += fullMerge) {
                 grailMergeForwards(array, mergeIndex, mergeLen, mergeLen, bufferOffset, cmp);
             }
-    
+
             int leftOver = length - (mergeIndex - start);
-    
+
             if(leftOver > mergeLen) {
                 grailMergeForwards(array, mergeIndex, mergeLen, leftOver - mergeLen, bufferOffset, cmp);
             }
             else {
                 grailRotate(array, mergeIndex - mergeLen, mergeLen, leftOver);
             }
-    
+
             start -= mergeLen;
         }
-        
+
         int fullMerge   = 2 * bufferLen; 
         int finalBlock  = length % fullMerge;
         int finalOffset = start + length - finalBlock;
-    
+
         if(finalBlock <= bufferLen) {
             grailRotate(array, finalOffset, finalBlock, bufferLen);
         }
         else {
             grailMergeBackwards(array, finalOffset, bufferLen, finalBlock - bufferLen, bufferLen, cmp);
         }
-    
+
         for(int mergeIndex = finalOffset - fullMerge; mergeIndex >= start; mergeIndex -= fullMerge) {
             grailMergeBackwards(array, mergeIndex, bufferLen, bufferLen, bufferLen, cmp);
         }
@@ -384,35 +384,35 @@ final public class GrailSort<K> {
 
     private void grailBuildOutOfPlace(K[] array, int start, int length, int bufferLen, int extLen, Comparator<K> cmp) {
         System.arraycopy(array, start - extLen, this.extBuffer, 0, extLen);
-        
+
         grailPairwiseWrites(array, start, length, cmp);
         start -= 2;
-        
+
         int mergeLen;
         for(mergeLen = 2; mergeLen < extLen; mergeLen *= 2) {
             int fullMerge = 2 * mergeLen;
-            
+
             int mergeIndex;
             int mergeEnd = start + length - fullMerge;
             int bufferOffset = mergeLen;
-    
+
             for(mergeIndex = start; mergeIndex <= mergeEnd; mergeIndex += fullMerge) {
                 grailMergeOutOfPlace(array, mergeIndex, mergeLen, mergeLen, bufferOffset, cmp);
             }
-    
+
             int leftOver = length - (mergeIndex - start);
-    
+
             if(leftOver > mergeLen) {
                 grailMergeOutOfPlace(array, mergeIndex, mergeLen, leftOver - mergeLen, bufferOffset, cmp);
             }
             else {
-            	// MINOR CHANGE: Used to be a loop; much clearer now
-            	System.arraycopy(array, mergeIndex, array, mergeIndex - mergeLen, leftOver);
+                // MINOR CHANGE: Used to be a loop; much clearer now
+                System.arraycopy(array, mergeIndex, array, mergeIndex - mergeLen, leftOver);
             }
-    
+
             start -= mergeLen;
         }
-        
+
         System.arraycopy(this.extBuffer, 0, array, start + length, extLen);
         grailBuildInPlace(array, start, length, mergeLen, bufferLen, cmp);
     }
@@ -423,7 +423,7 @@ final public class GrailSort<K> {
     private void grailBuildBlocks(K[] array, int start, int length, int bufferLen, Comparator<K> cmp) {
         if(this.extBuffer != null) {
             int extLen;
-            
+
             if(bufferLen < this.extBufferLen) {
                 extLen = bufferLen;
             }
@@ -434,7 +434,7 @@ final public class GrailSort<K> {
                     extLen *= 2;
                 }
             }
-            
+
             this.grailBuildOutOfPlace(array, start, length, bufferLen, extLen, cmp);
         }
         else {
@@ -446,7 +446,7 @@ final public class GrailSort<K> {
     // Returns the final position of 'medianKey'.
     // MINOR CHANGES: Change comparison order to emphasize "less-than" relation; fewer variables (Credit to Anonymous0726 for better variable names!)
     private static <K> int grailBlockSelectSort(K[] array, int firstKey, int start, int medianKey,
-    		                                               int blockCount, int blockLen, Comparator<K> cmp) {
+                                                           int blockCount, int blockLen, Comparator<K> cmp) {
         for(int firstBlock = 0; firstBlock < blockCount; firstBlock++) {
             int selectBlock = firstBlock;
 
@@ -482,7 +482,7 @@ final public class GrailSort<K> {
 
         return medianKey;
     }
-    
+
     // Swaps Grailsort's "scrolling buffer" from the right side of the array all the way back to 'start'.
     // Costs O(n) operations.
     //
@@ -492,7 +492,7 @@ final public class GrailSort<K> {
             grailSwap(array, index, index - bufferLen);
         }
     }
-    
+
     // Shifts entire array over 'bufferSize' spaces to make room for the out-of-place merging buffer.
     // Costs O(n) operations.
     //
@@ -502,7 +502,7 @@ final public class GrailSort<K> {
             array[index] = array[index - bufferLen];
         }
     }
-    
+
     // Rewinds Grailsort's "scrolling buffer" such that any items from a left subarray block left over by a "smart merge" are moved to
     // the right of the buffer. This is used to maintain stability and to continue an ongoing merge that has run out of buffer space.
     // Costs O(sqrt n) swaps in the *absolute* worst-case. 
@@ -515,7 +515,7 @@ final public class GrailSort<K> {
             grailSwap(array, buffer, leftOvers);
         }
     }
-    
+
     // Rewinds Grailsort's out-of-place buffer such that any items from a left subarray block left over by a "smart merge" are moved to
     // the right of the buffer. This is used to maintain stability and to continue an ongoing merge that has run out of buffer space.
     // Costs O(sqrt n) writes in the *absolute* worst-case.
@@ -528,7 +528,7 @@ final public class GrailSort<K> {
             array[buffer] = array[leftOvers];
         }
     }
-    
+
     private static <K> Subarray grailGetSubarray(K[] array, int currentKey, int medianKey, Comparator<K> cmp) {
         if(cmp.compare(array[currentKey], array[medianKey]) < 0) {
             return Subarray.LEFT;
@@ -541,27 +541,28 @@ final public class GrailSort<K> {
     // FUNCTION RENAMED: more clear *which* left blocks are being counted
     private static <K> int grailCountFinalLeftBlocks(K[] array, int offset, int blockCount, int blockLen, Comparator<K> cmp) {
         int leftBlocks = 0;
-        
+
         int firstRightBlock = offset + (blockCount * blockLen);
         int   prevLeftBlock = firstRightBlock - blockLen;
-        
+
         while(leftBlocks < blockCount && cmp.compare(array[firstRightBlock],
                                                      array[  prevLeftBlock]) < 0) {
             leftBlocks++;
             prevLeftBlock -= blockLen;
         }
-        
+
         return leftBlocks;
     }
-    
-    private void grailSmartMerge(K[] array, int start, int leftLen, Subarray leftOrigin, int rightLen,
-    		                                           int bufferOffset, Comparator<K> cmp) {
+
+    private void grailSmartMerge(K[] array, int start, int leftLen, Subarray leftOrigin,
+                                                       int rightLen, int bufferOffset,
+                                                       Comparator<K> cmp) {
         int buffer = start  - bufferOffset;
-    	int   left = start;
+        int   left = start;
         int middle = start  +  leftLen;
         int  right = middle;
         int    end = middle + rightLen;
-        
+
         if(leftOrigin == Subarray.LEFT) {
             while(left < middle && right < end) {
                 if(cmp.compare(array[left], array[right]) <= 0) {
@@ -588,7 +589,7 @@ final public class GrailSort<K> {
                 buffer++;
             }            
         }
-        
+
         if(left < middle) {
             this.currBlockLen = middle - left;
             grailInPlaceBufferRewind(array, left, middle, end);
@@ -609,13 +610,13 @@ final public class GrailSort<K> {
             if(cmp.compare(array[start + leftLen - 1], array[start + leftLen]) >  0) {
                 while(leftLen != 0) {
                     int insertPos = grailBinarySearchLeft(array, start + leftLen, rightLen, array[start], cmp);
-                    
+
                     if(insertPos != 0) {
                         grailRotate(array, start, leftLen, insertPos);
                         start    += insertPos;
                         rightLen -= insertPos;
                     }
-                    
+
                     if(rightLen == 0) {
                         this.currBlockLen = leftLen;
                         return;
@@ -634,13 +635,13 @@ final public class GrailSort<K> {
             if(cmp.compare(array[start + leftLen - 1], array[start + leftLen]) >= 0) {
                 while(leftLen != 0) {
                     int insertPos = grailBinarySearchRight(array, start + leftLen, rightLen, array[start], cmp);
-                    
+
                     if(insertPos != 0) {
                         grailRotate(array, start, leftLen, insertPos);
                         start    += insertPos;
                         rightLen -= insertPos;
                     }
-                    
+
                     if(rightLen == 0) {
                         this.currBlockLen = leftLen;
                         return;
@@ -655,7 +656,7 @@ final public class GrailSort<K> {
                 }
             }
         }
-        
+
         this.currBlockLen = rightLen;
         if(leftOrigin == Subarray.LEFT) {
             this.currBlockOrigin = Subarray.RIGHT;
@@ -666,14 +667,15 @@ final public class GrailSort<K> {
     }
 
     // FUNCTION RENAMED: more consistent with other "out-of-place" merges
-    private void grailSmartMergeOutOfPlace(K[] array, int start, int leftLen, Subarray leftOrigin, int rightLen, 
-    		                                                     int bufferOffset, Comparator<K> cmp) {
+    private void grailSmartMergeOutOfPlace(K[] array, int start, int leftLen, Subarray leftOrigin,
+                                                                 int rightLen, int bufferOffset,
+                                                                 Comparator<K> cmp) {
         int buffer = start  - bufferOffset;
-    	int   left = start;
+        int   left = start;
         int middle = start  +  leftLen;
         int  right = middle;
         int    end = middle + rightLen;
-        
+
         if(leftOrigin == Subarray.LEFT) {
             while(left < middle && right < end) {
                 if(cmp.compare(array[left], array[right]) <= 0) {
@@ -700,7 +702,7 @@ final public class GrailSort<K> {
                 buffer++;
             }            
         }
-        
+
         if(left < middle) {
             this.currBlockLen = middle - left;
             grailOutOfPlaceBufferRewind(array, left, middle, end);
@@ -719,36 +721,36 @@ final public class GrailSort<K> {
     // Credit to Anonymous0726 for better variable names such as "nextBlock"
     // Also minor change: removed unnecessary "currBlock = nextBlock" lines
     private void grailMergeBlocks(K[] array, int firstKey, int medianKey, int start,
-    									     int blockCount, int blockLen, int finalLeftBlocks,
-    									     int finalLen, Comparator<K> cmp) {
+                                             int blockCount, int blockLen, int finalLeftBlocks,
+                                             int finalLen, Comparator<K> cmp) {
         int currBlock;
         int nextBlock = blockLen;
-        
+
         this.currBlockLen    = blockLen;
         this.currBlockOrigin = grailGetSubarray(array, firstKey, medianKey, cmp);
-        
+
         Subarray nextBlockOrigin;
-        
+
         for(int keyIndex = 1; keyIndex < blockCount; keyIndex++, nextBlock += blockLen) {
             currBlock       = nextBlock - this.currBlockLen;
             nextBlockOrigin = grailGetSubarray(array, firstKey + keyIndex, medianKey, cmp);
-            
+
             if(nextBlockOrigin == this.currBlockOrigin) {
                 grailBlockSwap(array, start + currBlock - blockLen, start + currBlock, this.currBlockLen);
                 this.currBlockLen = blockLen;
             }
             else {
                 this.grailSmartMerge(array, start + currBlock, this.currBlockLen, this.currBlockOrigin,
-                		             blockLen, blockLen, cmp);
+                                     blockLen, blockLen, cmp);
             }
         }
-        
+
         currBlock = nextBlock - this.currBlockLen;
-        
+
         if(finalLen != 0) {
             if(this.currBlockOrigin == Subarray.RIGHT) {
                 grailBlockSwap(array, start + currBlock - blockLen, start + currBlock, this.currBlockLen);
-                
+
                 currBlock            = nextBlock;
                 this.currBlockLen    = blockLen * finalLeftBlocks;
                 this.currBlockOrigin = Subarray.LEFT;
@@ -756,7 +758,7 @@ final public class GrailSort<K> {
             else {
                 this.currBlockLen += blockLen * finalLeftBlocks;
             }
-            
+
             grailMergeForwards(array, start + currBlock, this.currBlockLen, finalLen, blockLen, cmp);
         }
         else {
@@ -765,20 +767,20 @@ final public class GrailSort<K> {
     }
 
     private void grailLazyMergeBlocks(K[] array, int firstKey, int medianKey, int start,
-    		                          			 int blockCount, int blockLen, int finalLeftBlocks,
-    		                          			 int finalLen, Comparator<K> cmp) {
+                                                 int blockCount, int blockLen, int finalLeftBlocks,
+                                                 int finalLen, Comparator<K> cmp) {
         int currBlock;
         int nextBlock = blockLen;
-        
+
         this.currBlockLen    = blockLen;
         this.currBlockOrigin = grailGetSubarray(array, firstKey, medianKey, cmp);
-        
+
         Subarray nextBlockOrigin;
-        
+
         for(int keyIndex = 1; keyIndex < blockCount; keyIndex++, nextBlock += blockLen) {
-            currBlock		= nextBlock - this.currBlockLen;
+            currBlock       = nextBlock - this.currBlockLen;
             nextBlockOrigin = grailGetSubarray(array, firstKey + keyIndex, medianKey, cmp);
-            
+
             if(nextBlockOrigin == this.currBlockOrigin) {
                 this.currBlockLen = blockLen;
             }
@@ -786,13 +788,13 @@ final public class GrailSort<K> {
                 // These checks were included in the original code... but why???
                 if(blockLen != 0 && this.currBlockLen != 0) {
                     this.grailSmartLazyMerge(array, start + currBlock, this.currBlockLen, this.currBlockOrigin,
-                    		                 blockLen, cmp);
+                                             blockLen, cmp);
                 }
             }
         }
-        
+
         currBlock = nextBlock - this.currBlockLen;
-        
+
         if(finalLen != 0) {
             if(this.currBlockOrigin == Subarray.RIGHT) {
                 currBlock            = nextBlock;
@@ -802,42 +804,42 @@ final public class GrailSort<K> {
             else {
                 this.currBlockLen += blockLen * finalLeftBlocks;
             }
-            
+
             grailLazyMerge(array, start + currBlock, this.currBlockLen, finalLen, cmp);
         }
     }
 
     private void grailMergeBlocksOutOfPlace(K[] array, int firstKey, int medianKey, int start,
-    		                                	       int blockCount, int blockLen, int finalLeftBlocks,
-    		                                	       int finalLen, Comparator<K> cmp) {
+                                                       int blockCount, int blockLen, int finalLeftBlocks,
+                                                       int finalLen, Comparator<K> cmp) {
         int currBlock;
         int nextBlock = blockLen;
-        
+
         this.currBlockLen    = blockLen;
         this.currBlockOrigin = grailGetSubarray(array, firstKey, medianKey, cmp);
-        
+
         Subarray nextBlockOrigin;
-        
+
         for(int keyIndex = 1; keyIndex < blockCount; keyIndex++, nextBlock += blockLen) {
-            currBlock 		= nextBlock - this.currBlockLen;  
+            currBlock       = nextBlock - this.currBlockLen;  
             nextBlockOrigin = grailGetSubarray(array, firstKey + keyIndex, medianKey, cmp);
-            
+
             if(nextBlockOrigin == this.currBlockOrigin) {
                 System.arraycopy(array, start + currBlock, array, start + currBlock - blockLen, this.currBlockLen);
                 this.currBlockLen = blockLen;
             }
             else {
                 this.grailSmartMergeOutOfPlace(array, start + currBlock, this.currBlockLen, this.currBlockOrigin,
-                		                       blockLen, blockLen, cmp);
+                                               blockLen, blockLen, cmp);
             }
         }
-        
+
         currBlock = nextBlock - this.currBlockLen;
-        
+
         if(finalLen != 0) {
             if(this.currBlockOrigin == Subarray.RIGHT) {
                 System.arraycopy(array, start + currBlock, array, start + currBlock - blockLen, this.currBlockLen);
-                
+
                 currBlock            = nextBlock;
                 this.currBlockLen    = blockLen * finalLeftBlocks;
                 this.currBlockOrigin = Subarray.LEFT;
@@ -845,7 +847,7 @@ final public class GrailSort<K> {
             else {
                 this.currBlockLen += blockLen * finalLeftBlocks;
             }
-            
+
             grailMergeOutOfPlace(array, start + currBlock, this.currBlockLen, finalLen, blockLen, cmp);
         }
         else {
@@ -855,23 +857,24 @@ final public class GrailSort<K> {
 
 
     //TODO: Double-check "Merge Blocks" arguments
-    private void grailCombineInPlace(K[] array, int firstKey, int start,
-    											int length, int subarrayLen, int blockLen,
-    		                                    int mergeCount, int lastSubarray, boolean buffer) { //TODO: Do collisions with hanging indents like these affect readability?
-    	Comparator<K> cmp = this.cmp; // local variable for performance
-    	
+    private void grailCombineInPlace(K[] array, int firstKey, int start, int length,
+                                                int subarrayLen, int blockLen,
+                                                int mergeCount, int lastSubarray,
+                                                boolean buffer) { //TODO: Do collisions with hanging indents like these affect readability?
+        Comparator<K> cmp = this.cmp; // local variable for performance
+
         int fullMerge = 2 * subarrayLen;
-        
+
         for(int mergeIndex = 0; mergeIndex < mergeCount; mergeIndex++) {
             int offset = start + (mergeIndex * fullMerge);
             int blockCount = fullMerge / blockLen;
-            
+
             grailInsertSort(array, firstKey, blockCount, cmp);
-    
+
             // INCORRECT PARAMETER BUG FIXED: `block select sort` should be using `offset`, not `start`
             int medianKey = subarrayLen / blockLen;
             medianKey = grailBlockSelectSort(array, firstKey, offset, medianKey, blockCount, blockLen, cmp);
-            
+
             if(buffer) {
                 this.grailMergeBlocks(array, firstKey, firstKey + medianKey, offset, blockCount, blockLen, 0, 0, cmp);
             }
@@ -879,18 +882,18 @@ final public class GrailSort<K> {
                 this.grailLazyMergeBlocks(array, firstKey, firstKey + medianKey, offset, blockCount, blockLen, 0, 0, cmp);
             }
         }
-    
+
         // INCORRECT CONDITIONAL/PARAMETER BUG FIXED: Credit to 666666t for debugging.
         if(lastSubarray != 0) {
             int offset = start + (mergeCount * fullMerge);
             int rightBlocks = lastSubarray / blockLen;
-            
+
             grailInsertSort(array, firstKey, rightBlocks + 1, cmp);
-            
+
             // INCORRECT PARAMETER BUG FIXED: `block select sort` should be using `offset`, not `start`
             int medianKey = subarrayLen / blockLen;
             medianKey = grailBlockSelectSort(array, firstKey, offset, medianKey, rightBlocks, blockLen, cmp);
-    
+
             // MISSING BOUNDS CHECK BUG FIXED: `lastFragment` *can* be 0 if the `lastSubarray` is evenly
             //                                 divided into blocks. This prevents Grailsort from going
             //                                 out of bounds.
@@ -902,13 +905,13 @@ final public class GrailSort<K> {
             else {
                 leftBlocks = 0;
             }
-    
+
             int blockCount = rightBlocks - leftBlocks;
-            
+
             //TODO: Double-check if this micro-optimization works correctly like the original
             if(blockCount == 0) {
                 int leftLength = leftBlocks * blockLen;
-                
+
                 // INCORRECT PARAMETER BUG FIXED: these merges should be using `offset`, not `start`
                 if(buffer) {
                     grailMergeForwards(array, offset, leftLength, lastFragment, blockLen, cmp);
@@ -920,47 +923,47 @@ final public class GrailSort<K> {
             else {
                 if(buffer) {
                     this.grailMergeBlocks(array, firstKey, firstKey + medianKey, offset,
-                    		              blockCount, blockLen, leftBlocks, lastFragment, cmp);
+                                          blockCount, blockLen, leftBlocks, lastFragment, cmp);
                 }
                 else {
                     this.grailLazyMergeBlocks(array, firstKey, firstKey + medianKey, offset,
-                    		                  blockCount, blockLen, leftBlocks, lastFragment, cmp);
+                                              blockCount, blockLen, leftBlocks, lastFragment, cmp);
                 }
             }
         }
-    
+
         if(buffer) {
             grailInPlaceBufferReset(array, start, length, blockLen);
         }
     }
 
-    private void grailCombineOutOfPlace(K[] array, int firstKey, int start,
-    									int length, int subarrayLen, int blockLen,
-    		                            int mergeCount, int lastSubarray) {
-    	Comparator<K> cmp = this.cmp; // local variable for performance
+    private void grailCombineOutOfPlace(K[] array, int firstKey, int start, int length,
+                                                   int subarrayLen, int blockLen,
+                                                   int mergeCount, int lastSubarray) {
+        Comparator<K> cmp = this.cmp; // local variable for performance
         System.arraycopy(array, start - blockLen, this.extBuffer, 0, blockLen);
-        
+
         int fullMerge = 2 * subarrayLen;
-        
+
         for(int mergeIndex = 0; mergeIndex < mergeCount; mergeIndex++) {
             int offset = start + (mergeIndex * fullMerge);
             int blockCount = fullMerge / blockLen;
-            
+
             grailInsertSort(array, firstKey, blockCount, cmp);
 
             // INCORRECT PARAMETER BUG FIXED: `block select sort` should be using `offset`, not `start`
             int medianKey = subarrayLen / blockLen;
             medianKey = grailBlockSelectSort(array, firstKey, offset, medianKey, blockCount, blockLen, cmp);
-            
+
             this.grailMergeBlocksOutOfPlace(array, firstKey, firstKey + medianKey, offset,
-            		                        blockCount, blockLen, 0, 0, cmp);
+                                            blockCount, blockLen, 0, 0, cmp);
         }
 
         // INCORRECT CONDITIONAL/PARAMETER BUG FIXED: Credit to 666666t for debugging.
         if(lastSubarray != 0) {
             int offset = start + (mergeCount * fullMerge);
             int rightBlocks = lastSubarray / blockLen;
-            
+
             grailInsertSort(array, firstKey, rightBlocks + 1, cmp);
 
             // INCORRECT PARAMETER BUG FIXED: `block select sort` should be using `offset`, not `start`
@@ -978,9 +981,9 @@ final public class GrailSort<K> {
             else {
                 leftBlocks = 0;
             }
-            
+
             int blockCount = rightBlocks - leftBlocks;
-            
+
             if(blockCount == 0) {
                 // INCORRECT PARAMETER BUG FIXED: this merge should be using `offset`, not `start`
                 int leftLength = leftBlocks * blockLen;
@@ -988,7 +991,7 @@ final public class GrailSort<K> {
             }
             else {
                 this.grailMergeBlocksOutOfPlace(array, firstKey, firstKey + medianKey, offset,
-                		                        blockCount, blockLen, leftBlocks, lastFragment, cmp);
+                                                blockCount, blockLen, leftBlocks, lastFragment, cmp);
             }
         }
 
@@ -998,26 +1001,26 @@ final public class GrailSort<K> {
 
     // 'keys' are on the left side of array. Blocks of length 'subarrayLen' combined. We'll combine them in pairs
     // 'subarrayLen' is a power of 2. (2 * subarrayLen / blockLen) keys are guaranteed
-    private void grailCombineBlocks(K[] array, int firstKey, int start, int length, int subarrayLen, int blockLen,
-    		                                   boolean buffer) {
+    private void grailCombineBlocks(K[] array, int firstKey, int start, int length,
+                                               int subarrayLen, int blockLen, boolean buffer) {
         int    fullMerge = 2 * subarrayLen;
         int   mergeCount = length /  fullMerge;
         int lastSubarray = length - (fullMerge * mergeCount);
-    
+
         if(lastSubarray <= subarrayLen) {
             length -= lastSubarray;
             lastSubarray = 0;
         }
-    
+
         // INCOMPLETE CONDITIONAL BUG FIXED: In order to combine blocks out-of-place, we must check if a full-sized
         //                                   block fits into our external buffer.
         if(buffer && blockLen <= this.extBufferLen) {
             this.grailCombineOutOfPlace(array, firstKey, start, length, subarrayLen, blockLen,
-            		                    mergeCount, lastSubarray);
+                                        mergeCount, lastSubarray);
         }
         else {
             this.grailCombineInPlace(array, firstKey, start, length, subarrayLen, blockLen,
-            		                 mergeCount, lastSubarray, buffer);
+                                     mergeCount, lastSubarray, buffer);
         }
     }
 
@@ -1073,54 +1076,54 @@ final public class GrailSort<K> {
             }
         }
     }
-    
+
     private static <K> void grailLazyStableSort(K[] array, int start, int length, Comparator<K> cmp) {
         for(int index = 1; index < length; index += 2) {
             int  left = start + index - 1;
             int right = start + index; 
-            
+
             if(cmp.compare(array[left], array[right]) > 0) {
                 grailSwap(array, left, right);
             }
         }
         for(int mergeLen = 2; mergeLen < length; mergeLen *= 2) {
             int fullMerge = 2 * mergeLen;
-            
+
             int mergeIndex;
             int mergeEnd = length - fullMerge;
-            
+
             for(mergeIndex = 0; mergeIndex <= mergeEnd; mergeIndex += fullMerge) {
                 grailLazyMerge(array, start + mergeIndex, mergeLen, mergeLen, cmp);
             }
-            
+
             int leftOver = length - mergeIndex;
             if(leftOver > mergeLen) {
                 grailLazyMerge(array, start + mergeIndex, mergeLen, leftOver - mergeLen, cmp);
             }
         }
     }
-    
+
     private static int grailCalcMinKeys(int numKeys, long blockKeysSum) {
         int minKeys = 1;
         while(minKeys < numKeys && blockKeysSum != 0) {
-           minKeys *= 2;
-           blockKeysSum /= 8;
+            minKeys *= 2;
+            blockKeysSum /= 8;
         }
         return minKeys; 
     }
-    
+
     void grailCommonSort(K[] array, int start, int length, K[] extBuffer, int extBufferLen) {
         if(length < 16) {
             grailInsertSort(array, start, length, this.cmp);
             return;
         }
-        
+
         int blockLen = 1;
 
         // find the smallest power of two greater than or equal to
         // the square root of the input's length
         while((blockLen * blockLen) < length) {
-        	blockLen *= 2;
+            blockLen *= 2;
         }
 
         // '((a - 1) / b) + 1' is actually a clever and very efficient
@@ -1138,80 +1141,80 @@ final public class GrailSort<K> {
 
         boolean idealBuffer;
         if(keysFound < idealKeys) {
-        	if(keysFound < 4) {
-        		// GRAILSORT STRATEGY 3 -- No block swaps or scrolling buffer; resort to Lazy Stable Sort
-        		grailLazyStableSort(array, start, length, this.cmp);
-        		return;
-        	}
-        	else {
-        		// GRAILSORT STRATEGY 2 -- Block swaps with small scrolling buffer and/or lazy merges
-        		keyLen = blockLen;
-        		blockLen = 0;
-        		idealBuffer = false;
+            if(keysFound < 4) {
+                // GRAILSORT STRATEGY 3 -- No block swaps or scrolling buffer; resort to Lazy Stable Sort
+                grailLazyStableSort(array, start, length, this.cmp);
+                return;
+            }
+            else {
+                // GRAILSORT STRATEGY 2 -- Block swaps with small scrolling buffer and/or lazy merges
+                keyLen = blockLen;
+                blockLen = 0;
+                idealBuffer = false;
 
-        		while(keyLen > keysFound) {
-        			keyLen /= 2;
-        		}
-        	}
+                while(keyLen > keysFound) {
+                    keyLen /= 2;
+                }
+            }
         }
         else {
-        	// GRAILSORT STRATEGY 1 -- Block swaps with scrolling buffer
-        	idealBuffer = true;
+            // GRAILSORT STRATEGY 1 -- Block swaps with scrolling buffer
+            idealBuffer = true;
         }
 
         int bufferEnd = blockLen + keyLen;
         int subarrayLen;
         if(idealBuffer) {
-        	subarrayLen = blockLen;
+            subarrayLen = blockLen;
         }
         else {
-        	subarrayLen = keyLen;
+            subarrayLen = keyLen;
         }
 
         if(idealBuffer && extBuffer != null) {
-        	// GRAILSORT + EXTRA SPACE
-        	this.extBuffer    = extBuffer;
-        	this.extBufferLen = extBufferLen;
+            // GRAILSORT + EXTRA SPACE
+            this.extBuffer    = extBuffer;
+            this.extBufferLen = extBufferLen;
         }
 
         this.grailBuildBlocks(array, start + bufferEnd, length - bufferEnd, subarrayLen, this.cmp);
 
         while((length - bufferEnd) > (2 * subarrayLen)) {
-        	subarrayLen *= 2;
+            subarrayLen *= 2;
 
-        	int currentBlockLen = blockLen;
-        	boolean scrollingBuffer = idealBuffer;
+            int currentBlockLen = blockLen;
+            boolean scrollingBuffer = idealBuffer;
 
-        	//TODO: Credit peeps from #rewritten-grail-discussions for helping clear up ambiguity
-        	if(!idealBuffer) {
-        		//TODO: Explain this incredibly confusing math AND credit Bee sort and Anon
-        		int halfKeyLen = keyLen / 2;
-        		if((halfKeyLen * halfKeyLen) >= (2 * subarrayLen)) {
-        			currentBlockLen = halfKeyLen;
-        			scrollingBuffer = true;
-        		}
-        		else {
-        			long blockKeysSum = ((long) subarrayLen * keysFound) / 2;
-        			int minKeys = grailCalcMinKeys(keyLen, blockKeysSum);
+            //TODO: Credit peeps from #rewritten-grail-discussions for helping clear up ambiguity
+            if(!idealBuffer) {
+                //TODO: Explain this incredibly confusing math AND credit Bee sort and Anon
+                int halfKeyLen = keyLen / 2;
+                if((halfKeyLen * halfKeyLen) >= (2 * subarrayLen)) {
+                    currentBlockLen = halfKeyLen;
+                    scrollingBuffer = true;
+                }
+                else {
+                    long blockKeysSum = ((long) subarrayLen * keysFound) / 2;
+                    int minKeys = grailCalcMinKeys(keyLen, blockKeysSum);
 
-        			currentBlockLen = (2 * subarrayLen) / minKeys;
-        		}
-        	}
+                    currentBlockLen = (2 * subarrayLen) / minKeys;
+                }
+            }
 
-        	// WRONG VARIABLE BUG FIXED: 4th argument should be `length - bufferEnd`, was `length - bufferLen` before.
-        	// Credit to 666666t and Anonymous0726 for debugging.
-        	this.grailCombineBlocks(array, start, start + bufferEnd, length - bufferEnd,
-        			                subarrayLen, currentBlockLen, scrollingBuffer);
+            // WRONG VARIABLE BUG FIXED: 4th argument should be `length - bufferEnd`, was `length - bufferLen` before.
+            // Credit to 666666t and Anonymous0726 for debugging.
+            this.grailCombineBlocks(array, start, start + bufferEnd, length - bufferEnd,
+                                    subarrayLen, currentBlockLen, scrollingBuffer);
         }
 
         grailInsertSort(array, start, bufferEnd, this.cmp);
         grailLazyMerge(array, start, bufferEnd, length - bufferEnd, this.cmp);
     }
-    
+
     public void grailSortInPlace(K[] array, int start, int length) {
         this.grailCommonSort(array, start, length, null, 0);
     }
-    
+
     // Credit to Anonymous0726 for 'array.getClass().getComponentType()' idea
     @SuppressWarnings("unchecked")
     public void grailSortStaticOOP(K[] array, int start, int length) {
