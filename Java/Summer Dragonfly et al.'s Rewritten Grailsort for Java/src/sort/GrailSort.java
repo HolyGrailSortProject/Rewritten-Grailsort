@@ -861,7 +861,7 @@ final public class GrailSort<K> {
                                                 int subarrayLen, int blockLen,
                                                 int mergeCount, int lastSubarray,
                                                 boolean buffer) { //TODO: Do collisions with hanging indents like these affect readability?
-        Comparator<K> cmp = this.cmp; // local variable for performance
+        Comparator<K> cmp = this.cmp; // local variable for performance à la Timsort
 
         int fullMerge = 2 * subarrayLen;
 
@@ -940,7 +940,7 @@ final public class GrailSort<K> {
     private void grailCombineOutOfPlace(K[] array, int firstKey, int start, int length,
                                                    int subarrayLen, int blockLen,
                                                    int mergeCount, int lastSubarray) {
-        Comparator<K> cmp = this.cmp; // local variable for performance
+        Comparator<K> cmp = this.cmp; // local variable for performance à la Timsort
         System.arraycopy(array, start - blockLen, this.extBuffer, 0, blockLen);
 
         int fullMerge = 2 * subarrayLen;
@@ -1227,9 +1227,7 @@ final public class GrailSort<K> {
         while((bufferLen * bufferLen) < length) {
             bufferLen *= 2;
         }
-
         K[] buffer = (K[]) Array.newInstance(array.getClass().getComponentType(), bufferLen);
-
         this.grailCommonSort(array, start, length, buffer, bufferLen);
     }
 }
