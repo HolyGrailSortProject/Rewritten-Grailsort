@@ -8,6 +8,7 @@ A diverse array of heavily refactored versions of Andrey Astrelin's GrailSort.h,
 * Enver's Rewritten Grailsort for **JavaScript**
 * Summer Dragonfly's *Simple* Rewritten Grailsort for **C**
 * _fluffyy's Rewritten Grailsort for **Python**
+* DeveloperSort's Minor Edits to Summer... et al.'s Rewritten Grailsort for **Java**
 * *more to come!*
 
 # What is Grailsort?
@@ -56,15 +57,15 @@ Visit our **Discord guild** for **project updates** and **behind-the-scenes cont
    * Anonymous0726
    * aphitorite
    * dani_dlg
+   * DeveloperSort
    * EilrahcF
    * Enver
    * lovebuny
+   * Morwenn
    * MP
    * phoenixbound
    * thatsOven
-   * Bee sort
    * _fluffyy
-   * Morwenn
  * Special thanks to "The Studio" Discord community!
 
 # Dedicated to Mr. Andrey Astrelin, 1969 - 2017

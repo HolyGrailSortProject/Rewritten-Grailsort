@@ -36,13 +36,15 @@ import java.util.Comparator;
  *                       Anonymous0726
  *                       aphitorite
  *                       dani_dlg
+ *                       DeveloperSort
  *                       EilrahcF
  *                       Enver
  *                       lovebuny
+ *                       Morwenn
  *                       MP
  *                       phoenixbound
  *                       thatsOven
- *                       Bee sort
+ *                       _fluffyy
  *
  * Special thanks to "The Studio" Discord community!
  */
