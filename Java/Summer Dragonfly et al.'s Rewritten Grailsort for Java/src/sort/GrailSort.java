@@ -110,7 +110,7 @@ final public class GrailSort<K> {
     // Also known as "Optimized Gnomesort".
     private static <K> void grailInsertSort(K[] array, int start, int length, Comparator<K> cmp) {
         for(int item = 1; item < length; item++) {
-            int left  = start + item - 1;
+            int  left = start + item - 1;
             int right = start + item;
 
             while(left >= start && cmp.compare(array[ left],
@@ -123,7 +123,7 @@ final public class GrailSort<K> {
     }
 
     private static <K> int grailBinarySearchLeft(K[] array, int start, int length, K target, Comparator<K> cmp) {
-        int left  = 0;
+        int  left = 0;
         int right = length;
 
         while(left < right) {
@@ -140,7 +140,7 @@ final public class GrailSort<K> {
     }
     // Credit to Anonymous0726 for debugging
     private static <K> int grailBinarySearchRight(K[] array, int start, int length, K target, Comparator<K> cmp) {
-        int left  = 0;
+        int  left = 0;
         int right = length;
 
         while(left < right) {
@@ -160,8 +160,8 @@ final public class GrailSort<K> {
     // cost: 2 * length + idealKeys^2 / 2
     private static <K> int grailCollectKeys(K[] array, int start, int length, int idealKeys, Comparator<K> cmp) {
         int keysFound = 1; // by itself, the first item in the array is our first unique key
-        int firstKey  = 0; // the first item in the array is at the first position in the array
-        int currKey   = 1; // the index used for finding potentially unique items ("keys") in the array
+        int  firstKey = 0; // the first item in the array is at the first position in the array
+        int   currKey = 1; // the index used for finding potentially unique items ("keys") in the array
 
         while(currKey < length && keysFound < idealKeys) {
 
