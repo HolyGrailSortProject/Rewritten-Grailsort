@@ -23,7 +23,7 @@ Choosing the length O(sqrt(n)) for blocks and key-buffers allows for assistance 
 # Why rewrite it?
 Andrey Astrelin was a genius when it came to not only understanding and implementing the ideas behind Grailsort, but also with writing extremely compact code.
 
-Unfortunately, Andrey's original implementation is incredibly hard to read and intuit... Don't believe us? Go ahead and take a look for yourself: https://github.com/Mrrl/GrailSort/blob/master/GrailSort.h. In fact, Grailsort was being considered as one of the included sorting algorithms for the Rust programming language, but their contributors agreed that the lack of documentation was daunting (https://github.com/rust-lang/rust/issues/19221).
+Unfortunately, Andrey's original implementation is incredibly hard to read and intuit... Don't believe us? Go ahead and take a look for yourself: https://github.com/Mrrl/GrailSort/blob/master/GrailSort.h. In fact, Grailsort was being considered as one of the included sorting algorithms for the Rust programming language, but the contributors agreed that the lack of documentation was daunting (https://github.com/rust-lang/rust/issues/19221).
 
 But then you might ask, "why bother with Grailsort? We've already found the best sorting algorithms you can get in computer science; the problem of sorting is already solved...".
 
