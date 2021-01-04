@@ -447,7 +447,7 @@ final public class GrailSort<K> {
     // MINOR CHANGES: Change comparison order to emphasize "less-than" relation; fewer variables (Credit to Anonymous0726 for better variable names!)
     private static <K> int grailBlockSelectSort(K[] array, int firstKey, int start, int medianKey,
                                                            int blockCount, int blockLen, Comparator<K> cmp) {
-        for(int firstBlock = 0; firstBlock < blockCount; firstBlock++) {
+        for(int firstBlock = 0; firstBlock < blockCount; firstBlock++) { //TODO: Do collisions with hanging indents like these affect readability?
             int selectBlock = firstBlock;
 
             for(int currBlock = firstBlock + 1; currBlock < blockCount; currBlock++) {
@@ -860,7 +860,7 @@ final public class GrailSort<K> {
     private void grailCombineInPlace(K[] array, int firstKey, int start, int length,
                                                 int subarrayLen, int blockLen,
                                                 int mergeCount, int lastSubarray,
-                                                boolean buffer) { //TODO: Do collisions with hanging indents like these affect readability?
+                                                boolean buffer) {
         Comparator<K> cmp = this.cmp; // local variable for performance à la Timsort
 
         int fullMerge = 2 * subarrayLen;
@@ -999,7 +999,7 @@ final public class GrailSort<K> {
         System.arraycopy(this.extBuffer, 0, array, start - blockLen, blockLen);
     }
 
-    // 'keys' are on the left side of array. Blocks of length 'subarrayLen' combined. We'll combine them in pairs
+    // Keys are on the left side of array. Blocks of length 'subarrayLen' combined. We'll combine them in pairs
     // 'subarrayLen' is a power of 2. (2 * subarrayLen / blockLen) keys are guaranteed
     private void grailCombineBlocks(K[] array, int firstKey, int start, int length,
                                                int subarrayLen, int blockLen, boolean buffer) {
