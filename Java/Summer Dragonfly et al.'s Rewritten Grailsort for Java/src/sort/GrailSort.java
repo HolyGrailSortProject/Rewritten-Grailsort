@@ -740,7 +740,7 @@ final public class GrailSort<K> {
         Subarray nextBlockOrigin;
 
         for(int keyIndex = 1; keyIndex < blockCount; keyIndex++, nextBlock += blockLen) {
-            currBlock = nextBlock - this.currBlockLen;
+            currBlock       = nextBlock - this.currBlockLen;
             nextBlockOrigin = grailGetSubarray(array, firstKey + keyIndex, medianKey, cmp);
 
             if(nextBlockOrigin == this.currBlockOrigin) {
@@ -789,7 +789,7 @@ final public class GrailSort<K> {
         Subarray nextBlockOrigin;
 
         for(int keyIndex = 1; keyIndex < blockCount; keyIndex++, nextBlock += blockLen) {
-            currBlock = nextBlock - this.currBlockLen;
+            currBlock       = nextBlock - this.currBlockLen;
             nextBlockOrigin = grailGetSubarray(array, firstKey + keyIndex, medianKey, cmp);
 
             if(nextBlockOrigin == this.currBlockOrigin) {
@@ -834,7 +834,7 @@ final public class GrailSort<K> {
         Subarray nextBlockOrigin;
 
         for(int keyIndex = 1; keyIndex < blockCount; keyIndex++, nextBlock += blockLen) {
-            currBlock = nextBlock - this.currBlockLen;  
+            currBlock       = nextBlock - this.currBlockLen;  
             nextBlockOrigin = grailGetSubarray(array, firstKey + keyIndex, medianKey, cmp);
 
             if(nextBlockOrigin == this.currBlockOrigin) {
