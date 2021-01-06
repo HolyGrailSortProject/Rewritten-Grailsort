@@ -109,7 +109,6 @@ final public class GrailSort<K> {
     }
 
     
-    
     // Variant of Insertion Sort that utilizes swaps instead of overwrites.
     // Also known as "Optimized Gnomesort".
     private static <K> void grailInsertSort(K[] array, int start, int length, Comparator<K> cmp) {
@@ -126,7 +125,6 @@ final public class GrailSort<K> {
         }
     }
 
-    
     
     private static <K> int grailBinarySearchLeft(K[] array, int start, int length, K target, Comparator<K> cmp) {
         int  left = 0;
@@ -164,7 +162,6 @@ final public class GrailSort<K> {
         return right;
     }
 
-    
     
     // cost: 2 * length + idealKeys^2 / 2
     private static <K> int grailCollectKeys(K[] array, int start, int length, int idealKeys, Comparator<K> cmp) {
@@ -207,7 +204,6 @@ final public class GrailSort<K> {
         return keysFound;
     }
 
-    
     
     private static <K> void grailPairwiseSwaps(K[] array, int start, int length, Comparator<K> cmp) {
         int index;
@@ -253,7 +249,6 @@ final public class GrailSort<K> {
         }
     }
 
-    
     
     // array[buffer .. start - 1] <=> "scrolling buffer"
     // 
@@ -357,7 +352,6 @@ final public class GrailSort<K> {
     }
 
     
-    
     private static <K> void grailBuildInPlace(K[] array, int start, int length, int currentLen, int bufferLen, Comparator<K> cmp) {
         for(int mergeLen = currentLen; mergeLen < bufferLen; mergeLen *= 2) {
             int fullMerge = 2 * mergeLen;
@@ -460,7 +454,6 @@ final public class GrailSort<K> {
     }
 
     
-    
     // Returns the final position of 'medianKey'.
     // MINOR CHANGES: Change comparison order to emphasize "less-than" relation; fewer variables (Credit to Anonymous0726 for better variable names!)
     private static <K> int grailBlockSelectSort(K[] array, int firstKey, int start, int medianKey,
@@ -501,7 +494,6 @@ final public class GrailSort<K> {
         return medianKey;
     }
 
-    
     
     // Swaps Grailsort's "scrolling buffer" from the right side of the array all the way back to 'start'.
     // Costs O(n) operations.
@@ -550,7 +542,6 @@ final public class GrailSort<K> {
     }
 
     
-    
     private static <K> Subarray grailGetSubarray(K[] array, int currentKey, int medianKey, Comparator<K> cmp) {
         if(cmp.compare(array[currentKey], array[medianKey]) < 0) {
             return Subarray.LEFT;
@@ -560,7 +551,6 @@ final public class GrailSort<K> {
         }
     }
 
-    
     
     // FUNCTION RENAMED: more clear *which* left blocks are being counted
     private static <K> int grailCountFinalLeftBlocks(K[] array, int offset, int blockCount, int blockLen, Comparator<K> cmp) {
@@ -578,7 +568,6 @@ final public class GrailSort<K> {
         return leftBlocks;
     }
 
-    
     
     private void grailSmartMerge(K[] array, int start, int leftLen, Subarray leftOrigin,
                                                        int rightLen, int bufferOffset,
@@ -751,7 +740,6 @@ final public class GrailSort<K> {
     }
 
     
-    
     // Credit to Anonymous0726 for better variable names such as "nextBlock"
     // Also minor change: removed unnecessary "currBlock = nextBlock" lines
     private void grailMergeBlocks(K[] array, int firstKey, int medianKey, int start,
@@ -900,7 +888,6 @@ final public class GrailSort<K> {
     }
 
 
-    
     //TODO: Double-check "Merge Blocks" arguments
     private void grailCombineInPlace(K[] array, int firstKey, int start, int length,
                                                 int subarrayLen, int blockLen,
@@ -1069,8 +1056,7 @@ final public class GrailSort<K> {
         }
     }
 
-    
-    
+
     // "Classic" in-place merge sort using binary searches and rotations
     //
     // cost: min(leftLen, rightLen)^2 + max(leftLen, rightLen)
@@ -1157,7 +1143,6 @@ final public class GrailSort<K> {
     }
 
     
-    
     private static int grailCalcMinKeys(int numKeys, long halfSubarrKeys) {
         int minKeys = 1;
         while(minKeys < numKeys && halfSubarrKeys != 0) {
@@ -1167,7 +1152,6 @@ final public class GrailSort<K> {
         return minKeys; 
     }
 
-    
     
     void grailCommonSort(K[] array, int start, int length, K[] extBuffer, int extBufferLen) {
         if(length < 16) {
@@ -1270,7 +1254,6 @@ final public class GrailSort<K> {
     }
 
 
-    
     public void grailSortInPlace(K[] array, int start, int length) {
         this.grailCommonSort(array, start, length, null, 0);
     }
