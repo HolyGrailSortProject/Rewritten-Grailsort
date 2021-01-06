@@ -1078,22 +1078,22 @@ final public class GrailSort<K> {
                 int insertPos = grailBinarySearchRight(array, start, leftLen, array[end], cmp);
 
                 if(insertPos != leftLen) {
-                    //TODO: Rewrite this abomination.
                     grailRotate(array, start + insertPos, leftLen - insertPos, rightLen);
-                    end    -= leftLen - insertPos;
                     leftLen = insertPos;
                 }
+                
+                end = start + leftLen + rightLen - 1;
 
                 if(leftLen == 0) {
                     break;
                 }
                 else {
-                    int leftEnd = start + leftLen - 1;
+                    int middle = start + leftLen;
                     do {
                         rightLen--;
                         end--;
-                    } while(rightLen != 0 && cmp.compare(array[leftEnd],
-                                                         array[    end]) <= 0);
+                    } while(rightLen != 0 && cmp.compare(array[middle - 1],
+                                                         array[end       ]) <= 0);
                 }
             }
         }
@@ -1125,11 +1125,11 @@ final public class GrailSort<K> {
         }
     }
 
-    private static int grailCalcMinKeys(int numKeys, long blockKeysSum) {
+    private static int grailCalcMinKeys(int numKeys, long halfSubarrKeys) {
         int minKeys = 1;
-        while(minKeys < numKeys && blockKeysSum != 0) {
-            minKeys *= 2;
-            blockKeysSum /= 8;
+        while(minKeys < numKeys && halfSubarrKeys != 0) {
+            minKeys        *= 2;
+            halfSubarrKeys /= 8;
         }
         return minKeys; 
     }
@@ -1211,13 +1211,14 @@ final public class GrailSort<K> {
             if(!idealBuffer) {
                 //TODO: Explain this incredibly confusing math AND credit Bee sort and Anon
                 int halfKeyLen = keyLen / 2;
+                
                 if((halfKeyLen * halfKeyLen) >= (2 * subarrayLen)) {
                     currentBlockLen = halfKeyLen;
                     scrollingBuffer = true;
                 }
                 else {
-                    long blockKeysSum = ((long) subarrayLen * keysFound) / 2;
-                    int minKeys = grailCalcMinKeys(keyLen, blockKeysSum);
+                    long halfSubarrKeys = ((long) subarrayLen * keysFound) / 2;
+                    int minKeys = grailCalcMinKeys(keyLen, halfSubarrKeys);
 
                     currentBlockLen = (2 * subarrayLen) / minKeys;
                 }
