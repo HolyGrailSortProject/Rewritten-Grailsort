@@ -1144,7 +1144,7 @@ final public class GrailSort<K> {
     }
 
     
-    // Calculates the minimum between "keyLen" and cbrt(2 * subarrayLen * keysFound).
+    // Calculates the minimum between numKeys and cbrt(2 * subarrayLen * keysFound).
     // Math will be further explained later, but just like in grailCommonSort, this
     // loop is rendered completely useless by the scrolling buffer optimization;
     // minKeys will always equal numKeys.
