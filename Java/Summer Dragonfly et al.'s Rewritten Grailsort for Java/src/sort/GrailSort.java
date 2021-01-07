@@ -620,21 +620,22 @@ final public class GrailSort<K> {
         }
     }
 
+    // MINOR CHANGE: better naming -- 'insertPos' is now 'mergeLen' -- and "middle" calculation simplified
     private void grailSmartLazyMerge(K[] array, int start, int leftLen, Subarray leftOrigin, int rightLen, Comparator<K> cmp) {
         int middle = start + leftLen;
         
         if(leftOrigin == Subarray.LEFT) {
             if(cmp.compare(array[middle - 1], array[middle]) >  0) {
                 while(leftLen != 0) {
-                    int insertPos = grailBinarySearchLeft(array, middle, rightLen, array[start], cmp);
+                    int mergeLen = grailBinarySearchLeft(array, middle, rightLen, array[start], cmp);
 
-                    if(insertPos != 0) {
-                        grailRotate(array, start, leftLen, insertPos);
-                        start    += insertPos;
-                        rightLen -= insertPos;
+                    if(mergeLen != 0) {
+                        grailRotate(array, start, leftLen, mergeLen);
+                        start    += mergeLen;
+                        rightLen -= mergeLen;
                     }
                     
-                    middle = start + leftLen;
+                    middle += mergeLen;
                     
                     if(rightLen == 0) {
                         this.currBlockLen = leftLen;
@@ -653,15 +654,15 @@ final public class GrailSort<K> {
         else {
             if(cmp.compare(array[middle - 1], array[middle]) >= 0) {
                 while(leftLen != 0) {
-                    int insertPos = grailBinarySearchRight(array, middle, rightLen, array[start], cmp);
+                    int mergeLen = grailBinarySearchRight(array, middle, rightLen, array[start], cmp);
 
-                    if(insertPos != 0) {
-                        grailRotate(array, start, leftLen, insertPos);
-                        start    += insertPos;
-                        rightLen -= insertPos;
+                    if(mergeLen != 0) {
+                        grailRotate(array, start, leftLen, mergeLen);
+                        start    += mergeLen;
+                        rightLen -= mergeLen;
                     }
 
-                    middle = start + leftLen;
+                    middle += mergeLen;
                     
                     if(rightLen == 0) {
                         this.currBlockLen = leftLen;
@@ -1060,20 +1061,21 @@ final public class GrailSort<K> {
     // "Classic" in-place merge sort using binary searches and rotations
     //
     // cost: min(leftLen, rightLen)^2 + max(leftLen, rightLen)
+    // MINOR CHANGES: better naming -- 'insertPos' is now 'mergeLen' -- and "middle"/"end" calculations simplified
     private static <K> void grailLazyMerge(K[] array, int start, int leftLen, int rightLen, Comparator<K> cmp) {
         if(leftLen < rightLen) {
             int middle = start + leftLen;
             
             while(leftLen != 0) {
-                int insertPos = grailBinarySearchLeft(array, middle, rightLen, array[start], cmp);
+                int mergeLen = grailBinarySearchLeft(array, middle, rightLen, array[start], cmp);
 
-                if(insertPos != 0) {
-                    grailRotate(array, start, leftLen, insertPos);
-                    start    += insertPos;
-                    rightLen -= insertPos;
+                if(mergeLen != 0) {
+                    grailRotate(array, start, leftLen, mergeLen);
+                    start    += mergeLen;
+                    rightLen -= mergeLen;
                 }
                 
-                middle = start + leftLen;
+                middle += mergeLen;
                 
                 if(rightLen == 0) {
                     break;
@@ -1092,14 +1094,13 @@ final public class GrailSort<K> {
             int end = start + leftLen + rightLen - 1;
             
             while(rightLen != 0) {            
-                int insertPos = grailBinarySearchRight(array, start, leftLen, array[end], cmp);
+                int mergeLen = grailBinarySearchRight(array, start, leftLen, array[end], cmp);
 
-                if(insertPos != leftLen) {
-                    grailRotate(array, start + insertPos, leftLen - insertPos, rightLen);
-                    leftLen = insertPos;
+                if(mergeLen != leftLen) {
+                    grailRotate(array, start + mergeLen, leftLen - mergeLen, rightLen);
+                    end     -=  leftLen - mergeLen;
+                    leftLen  = mergeLen;
                 }
-                
-                end = start + leftLen + rightLen - 1;
 
                 if(leftLen == 0) {
                     break;
@@ -1143,14 +1144,22 @@ final public class GrailSort<K> {
     }
 
     
-    private static int grailCalcMinKeys(int numKeys, long halfSubarrKeys) {
-        int minKeys = 1;
-        while(minKeys < numKeys && halfSubarrKeys != 0) {
-            minKeys        *= 2;
-            halfSubarrKeys /= 8;
-        }
-        return minKeys; 
-    }
+    // Calculates the minimum between "keyLen" and cbrt(2 * subarrayLen * keysFound).
+    // Math will be further explained later, but just like in grailCommonSort, this
+    // loop is rendered completely useless by the scrolling buffer optimization;
+    // minKeys will always equal numKeys.
+    //
+    // Code still here for preservation purposes.
+    /*
+     * private static int grailCalcMinKeys(int numKeys, long subarrayKeys) {
+     *     int minKeys = 1;
+     *     while(minKeys < numKeys && subarrayKeys != 0) {
+     *         minKeys      *= 2;
+     *         subarrayKeys /= 8;
+     *     }
+     *     return minKeys; 
+     * }
+     */
 
     
     void grailCommonSort(K[] array, int start, int length, K[] extBuffer, int extBufferLen) {
@@ -1226,20 +1235,36 @@ final public class GrailSort<K> {
             int currentBlockLen = blockLen;
             boolean scrollingBuffer = idealBuffer;
 
-            //TODO: Credit peeps from #rewritten-grail-discussions for helping clear up ambiguity
+            // Huge credit to Anonymous0726, phoenixbound, and DeveloperSort for their tireless efforts
+            // towards deconstructing this math.
             if(!idealBuffer) {
-                //TODO: Explain this incredibly confusing math AND credit Bee sort and Anon
-                int halfKeyLen = keyLen / 2;
+                int keyBuffer = keyLen / 2;
                 
-                if((halfKeyLen * halfKeyLen) >= (2 * subarrayLen)) {
-                    currentBlockLen = halfKeyLen;
+                // Recall that the key-buffer is 'O(sqrt n)' items. If the key-buffer squared is greater than
+                // or equal to the length of the two subarrays being merged, then we have at least 1 key per
+                // item. This allows us to use a sufficient 'O(sqrt n)' scrolling buffer for 'O(n)' local
+                // merges as long as possible, greatly improving the performance of Grailsort Strategy 2.
+                if((keyBuffer * keyBuffer) >= (2 * subarrayLen)) {
+                    currentBlockLen = keyBuffer;
                     scrollingBuffer = true;
                 }
                 else {
-                    long halfSubarrKeys = ((long) subarrayLen * keysFound) / 2;
-                    int minKeys = grailCalcMinKeys(keyLen, halfSubarrKeys);
-
-                    currentBlockLen = (2 * subarrayLen) / minKeys;
+                    // This is a very recent discovery, and the math will be spelled out later, but this
+                    // "minKeys" calculation is *completely unnecessary*. "minKeys" would be less than
+                    // "keyLen" iff (keyBuffer * keyBuffer) >= (2 * subarrayLen)... but this situation
+                    // is already covered by our scrolling buffer optimization right above!! Consequently,
+                    // "minKeys" will *always* be equal to "keyLen" when Grailsort resorts to smart lazy
+                    // merges. Removing this loop is by itself a decent optimization, as well!
+                    //
+                    // Code still here for preservation purposes.
+                    /*
+                     * long subarrayKeys = ((long) subarrayLen * keysFound) / 2;
+                     * int minKeys = grailCalcMinKeys(keyLen, subarrayKeys);
+                     *
+                     * currentBlockLen = (2 * subarrayLen) / minKeys;
+                     */
+                    
+                    currentBlockLen = (2 * subarrayLen) / keyLen;
                 }
             }
 
