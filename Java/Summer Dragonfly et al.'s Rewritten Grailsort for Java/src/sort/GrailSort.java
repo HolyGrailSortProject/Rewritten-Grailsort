@@ -92,18 +92,18 @@ final public class GrailSort<K> {
         }
     }
 
-    // Swaps two adjacent blocks whose lengths may or may not be equal.
+    // Swaps the order of two adjacent blocks whose lengths may or may not be equal.
     // Variant of the Gries-Mills algorithm, which is basically recursive block swaps.
-    private static <K> void grailRotate(K[] array, int start, int leftBlock, int rightBlock) {
-        while(leftBlock > 0 && rightBlock > 0) {
-            if(leftBlock <= rightBlock) {
-                grailBlockSwap(array, start, start + leftBlock, leftBlock);
-                start      += leftBlock;
-                rightBlock -= leftBlock;
+    private static <K> void grailRotate(K[] array, int start, int leftLen, int rightLen) {
+        while(leftLen > 0 && rightLen > 0) {
+            if(leftLen <= rightLen) {
+                grailBlockSwap(array, start, start + leftLen, leftLen);
+                start    += leftLen;
+                rightLen -= leftLen;
             } 
             else {
-                grailBlockSwap(array, start + leftBlock - rightBlock, start + leftBlock, rightBlock);
-                leftBlock  -= rightBlock;
+                grailBlockSwap(array, start + leftLen - rightLen, start + leftLen, rightLen);
+                leftLen  -= rightLen;
             }
         }
     }
