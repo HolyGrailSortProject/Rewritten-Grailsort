@@ -379,7 +379,7 @@ final public class GrailSort<K> {
             start -= mergeLen;
         }
 
-        int fullMerge   = 2 * bufferLen; 
+        int fullMerge  = 2 * bufferLen; 
         int lastBlock  = length % fullMerge;
         int lastOffset = start + length - lastBlock;
 
