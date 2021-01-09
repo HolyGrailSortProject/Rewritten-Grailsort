@@ -179,8 +179,8 @@ public class Tester {
 
             // Grailsort with static buffer
             if(grailBufferType == 1) {
-                buffer    = (GrailPair[]) Array.newInstance(this.keyArray.getClass().getComponentType(), GrailSort.GRAIL_STATIC_EXT_BUF_LEN);
-                bufferLen = GrailSort.GRAIL_STATIC_EXT_BUF_LEN;
+                buffer    = (GrailPair[]) Array.newInstance(this.keyArray.getClass().getComponentType(), GrailSort.GRAIL_STATIC_EXT_BUFFER_LEN);
+                bufferLen = GrailSort.GRAIL_STATIC_EXT_BUFFER_LEN;
             }
             // Grailsort with dynamic buffer
             else if(grailBufferType == 2) {
