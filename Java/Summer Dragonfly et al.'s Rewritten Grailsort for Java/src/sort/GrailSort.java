@@ -288,7 +288,8 @@ final public class GrailSort<K> {
                                                            int bufferOffset, Comparator<K> cmp) {
         // used to be '= start'
         int    end = start  -  1;
-        int   left = start  +  leftLen - 1;
+        // used to be '= start + leftLen - 1'
+        int   left = end    +  leftLen;
         int middle = left;
         // OFF-BY-ONE BUG FIXED: used to be `int  right = middle + rightLen - 1;`
         int  right = middle + rightLen;
@@ -1252,19 +1253,16 @@ final public class GrailSort<K> {
             if(!idealBuffer) {
                 int keyBuffer = keyLen / 2;
                 
-                // Recall that the key-buffer is 'O(sqrt n)' items. If the key-buffer squared is greater than
-                // or equal to the length of the two subarrays being merged, then we have at least 1 key per
-                // item. This allows us to use a sufficient 'O(sqrt n)' scrolling buffer for 'O(n)' local
-                // merges as long as possible, greatly improving the performance of Grailsort Strategy 2.
-                if((keyBuffer * keyBuffer) >= (2 * subarrayLen)) {
+                // TODO: Rewrite explanation for this math
+                if(keyBuffer >= (2 * subarrayLen) / keyBuffer) {
                     currentBlockLen = keyBuffer;
                     scrollingBuffer = true;
                 }
                 else {
                     // This is a very recent discovery, and the math will be spelled out later, but this
                     // "minKeys" calculation is *completely unnecessary*. "minKeys" would be less than
-                    // "keyLen" iff (keyBuffer * keyBuffer) >= (2 * subarrayLen)... but this situation
-                    // is already covered by our scrolling buffer optimization right above!! Consequently,
+                    // "keyLen" iff keyBuffer >= (2 * subarrayLen) / keyBuffer... but this situation is
+                    // already covered by our scrolling buffer optimization right above!! Consequently,
                     // "minKeys" will *always* be equal to "keyLen" when Grailsort resorts to smart lazy
                     // merges. Removing this loop is by itself a decent optimization, as well!
                     //
