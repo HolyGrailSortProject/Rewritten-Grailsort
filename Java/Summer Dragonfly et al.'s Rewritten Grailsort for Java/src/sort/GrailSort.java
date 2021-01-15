@@ -1221,8 +1221,7 @@ final public class GrailSort<K> {
 
         boolean idealBuffer;
         if(keysFound < idealKeys) {
-            if(keysFound == 1) return;
-            else if(keysFound < 4) {
+            if(keysFound < 4) {
                 // GRAILSORT STRATEGY 3 -- No block swaps or scrolling buffer; resort to Lazy Stable Sort
                 grailLazyStableSort(array, start, length, this.cmp);
                 return;
