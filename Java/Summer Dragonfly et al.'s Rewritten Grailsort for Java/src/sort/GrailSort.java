@@ -462,7 +462,7 @@ final public class GrailSort<K> {
     // MINOR CHANGES: Change comparison order to emphasize "less-than" relation; fewer variables (Credit to Anonymous0726 for better variable names!)
     private static <K> int grailBlockSelectSort(K[] array, int firstKey, int start, int medianKey,
                                                            int blockCount, int blockLen, Comparator<K> cmp) {
-        for(int firstBlock = 0; firstBlock < blockCount; firstBlock++) {
+        for(int  firstBlock = 0; firstBlock < blockCount; firstBlock++) {
             int selectBlock = firstBlock;
 
             for(int currBlock = firstBlock + 1; currBlock < blockCount; currBlock++) {
@@ -500,48 +500,63 @@ final public class GrailSort<K> {
 
     
     // Swaps Grailsort's "scrolling buffer" from the right side of the array all the way back to 'start'.
-    // Costs O(n) operations.
+    // Costs O(n) swaps (amortized).
     //
     // OFF-BY-ONE BUG FIXED: used to be `int index = start + resetLen`; credit to 666666t for debugging
-    private static <K> void grailInPlaceBufferReset(K[] array, int start, int resetLen, int bufferLen) {
-        for(int index = start + resetLen - 1; index >= start; index--) {
-            grailSwap(array, index, index - bufferLen);
+    // RESTRUCTED, BETTER NAMES: 'resetLen' is now 'length' and 'bufferLen' is now 'bufferOffset'
+    private static <K> void grailInPlaceBufferReset(K[] array, int start, int length, int bufferOffset) {
+        int  index = start + length - 1;
+        int buffer = index - bufferOffset;
+        
+        while(index >= start) {
+            grailSwap(array, index, buffer);
+            index--;
+            buffer--;
         }
     }
 
-    // Shifts entire array over 'bufferSize' spaces to make room for the out-of-place merging buffer.
-    // Costs O(n) operations.
+    // Shifts entire array over 'bufferOffset' spaces to move the out-of-place merging buffer back to
+    // the beginning of the array.
+    // Costs O(n) writes (amortized).
     //
     // OFF-BY-ONE BUG FIXED: used to be `int index = start + resetLen`; credit to 666666t for debugging
-    private static <K> void grailOutOfPlaceBufferReset(K[] array, int start, int resetLen, int bufferLen) {
-        for(int index = start + resetLen - 1; index >= start; index--) {
-            array[index] = array[index - bufferLen];
+    // RESTRUCTED, BETTER NAMES: 'resetLen' is now 'length' and 'bufferLen' is now 'bufferOffset'
+    private static <K> void grailOutOfPlaceBufferReset(K[] array, int start, int length, int bufferOffset) {
+        int  index = start + length - 1;
+        int buffer = index - bufferOffset;
+        
+        while(index >= start) {
+            array[index] = array[buffer];
+            index--;
+            buffer--;
         }
     }
 
-    // Rewinds Grailsort's "scrolling buffer" such that any items from a left subarray block left over by a "smart merge" are moved to
-    // the right of the buffer. This is used to maintain stability and to continue an ongoing merge that has run out of buffer space.
-    // Costs O(sqrt n) swaps in the *absolute* worst-case. 
+    // Rewinds Grailsort's "scrolling buffer" to the left of any items belonging to the left subarray block
+    // left over by a "smart merge". This is used to continue an ongoing merge that has run out of buffer space.
+    // Costs O(sqrt n) swaps (amortized) in the *absolute* worst-case. 
     //
-    // NAMING IMPROVED: the left over items are in the middle of the merge while the buffer is at the end
-    private static <K> void grailInPlaceBufferRewind(K[] array, int start, int leftOvers, int buffer) {
-        while(leftOvers > start) {
-            leftOvers--;
+    // BETTER ORDER-OF-OPERATIONS, NAMING IMPROVED: the left over items (now called 'leftBlock') are in the
+    //                                              middle of the merge while the buffer is at the end
+    private static <K> void grailInPlaceBufferRewind(K[] array, int start, int leftBlock, int buffer) {
+        while(leftBlock >= start) {
+            grailSwap(array, buffer, leftBlock);
+            leftBlock--;
             buffer--;
-            grailSwap(array, buffer, leftOvers);
         }
     }
 
-    // Rewinds Grailsort's out-of-place buffer such that any items from a left subarray block left over by a "smart merge" are moved to
-    // the right of the buffer. This is used to maintain stability and to continue an ongoing merge that has run out of buffer space.
-    // Costs O(sqrt n) writes in the *absolute* worst-case.
+    // Rewinds Grailsort's out-of-place buffer to the left of any items belonging to the left subarray block
+    // left over by a "smart merge". This is used to continue an ongoing merge that has run out of buffer space.
+    // Costs O(sqrt n) writes (amortized) in the *absolute* worst-case.
     //
-    // INCORRECT ORDER OF PARAMETERS BUG FIXED: `leftOvers` should be the middle, and `buffer` should be the end
-    private static <K> void grailOutOfPlaceBufferRewind(K[] array, int start, int leftOvers, int buffer) {
-        while(leftOvers > start) {
-            leftOvers--;
+    // BETTER ORDER, INCORRECT ORDER OF PARAMETERS BUG FIXED: `leftOvers` (now called 'leftBlock') should be
+    //                                                        the middle, and `buffer` should be the end
+    private static <K> void grailOutOfPlaceBufferRewind(K[] array, int start, int leftBlock, int buffer) {
+        while(leftBlock >= start) {
+            array[buffer] = array[leftBlock];
+            leftBlock--;
             buffer--;
-            array[buffer] = array[leftOvers];
         }
     }
 
@@ -611,7 +626,8 @@ final public class GrailSort<K> {
 
         if(left < middle) {
             this.currBlockLen = middle - left;
-            grailInPlaceBufferRewind(array, left, middle, end);
+            // UPDATED ARGUMENTS: 'middle' and 'end' now 'middle - 1' and 'end - 1'
+            grailInPlaceBufferRewind(array, left, middle - 1, end - 1);
         }
         else {
             this.currBlockLen = end - right;
@@ -731,7 +747,8 @@ final public class GrailSort<K> {
 
         if(left < middle) {
             this.currBlockLen = middle - left;
-            grailOutOfPlaceBufferRewind(array, left, middle, end);
+            // UPDATED ARGUMENTS: 'middle' and 'end' now 'middle - 1' and 'end - 1'
+            grailOutOfPlaceBufferRewind(array, left, middle - 1, end - 1);
         }
         else {
             this.currBlockLen = end - right;
