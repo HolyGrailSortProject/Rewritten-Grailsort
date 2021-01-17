@@ -500,41 +500,43 @@ final public class GrailSort<K> {
 
     
     // Swaps Grailsort's "scrolling buffer" from the right side of the array all the way back to 'start'.
-    // Costs O(n) swaps (amortized).
+    // Costs O(n) swaps.
     //
     // OFF-BY-ONE BUG FIXED: used to be `int index = start + resetLen`; credit to 666666t for debugging
     // RESTRUCTED, BETTER NAMES: 'resetLen' is now 'length' and 'bufferLen' is now 'bufferOffset'
+    // SWAPPED NAMES: 'buffer' is now 'index' and vice versa
     private static <K> void grailInPlaceBufferReset(K[] array, int start, int length, int bufferOffset) {
-        int  index = start + length - 1;
-        int buffer = index - bufferOffset;
+        int buffer =  start + length - 1;
+        int  index = buffer - bufferOffset;
         
-        while(index >= start) {
+        while(buffer >= start) {
             grailSwap(array, index, buffer);
-            index--;
             buffer--;
+            index--;
         }
     }
 
     // Shifts entire array over 'bufferOffset' spaces to move the out-of-place merging buffer back to
     // the beginning of the array.
-    // Costs O(n) writes (amortized).
+    // Costs O(n) writes.
     //
     // OFF-BY-ONE BUG FIXED: used to be `int index = start + resetLen`; credit to 666666t for debugging
     // RESTRUCTED, BETTER NAMES: 'resetLen' is now 'length' and 'bufferLen' is now 'bufferOffset'
+    // SWAPPED NAMES: 'buffer' is now 'index' and vice versa
     private static <K> void grailOutOfPlaceBufferReset(K[] array, int start, int length, int bufferOffset) {
-        int  index = start + length - 1;
-        int buffer = index - bufferOffset;
+        int buffer =  start + length - 1;
+        int  index = buffer - bufferOffset;
         
-        while(index >= start) {
-            array[index] = array[buffer];
-            index--;
+        while(buffer >= start) {
+            array[buffer] = array[index];
             buffer--;
+            index--;
         }
     }
 
     // Rewinds Grailsort's "scrolling buffer" to the left of any items belonging to the left subarray block
     // left over by a "smart merge". This is used to continue an ongoing merge that has run out of buffer space.
-    // Costs O(sqrt n) swaps (amortized) in the *absolute* worst-case. 
+    // Costs O(sqrt n) swaps in the *absolute* worst-case. 
     //
     // BETTER ORDER-OF-OPERATIONS, NAMING IMPROVED: the left over items (now called 'leftBlock') are in the
     //                                              middle of the merge while the buffer is at the end
@@ -548,7 +550,7 @@ final public class GrailSort<K> {
 
     // Rewinds Grailsort's out-of-place buffer to the left of any items belonging to the left subarray block
     // left over by a "smart merge". This is used to continue an ongoing merge that has run out of buffer space.
-    // Costs O(sqrt n) writes (amortized) in the *absolute* worst-case.
+    // Costs O(sqrt n) writes in the *absolute* worst-case.
     //
     // BETTER ORDER, INCORRECT ORDER OF PARAMETERS BUG FIXED: `leftOvers` (now called 'leftBlock') should be
     //                                                        the middle, and `buffer` should be the end
@@ -651,11 +653,11 @@ final public class GrailSort<K> {
 
                     if(mergeLen != 0) {
                         grailRotate(array, start, leftLen, mergeLen);
+                        
                         start    += mergeLen;
+                        middle   += mergeLen;
                         rightLen -= mergeLen;
                     }
-                    
-                    middle += mergeLen;
                     
                     if(rightLen == 0) {
                         this.currBlockLen = leftLen;
@@ -678,11 +680,11 @@ final public class GrailSort<K> {
 
                     if(mergeLen != 0) {
                         grailRotate(array, start, leftLen, mergeLen);
+                        
                         start    += mergeLen;
+                        middle   += mergeLen;
                         rightLen -= mergeLen;
                     }
-
-                    middle += mergeLen;
                     
                     if(rightLen == 0) {
                         this.currBlockLen = leftLen;
@@ -775,9 +777,9 @@ final public class GrailSort<K> {
         this.currBlockLen    = blockLen;
         this.currBlockOrigin = grailGetSubarray(array, firstKey, medianKey, cmp);
 
-        Subarray nextBlockOrigin;
-
         for(int keyIndex = 1; keyIndex < blockCount; keyIndex++, nextBlock += blockLen) {
+            Subarray nextBlockOrigin;
+            
             currBlock       = nextBlock - this.currBlockLen;
             nextBlockOrigin = grailGetSubarray(array, firstKey + keyIndex, medianKey, cmp);
 
@@ -824,9 +826,9 @@ final public class GrailSort<K> {
         this.currBlockLen    = blockLen;
         this.currBlockOrigin = grailGetSubarray(array, firstKey, medianKey, cmp);
 
-        Subarray nextBlockOrigin;
-
         for(int keyIndex = 1; keyIndex < blockCount; keyIndex++, nextBlock += blockLen) {
+            Subarray nextBlockOrigin;
+            
             currBlock       = nextBlock - this.currBlockLen;
             nextBlockOrigin = grailGetSubarray(array, firstKey + keyIndex, medianKey, cmp);
 
@@ -869,9 +871,9 @@ final public class GrailSort<K> {
         this.currBlockLen    = blockLen;
         this.currBlockOrigin = grailGetSubarray(array, firstKey, medianKey, cmp);
 
-        Subarray nextBlockOrigin;
-
         for(int keyIndex = 1; keyIndex < blockCount; keyIndex++, nextBlock += blockLen) {
+            Subarray nextBlockOrigin;
+            
             currBlock       = nextBlock - this.currBlockLen;  
             nextBlockOrigin = grailGetSubarray(array, firstKey + keyIndex, medianKey, cmp);
 
@@ -1059,8 +1061,8 @@ final public class GrailSort<K> {
     // 'keys' are on the left side of array. Blocks of length 'subarrayLen' combined. We'll combine them in pairs
     // 'subarrayLen' is a power of 2. (2 * subarrayLen / blockLen) keys are guaranteed
     //
-    // IMPORTANT RENAMES: 'lastSubarray' is now 'lastSubarrays' because it includes the length of the last left
-    //                    subarray AND last right subarray (if there is a right subarray at all).
+    // IMPORTANT RENAME: 'lastSubarray' is now 'lastSubarrays' because it includes the length of the last left
+    //                   subarray AND last right subarray (if there is a right subarray at all).
     //
     //                    *Please also check everything surrounding 'if(lastSubarrays != 0)' inside
     //                    'combine in-/out-of-place' methods for other renames!!*
@@ -1101,11 +1103,11 @@ final public class GrailSort<K> {
 
                 if(mergeLen != 0) {
                     grailRotate(array, start, leftLen, mergeLen);
+                    
                     start    += mergeLen;
+                    middle   += mergeLen;
                     rightLen -= mergeLen;
                 }
-                
-                middle += mergeLen;
                 
                 if(rightLen == 0) {
                     break;
@@ -1128,6 +1130,7 @@ final public class GrailSort<K> {
 
                 if(mergeLen != leftLen) {
                     grailRotate(array, start + mergeLen, leftLen - mergeLen, rightLen);
+                    
                     end     -=  leftLen - mergeLen;
                     leftLen  = mergeLen;
                 }
@@ -1271,15 +1274,15 @@ final public class GrailSort<K> {
                 int keyBuffer = keyLen / 2;
                 
                 // TODO: Rewrite explanation for this math
-                if(keyBuffer >= (2 * subarrayLen) / keyBuffer) {
+                if(keyBuffer >= ((2 * subarrayLen) / keyBuffer)) {
                     currentBlockLen = keyBuffer;
                     scrollingBuffer = true;
                 }
                 else {
                     // This is a very recent discovery, and the math will be spelled out later, but this
                     // "minKeys" calculation is *completely unnecessary*. "minKeys" would be less than
-                    // "keyLen" iff keyBuffer >= (2 * subarrayLen) / keyBuffer... but this situation is
-                    // already covered by our scrolling buffer optimization right above!! Consequently,
+                    // "keyLen" iff keyBuffer >= ((2 * subarrayLen) / keyBuffer)... but this situation
+                    // is already covered by our scrolling buffer optimization right above!! Consequently,
                     // "minKeys" will *always* be equal to "keyLen" when Grailsort resorts to smart lazy
                     // merges. Removing this loop is by itself a decent optimization, as well!
                     //
