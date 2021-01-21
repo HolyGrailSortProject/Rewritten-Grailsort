@@ -67,6 +67,7 @@ Visit our **Discord guild** for **project updates** and **behind-the-scenes cont
    * Morwenn
    * MP
    * phoenixbound
+   * Spex_guy
    * thatsOven
    * \_fluffyy
  * Special thanks to "The Studio" Discord community!

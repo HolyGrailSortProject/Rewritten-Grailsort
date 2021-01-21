@@ -34,14 +34,17 @@ import java.util.Comparator;
  * Project Contributors: 666666t
  *                       Anonymous0726
  *                       aphitorite
+ *                       Control
  *                       dani_dlg
  *                       DeveloperSort
  *                       EilrahcF
  *                       Enver
+ *                       Gaming32
  *                       lovebuny
  *                       Morwenn
  *                       MP
  *                       phoenixbound
+ *                       Spex_guy
  *                       thatsOven
  *                       _fluffyy
  *
@@ -1064,8 +1067,8 @@ final public class GrailSort<K> {
     // IMPORTANT RENAME: 'lastSubarray' is now 'lastSubarrays' because it includes the length of the last left
     //                   subarray AND last right subarray (if there is a right subarray at all).
     //
-    //                    *Please also check everything surrounding 'if(lastSubarrays != 0)' inside
-    //                    'combine in-/out-of-place' methods for other renames!!*
+    //                   *Please also check everything surrounding 'if(lastSubarrays != 0)' inside
+    //                   'combine in-/out-of-place' methods for other renames!!*
     private void grailCombineBlocks(K[] array, int firstKey, int start, int length,
                                                int subarrayLen, int blockLen, boolean buffer) {
         int     fullMerge = 2 * subarrayLen;
@@ -1281,7 +1284,7 @@ final public class GrailSort<K> {
                 else {
                     // This is a very recent discovery, and the math will be spelled out later, but this
                     // "minKeys" calculation is *completely unnecessary*. "minKeys" would be less than
-                    // "keyLen" iff keyBuffer >= ((2 * subarrayLen) / keyBuffer)... but this situation
+                    // "keyLen" iff ((keyBuffer >= (2 * subarrayLen)) / keyBuffer)... but this situation
                     // is already covered by our scrolling buffer optimization right above!! Consequently,
                     // "minKeys" will *always* be equal to "keyLen" when Grailsort resorts to smart lazy
                     // merges. Removing this loop is by itself a decent optimization, as well!
