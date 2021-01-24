@@ -2,14 +2,14 @@
 A diverse array of heavily refactored versions of Andrey Astrelin's GrailSort.h, aiming to be as readable and intuitive as possible. *Owned and maintained by The Holy Grail Sort Project.*
 
 # Current implementations featured in our repo:
-* Summer Dragonfly et al.'s Rewritten Grailsort for **Java** (ALL TESTS PASSING / POTENTIALLY FIXED) 
+* Summer Dragonfly et al.'s Rewritten Grailsort for **Java** (ALL TESTS PASSING / POTENTIALLY FIXED)
+* * DeveloperSort's Minor Edits to Summer... et al.'s Rewritten Grailsort for **Java**
 * 666666t's Rewritten Grailsort for **Rust**
 * thatsOven's Rewritten Grailsort for **Python**
 * Enver's Rewritten Grailsort for **JavaScript**
 * Summer Dragonfly's *Simple* Rewritten Grailsort for **C**
 * \_fluffyy's Rewritten Grailsort for **Python**
 * Gaming32's Rewritten Grailsort for **Cython**
-* DeveloperSort's Minor Edits to Summer... et al.'s Rewritten Grailsort for **Java**
 * SpexGuy's Rewritten Grailsort for **Zig**
 * *more to come!*
 
