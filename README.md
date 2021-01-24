@@ -3,7 +3,7 @@ A diverse array of heavily refactored versions of Andrey Astrelin's GrailSort.h,
 
 # Current implementations featured in our repo:
 * Summer Dragonfly et al.'s Rewritten Grailsort for **Java** (ALL TESTS PASSING / POTENTIALLY FIXED)
-* * DeveloperSort's Minor Edits to Summer... et al.'s Rewritten Grailsort for **Java**
+  * DeveloperSort's Minor Edits to Summer... et al.'s Rewritten Grailsort for **Java**
 * 666666t's Rewritten Grailsort for **Rust**
 * thatsOven's Rewritten Grailsort for **Python**
 * Enver's Rewritten Grailsort for **JavaScript**
