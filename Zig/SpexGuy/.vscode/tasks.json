@@ -1,0 +1,52 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build-debug",
+            "type": "shell",
+            "command": "zig",
+            "args": ["build", "vscode"],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "build-devel",
+            "type": "shell",
+            "command": "zig",
+            "args": ["build", "vscode", "-Drelease-safe=true"],
+            "problemMatcher": [],
+            "group": "build",
+        },
+        {
+            "label": "build-release",
+            "type": "shell",
+            "command": "zig",
+            "args": ["build", "vscode", "-Drelease-fast=true"],
+            "problemMatcher": [],
+            "group": "build",
+        },
+        {
+            "label": "test",
+            "type": "shell",
+            "command": "zig",
+            "args": ["build", "test"],
+            "problemMatcher": [],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "format",
+            "type": "shell",
+            "command": "zig",
+            "args": ["fmt", "${file}"],
+            "problemMatcher": [],
+        },
+    ]
+}

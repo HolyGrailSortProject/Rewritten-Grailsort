@@ -10,6 +10,7 @@ A diverse array of heavily refactored versions of Andrey Astrelin's GrailSort.h,
 * \_fluffyy's Rewritten Grailsort for **Python**
 * Gaming32's Rewritten Grailsort for **Cython**
 * DeveloperSort's Minor Edits to Summer... et al.'s Rewritten Grailsort for **Java**
+* SpexGuy's Rewritten Grailsort for **Zig**
 * *more to come!*
 
 # What is Grailsort?
