@@ -1,4 +1,4 @@
-Visit our **Discord guild** for **project updates** and **behind-the-scenes content**:
+Visit our **Discord guild** for **project updates**:
 
 [![Discord Banner 2](https://discordapp.com/api/guilds/592082838791127075/widget.png?style=banner2)](https://discord.com/invite/2xGkKC2)
 
