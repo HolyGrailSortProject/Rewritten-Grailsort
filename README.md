@@ -49,7 +49,8 @@ Now, there *are* some glaring flaws with Grailsort, but they're now easier than 
 - Official Wikipedia for Block (Merge) Sort: https://en.wikipedia.org/wiki/Block_sort
 - *Full documentation/educational lessons on Grailsort and Block Merge Sorting coming soon!!*
 
-Visit our **Discord guild** for **project updates** and **behind-the-scenes content**: https://discord.com/invite/2xGkKC2
+Visit our **Discord guild** for **project updates** and **behind-the-scenes content**:
+[![Discord Banner 2](https://discordapp.com/api/guilds/592082838791127075/widget.png?style=banner2)](https://discord.com/invite/2xGkKC2)
 
 # The Holy Grail Sort Project
  * Project Manager:
