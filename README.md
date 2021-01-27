@@ -1,3 +1,7 @@
+Visit our **Discord guild** for **project updates** and **behind-the-scenes content**:
+
+[![Discord Banner 2](https://discordapp.com/api/guilds/592082838791127075/widget.png?style=banner2)](https://discord.com/invite/2xGkKC2)
+
 # The Rewritten Grailsort repo
 A diverse array of heavily refactored versions of Andrey Astrelin's GrailSort.h, aiming to be as readable and intuitive as possible. *Owned and maintained by The Holy Grail Sort Project.*
 
@@ -48,9 +52,6 @@ Now, there *are* some glaring flaws with Grailsort, but they're now easier than 
 - Academic paper that Wikisort is based off of: https://github.com/BonzaiThePenguin/WikiSort/blob/master/tamc2008.pdf
 - Official Wikipedia for Block (Merge) Sort: https://en.wikipedia.org/wiki/Block_sort
 - *Full documentation/educational lessons on Grailsort and Block Merge Sorting coming soon!!*
-
-Visit our **Discord guild** for **project updates** and **behind-the-scenes content**:
-[![Discord Banner 2](https://discordapp.com/api/guilds/592082838791127075/widget.png?style=banner2)](https://discord.com/invite/2xGkKC2)
 
 # The Holy Grail Sort Project
  * Project Manager:
