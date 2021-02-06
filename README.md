@@ -40,6 +40,10 @@ Not only that, our team has found a ton of potential in Grailsort, and so did th
   
 The paper is linked in this repo for reference.
 
+Side note: While the paper advertizes very appealing stats, it is worth pointing out Grailsort differs from the original paper in several ways. That being said, Andrey Astrelin's blog post (*linked below*) offers this bit of analysis:
+
+> "Experiments show that in the worst case, the algorithm requires no more than 1.61 * N * log 2 N comparisons and 2.12 * N * log 2N exchanges (for N≤1000000, on random data with a predetermined number of different keys)."
+
 Now, there *are* some glaring flaws with Grailsort, but they're now easier than ever to study and optimize! This is only the beginning of our little project, and we hope you enjoy our hard work. :)
 
 # Helpful resources
