@@ -1,10 +1,18 @@
 [package]
-name = "grail_rewrite"
-version = "0.1.0"
+name = "grailsort"
+version = "0.2.0"
 authors = ["Dani Jung <dajtg6@gmail.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
+[dev-dependencies]
 rand = "0.7.3"
+criterion = "0.3"
+
+[profile.release]
+debug = true
+
+[[bench]]
+name = "bufferless_grail"
+harness = false
