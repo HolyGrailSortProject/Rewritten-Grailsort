@@ -58,50 +58,51 @@ def arrayCopy(fromArray, fromIndex, toArray, toIndex, length):   # thanks to Bee
 #
 # Primary author: thatsOven
 #
-# Current status: Potentially working (Untested)
+# Current status: Not working
 
 class Subarray:
     LEFT, RIGHT = 0, 1
 
 class GrailSort:
 
-    GRAIL_STATIC_EXT_BUFFER_LEN = 512
+    GRAIL_STATIC_EXT_BUF_LEN = 512
 
     extBuffer = None
     extBufferLen = 0
 
-    def grailSwap(self, array, a, b):
+    @staticmethod
+    def grailSwap(array, a, b):
         array[a], array[b] = array[b], array[a]
     
-
-    def grailBlockSwap(self, array, a, b, blockLen):
+    @staticmethod
+    def grailBlockSwap(array, a, b, blockLen):
         for i in range(0, blockLen):
-            self.grailSwap(array, a + i, b + i)
+            GrailSort.grailSwap(array, a + i, b + i)
 
-
-    def grailRotate(self, array, start, leftLen, rightLen):
+    @staticmethod
+    def grailRotate(array, start, leftLen, rightLen):
         while leftLen > 0 and rightLen > 0:
             if leftLen <= rightLen:
-                self.grailBlockSwap(array, start, start + leftLen, leftLen)
+                GrailSort.grailBlockSwap(array, start, start + leftLen, leftLen)
                 start    += leftLen
                 rightLen -= leftLen
             else:
-                self.grailBlockSwap(array, start + leftLen - rightLen, start + leftLen, rightLen)
+                GrailSort.grailBlockSwap(array, start + leftLen - rightLen, start + leftLen, rightLen)
                 leftLen -= rightLen
     
-
-    def grailInsertSort(self, array, start, length):
+    @staticmethod
+    def grailInsertSort(array, start, length):
         for item in range(1, length):
             left  = start + item - 1
             right = start + item
 
             while left >= start and array[left] > array[right]:
-                self.grailSwap(array, left, right)
+                GrailSort.grailSwap(array, left, right)
                 left  -= 1
                 right -= 1
 
-
-    def grailBinarySearchLeft(self, array, start, length, target):
+    @staticmethod
+    def grailBinarySearchLeft(array, start, length, target):
         left  = 0
         right = length
 
@@ -115,8 +116,8 @@ class GrailSort:
 
         return left
 
-
-    def grailBinarySearchRight(self, array, start, length, target):
+    @staticmethod
+    def grailBinarySearchRight(array, start, length, target):
         left  = 0
         right = length
 
@@ -130,53 +131,53 @@ class GrailSort:
 
         return right
 
-
-    def grailCollectKeys(self, array, start, length, idealKeys):
+    @staticmethod    
+    def grailCollectKeys(array, start, length, idealKeys):
         keysFound  = 1
         firstKey   = 0
         currKey    = 1
 
         while currKey < length and keysFound < idealKeys:
 
-            insertPos = self.grailBinarySearchLeft(array, start + firstKey, keysFound, array[start + currentKey])
+            insertPos = GrailSort.grailBinarySearchLeft(array, start + firstKey, keysFound, array[start + currKey])
 
             if insertPos == keysFound or array[start + currKey] != array[start + firstKey + insertPos]:
 
-                self.grailRotate(array, start + firstKey, keysFound, currKey - (firstKey + keysFound))
+                GrailSort.grailRotate(array, start + firstKey, keysFound, currKey - (firstKey + keysFound))
 
                 firstKey = currKey - keysFound
 
-                self.grailRotate(array, start + firstKey + insertPos, keysFound - insertPos, 1)
+                GrailSort.grailRotate(array, start + firstKey + insertPos, keysFound - insertPos, 1)
 
                 keysFound += 1
 
             currKey += 1
 
-        self.grailRotate(array, start, firstKey, keysFound)
+        GrailSort.grailRotate(array, start, firstKey, keysFound)
         return keysFound
 
-
-    def grailPairwiseSwaps(self, array, start, length):
+    @staticmethod
+    def grailPairwiseSwaps(array, start, length):
         index = 1
         while index < length:
             left  = start + index - 1
             right = start + index
 
             if array[left] > array[right]:
-                self.grailSwap(array,  left - 2, right)
-                self.grailSwap(array, right - 2,  left)
+                GrailSort.grailSwap(array,  left - 2, right)
+                GrailSort.grailSwap(array, right - 2,  left)
             else:
-                self.grailSwap(array,  left - 2,  left)
-                self.grailSwap(array, right - 2, right)
+                GrailSort.grailSwap(array,  left - 2,  left)
+                GrailSort.grailSwap(array, right - 2, right)
                 
             index += 2
         
         left = start + index - 1
         if left < start + length:
-            self.grailSwap(array, left - 2, left)
+            GrailSort.grailSwap(array, left - 2, left)
 
-
-    def grailPairwiseWrites(self, array, start, length):
+    @staticmethod
+    def grailPairwiseWrites(array, start, length):
         index = 1
         while index < length:
             left  = start + index - 1
@@ -193,8 +194,8 @@ class GrailSort:
         if left < start + length:
             array[left - 2] = array[left]
 
-    
-    def grailMergeForwards(self, array, start, leftLen, rightLen, bufferOffset):
+    @staticmethod
+    def grailMergeForwards(array, start, leftLen, rightLen, bufferOffset):
         left   = start
         middle = start + leftLen
         right  = middle
@@ -203,41 +204,41 @@ class GrailSort:
 
         while right < end:
             if left == middle or array[left] > array[right]:
-                self.grailSwap(array, buffer, right)
+                GrailSort.grailSwap(array, buffer, right)
                 right += 1
             else:
-                self.grailSwap(array, buffer, left)
+                GrailSort.grailSwap(array, buffer, left)
                 left += 1
             buffer += 1
 
         if buffer != left:
-            self.grailBlockSwap(array, buffer, left, middle-left)
+            GrailSort.grailBlockSwap(array, buffer, left, middle-left)
         
-    
-    def grailMergeBackwards(self, array, start, leftLen, rightLen, bufferOffset):
-        left   = start + leftLen - 1
+    @staticmethod
+    def grailMergeBackwards(array, start, leftLen, rightLen, bufferOffset):
+        end    = start - 1
+        left   = end + leftLen
         middle = left
         right  = middle + rightLen
-        end    = start - 1
         buffer = right + bufferOffset
 
-        while left >= end:
+        while left > end:
             if right == middle or array[left] > array[right]:
-                self.grailSwap(array, buffer, left)
+                GrailSort.grailSwap(array, buffer, left)
                 left -= 1
             else:
-                self.grailSwap(array, buffer, right)
+                GrailSort.grailSwap(array, buffer, right)
                 right -= 1
             buffer -= 1
 
         if right != buffer:
             while right > middle:
-                self.grailSwap(array, buffer, right)
+                GrailSort.grailSwap(array, buffer, right)
                 buffer -= 1
                 right -= 1
 
-    
-    def grailMergeOutOfPlace(self, array, start, leftLen, rightLen, bufferOffset):
+    @staticmethod 
+    def grailMergeOutOfPlace(array, start, leftLen, rightLen, bufferOffset):
         left   = start
         middle = start + leftLen
         right  = middle
@@ -259,8 +260,8 @@ class GrailSort:
                 buffer += 1
                 left += 1
 
-
-    def grailBuildInPlace(self, array, start, length, currentLen, bufferLen):
+    @staticmethod
+    def grailBuildInPlace(array, start, length, currentLen, bufferLen):
         mergeLen = currentLen
         while mergeLen < bufferLen:
             fullMerge = 2 * mergeLen
@@ -270,40 +271,40 @@ class GrailSort:
 
             mergeIndex = start
             while mergeIndex <= mergeEnd:
-                self.grailMergeForwards(array, mergeIndex, mergeLen, mergeLen, bufferOffset)
+                GrailSort.grailMergeForwards(array, mergeIndex, mergeLen, mergeLen, bufferOffset)
 
                 mergeIndex += fullMerge
 
             leftOver = length - (mergeIndex - start)
 
             if leftOver > mergeLen:
-                self.grailMergeForwards(array, mergeIndex, mergeLen, leftOver - mergeLen, bufferOffset)
+                GrailSort.grailMergeForwards(array, mergeIndex, mergeLen, leftOver - mergeLen, bufferOffset)
             else:
-                self.grailRotate(array, mergeIndex - mergeLen, mergeLen, leftOver)
+                GrailSort.grailRotate(array, mergeIndex - mergeLen, mergeLen, leftOver)
 
             start -= mergeLen
 
             mergeLen *= 2
 
         fullMerge = 2 * bufferLen
-        lastBlock = length % fullMerge
+        lastBlock = int(length % fullMerge)
         lastOffset = start + length - lastBlock
 
         if lastBlock <= bufferLen:
-            self.grailRotate(array, lastOffset, lastBlock, bufferLen)
+            GrailSort.grailRotate(array, lastOffset, lastBlock, bufferLen)
         else:
-            self.grailMergeBackwards(array, lastOffset, bufferLen, lastBlock - bufferLen, bufferLen)
+            GrailSort.grailMergeBackwards(array, lastOffset, bufferLen, lastBlock - bufferLen, bufferLen)
 
         mergeIndex = lastOffset - fullMerge
         while mergeIndex >= start:
-            self.grailMergeBackwards(array, mergeIndex, bufferLen, bufferLen, bufferLen)
+            GrailSort.grailMergeBackwards(array, mergeIndex, bufferLen, bufferLen, bufferLen)
             mergeIndex -= fullMerge
 
-    
-    def grailBuildOutOfPlace(self, array, start, length, bufferLen, extLen):
-        arrayCopy(array, start - extLen, self.extBuffer, 0, extLen)
+    @staticmethod   
+    def grailBuildOutOfPlace(array, start, length, bufferLen, extLen):
+        arrayCopy(array, start - extLen, GrailSort.extBuffer, 0, extLen)
 
-        self.grailPairwiseWrites(array, start, length)
+        GrailSort.grailPairwiseWrites(array, start, length)
         start -= 2
 
         mergeLen = 2
@@ -315,38 +316,38 @@ class GrailSort:
 
             mergeIndex = start
             while mergeIndex <= mergeEnd:
-                self.grailMergeOutOfPlace(array, mergeIndex, mergeLen, mergeLen, bufferOffset)
+                GrailSort.grailMergeOutOfPlace(array, mergeIndex, mergeLen, mergeLen, bufferOffset)
                 mergeIndex += fullMerge
 
             leftOver = length - (mergeIndex - start)
 
             if leftOver > mergeLen:
-                self.grailMergeOutOfPlace(array, mergeIndex, mergeLen, leftOver - mergeLen, bufferOffset)
+                GrailSort.grailMergeOutOfPlace(array, mergeIndex, mergeLen, leftOver - mergeLen, bufferOffset)
             else:
                 arrayCopy(array, mergeIndex, array, mergeIndex - mergeLen, leftOver)
 
             start -= mergeLen
             mergeLen *= 2
 
-        arrayCopy(self.extBuffer, 0, array, start + length, extLen)
-        self.grailBuildInPlace(array, start, length, mergeLen, bufferLen)
+        arrayCopy(GrailSort.extBuffer, 0, array, start + length, extLen)
+        GrailSort.grailBuildInPlace(array, start, length, mergeLen, bufferLen)
 
-
-    def grailBuildBlocks(self, array, start, length, bufferLen):
-        if self.extBuffer is not None:
-            if bufferLen < self.extBufferLen:
+    @staticmethod
+    def grailBuildBlocks(array, start, length, bufferLen):
+        if GrailSort.extBuffer is not None:
+            if bufferLen < GrailSort.extBufferLen:
                 extLen = bufferLen
             else:
                 extLen = 1
-                while (extLen*2) <= self.extBufferLen:
+                while (extLen*2) <= GrailSort.extBufferLen:
                     extLen *= 2
-            self.grailBuildOutOfPlace(array, start, length, bufferLen, extLen)
+            GrailSort.grailBuildOutOfPlace(array, start, length, bufferLen, extLen)
         else:
-            self.grailPairwiseSwaps(array, start, length)
-            self.grailBuildInPlace(array, start - 2, length, 2, bufferLen)   
+            GrailSort.grailPairwiseSwaps(array, start, length)
+            GrailSort.grailBuildInPlace(array, start - 2, length, 2, bufferLen)   
 
-    
-    def grailBlockSelectSort(self, array, firstKey, start, medianKey, blockCount, blockLen):
+    @staticmethod   
+    def grailBlockSelectSort(array, firstKey, start, medianKey, blockCount, blockLen):
         for firstBlock in range(0, blockCount):
             selectBlock = firstBlock
 
@@ -358,50 +359,54 @@ class GrailSort:
                     selectBlock = currBlock
 
             if selectBlock != firstBlock:
-                self.grailBlockSwap(array, start + (firstBlock * blockLen), start + (selectBlock * blockLen), blockLen)
+                GrailSort.grailBlockSwap(array, start + (firstBlock * blockLen), start + (selectBlock * blockLen), blockLen)
 
-                self.grailSwap(array, firstKey + firstBlock, firstKey + selectBlock)
+                GrailSort.grailSwap(array, firstKey + firstBlock, firstKey + selectBlock)
 
                 if   medianKey == firstBlock:  medianKey = selectBlock
                 elif medianKey == selectBlock: medianKey = firstBlock
 
         return medianKey
 
-
-    def grailInPlaceBufferReset(self, array, start, resetLen, bufferLen):
-        index = start + resetLen - 1
-        while index >= start:
-            self.grailSwap(array, index, index - bufferLen)
+    @staticmethod
+    def grailInPlaceBufferReset(array, start, length, bufferOffset):
+        buffer = start + length - 1
+        index  = buffer - bufferOffset 
+        while buffer >= start:
+            GrailSort.grailSwap(array, index, buffer)
+            buffer -= 1
             index -= 1
 
-
-    def grailOutOfPlaceBufferReset(self, array, start, resetLen, bufferLen):
-        index = start + resetLen
-        while index >= 0:
-            array[index] = array[index - bufferLen]
+    @staticmethod
+    def grailOutOfPlaceBufferReset(array, start, length, bufferOffset):
+        buffer = start + length - 1
+        index  = buffer - bufferOffset 
+        while buffer >= start:
+            array[buffer] = array[index]
+            buffer -= 1
             index -= 1
 
-
-    def grailInPlaceBufferRewind(self, array, start, buffer, leftOvers):
-        while start < buffer:
+    @staticmethod
+    def grailInPlaceBufferRewind(array, start, leftBlock, buffer):
+        while leftBlock >= start:
+            GrailSort.grailSwap(array, buffer, leftBlock)
             buffer -= 1
-            leftOvers -= 1
-            self.grailSwap(array, buffer, leftOvers)
-
-
-    def grailOutOfPlaceBufferRewind(self, array, start, buffer, leftOvers):
-        while start < buffer:
+            leftBlock -= 1
+            
+    @staticmethod
+    def grailOutOfPlaceBufferRewind(array, start, leftBlock, buffer):
+        while leftBlock >= start:
+            array[buffer] = array[leftBlock]
             buffer -= 1
-            leftOvers -= 1
-            array[buffer] = array[leftOvers]
+            leftBlock -= 1
 
-
-    def grailGetSubarray(self, array, currentKey, medianKey):
+    @staticmethod
+    def grailGetSubarray(array, currentKey, medianKey):
         if array[currentKey] < array[medianKey] : return Subarray.LEFT
         else                                    : return Subarray.RIGHT
 
-
-    def grailCountFinalLeftBlocks(self, array, offset, blockCount, blockLen):
+    @staticmethod
+    def grailCountLastMergeBlocks(array, offset, blockCount, blockLen):
         blocksToMerge = 0
 
         lastRightFrag = offset + (blockCount * blockLen)
@@ -413,8 +418,8 @@ class GrailSort:
 
         return blocksToMerge
 
-
-    def grailSmartMerge(self, array, start, leftLen, leftOrigin, rightLen, bufferOffset):
+    @staticmethod
+    def grailSmartMerge(array, start, leftLen, leftOrigin, rightLen, bufferOffset):
         left   = start
         middle = start + leftLen
         right  = middle
@@ -424,49 +429,50 @@ class GrailSort:
         if leftOrigin == Subarray.LEFT:
             while (left < middle) and (right < end):
                 if array[left] <= array[right]:
-                    self.grailSwap(array, buffer, left)
+                    GrailSort.grailSwap(array, buffer, left)
                     left += 1
                 else:
-                    self.grailSwap(array, buffer, right)
+                    GrailSort.grailSwap(array, buffer, right)
                     right += 1
                 buffer += 1
         
         else:
             while (left < middle) and (right < end):
                 if array[left] < array[right]:
-                    self.grailSwap(array, buffer, left)
+                    GrailSort.grailSwap(array, buffer, left)
                     left += 1
                 else:
-                    self.grailSwap(array, buffer, right)
+                    GrailSort.grailSwap(array, buffer, right)
                     right += 1
                 buffer += 1
 
         if left < middle:
-            self.currBlockLen = middle - left
-            self.grailInPlaceBufferRewind(array, left, middle, end)
+            GrailSort.currBlockLen = middle - left
+            GrailSort.grailInPlaceBufferRewind(array, left, middle - 1, end - 1)
         else:
-            self.currBlockLen = end - right
+            GrailSort.currBlockLen = end - right
             if leftOrigin == Subarray.LEFT:
-                self.currBlockOrigin = Subarray.RIGHT
+                GrailSort.currBlockOrigin = Subarray.RIGHT
             else:
-                self.currBlockOrigin = Subarray.LEFT
+                GrailSort.currBlockOrigin = Subarray.LEFT
 
-
-    def grailSmartLazyMerge(self, array, start, leftLen, leftOrigin, rightLen):
+    @staticmethod
+    def grailSmartLazyMerge(array, start, leftLen, leftOrigin, rightLen):
         middle = start + leftLen
 
         if leftOrigin == Subarray.LEFT:
             if array[middle- 1] > array[middle]:
                 while leftLen != 0:
-                    mergeLen = self.grailBinarySearchLeft(array, middle, rightLen, array[start])
+                    mergeLen = GrailSort.grailBinarySearchLeft(array, middle, rightLen, array[start])
 
                     if mergeLen != 0:
-                        self.grailRotate(array, start, leftLen, mergeLen)
+                        GrailSort.grailRotate(array, start, leftLen, mergeLen)
                         start    += mergeLen
                         rightLen -= mergeLen
+                        middle   += mergeLen
 
                     if rightLen == 0:
-                        self.currBlockLen = leftLen
+                        GrailSort.currBlockLen = leftLen
                         return
                     else:
                         condition = True
@@ -477,17 +483,16 @@ class GrailSort:
         else:
             if array[middle - 1] >= array[middle]:
                 while leftLen != 0:
-                    mergeLen = self.grailBinarySearchRight(array, middle, rightLen, array[start])
+                    mergeLen = GrailSort.grailBinarySearchRight(array, middle, rightLen, array[start])
 
                     if mergeLen != 0:
-                        self.grailRotate(array, start, leftLen, mergeLen)
+                        GrailSort.grailRotate(array, start, leftLen, mergeLen)
                         start    += mergeLen
                         rightLen -= mergeLen
-
-                    middle += mergeLen
+                        middle   += mergeLen
 
                     if rightLen == 0:
-                        self.currBlockLen = leftLen
+                        GrailSort.currBlockLen = leftLen
                         return
                     else:
                         condition = True
@@ -496,14 +501,14 @@ class GrailSort:
                             leftLen -= 1
                             condition = (leftLen !=  0) and (array[start] < array[middle])
         
-        self.currBlockLen = rightLen
+        GrailSort.currBlockLen = rightLen
         if leftOrigin == Subarray.LEFT:
-            self.currBlockOrigin = Subarray.RIGHT
+            GrailSort.currBlockOrigin = Subarray.RIGHT
         else:
-            self.currBlockOrigin = Subarray.LEFT
+            GrailSort.currBlockOrigin = Subarray.LEFT
 
-
-    def grailSmartMergeOutOfPlace(self, array, start, leftLen, leftOrigin, rightLen, bufferOffset):
+    @staticmethod
+    def grailSmartMergeOutOfPlace(array, start, leftLen, leftOrigin, rightLen, bufferOffset):
         left   = start
         middle = start + leftLen
         right  = middle
@@ -531,150 +536,150 @@ class GrailSort:
                 buffer += 1
 
         if left < middle:
-            self.currBlockLen = middle - left
-            self.grailOutOfPlaceBufferRewind(array, left, middle, end)
+            GrailSort.currBlockLen = middle - left
+            GrailSort.grailOutOfPlaceBufferRewind(array, left, middle - 1, end - 1)
         else:
-            self.currBlockLen = end - right
+            GrailSort.currBlockLen = end - right
             if leftOrigin == Subarray.LEFT:
-                self.currBlockOrigin = Subarray.RIGHT
+                GrailSort.currBlockOrigin = Subarray.RIGHT
             else:
-                self.currBlockOrigin = Subarray.LEFT
+                GrailSort.currBlockOrigin = Subarray.LEFT
 
-
-    def grailMergeBlocks(self, array, firstKey, medianKey, start, blockCount, blockLen, lastMergeBlocks, lastLen):
+    @staticmethod
+    def grailMergeBlocks(array, firstKey, medianKey, start, blockCount, blockLen, lastMergeBlocks, lastLen):
         nextBlock = start + blockLen
 
-        self.currBlockLen    = blockLen
-        self.currBlockOrigin = self.grailGetSubarray(array, firstKey, medianKey)
+        GrailSort.currBlockLen    = blockLen
+        GrailSort.currBlockOrigin = GrailSort.grailGetSubarray(array, firstKey, medianKey)
 
         for keyIndex in range(1, blockCount):
-            currBlock       = nextBlock - self.currBlockLen
-            nextBlockOrigin = self.grailGetSubarray(array, firstKey + keyIndex)
+            currBlock       = nextBlock - GrailSort.currBlockLen
+            nextBlockOrigin = GrailSort.grailGetSubarray(array, firstKey + keyIndex, medianKey)
 
-            if nextBlockOrigin == self.currBlockOrigin:
+            if nextBlockOrigin == GrailSort.currBlockOrigin:
                 buffer = currBlock - blockLen
 
-                self.grailBlockSwap(array, buffer, currBlock, self.currBlockLen)
-                self.currBlockLen = blockLen
+                GrailSort.grailBlockSwap(array, buffer, currBlock, GrailSort.currBlockLen)
+                GrailSort.currBlockLen = blockLen
             else:
-                self.grailSmartMerge(array, currBlock, self.currBlockLen, self.currBlockOrigin, blockLen, blockLen)
+                GrailSort.grailSmartMerge(array, currBlock, GrailSort.currBlockLen, GrailSort.currBlockOrigin, blockLen, blockLen)
 
             nextBlock += blockLen
         
-        currBlock = nextBlock - self.currBlockLen
+        currBlock = nextBlock - GrailSort.currBlockLen
         buffer    = currBlock - blockLen
 
         if lastLen != 0:
-            if self.currBlockOrigin == Subarray.RIGHT:
-                self.grailBlockSwap(array, buffer, currBlock, self.currBlockLen)
+            if GrailSort.currBlockOrigin == Subarray.RIGHT:
+                GrailSort.grailBlockSwap(array, buffer, currBlock, GrailSort.currBlockLen)
 
-                currBlock            = nextBlock
-                self.currBlockLen    = blockLen * lastMergeBlocks
-                self.currBlockOrigin = Subarray.LEFT
+                currBlock                 = nextBlock
+                GrailSort.currBlockLen    = blockLen * lastMergeBlocks
+                GrailSort.currBlockOrigin = Subarray.LEFT
             else:
-                self.currBlockLen += blockLen * lastMergeBlocks
+                GrailSort.currBlockLen += blockLen * lastMergeBlocks
 
-            self.grailMergeForwards(array, currBlock, self.currBlockLen, lastLen, blockLen)
+            GrailSort.grailMergeForwards(array, currBlock, GrailSort.currBlockLen, lastLen, blockLen)
         else:
-            self.grailBlockSwap(array, buffer, currBlock, self.currBlockLen)
+            GrailSort.grailBlockSwap(array, buffer, currBlock, GrailSort.currBlockLen)
 
-    
-    def grailLazyMergeBlocks(self, array, firstKey, medianKey, start, blockCount, blockLen, lastMergeBlocks, lastLen):
+    @staticmethod
+    def grailLazyMergeBlocks(array, firstKey, medianKey, start, blockCount, blockLen, lastMergeBlocks, lastLen):
         nextBlock = start + blockLen
 
-        self.currBlockLen    = blockLen
-        self.currBlockOrigin = self.grailGetSubarray(array, firstKey, medianKey)
+        GrailSort.currBlockLen    = blockLen
+        GrailSort.currBlockOrigin = GrailSort.grailGetSubarray(array, firstKey, medianKey)
 
         for keyIndex in range(1, blockCount):
-            currBlock       = nextBlock - self.currBlockLen
-            nextBlockOrigin = self.grailGetSubarray(array, firstKey + keyIndex, medianKey)
+            currBlock       = nextBlock - GrailSort.currBlockLen
+            nextBlockOrigin = GrailSort.grailGetSubarray(array, firstKey + keyIndex, medianKey)
 
-            if nextBlockOrigin == self.currBlockOrigin:
-                self.currBlockLen = blockLen
+            if nextBlockOrigin == GrailSort.currBlockOrigin:
+                GrailSort.currBlockLen = blockLen
             else:
-                if blockLen != 0 and self.currBlockLen != 0:
-                    self.grailSmartLazyMerge(array, currBlock, self.currBlockLen, self.currBlockOrigin, blockLen)
+                if blockLen != 0 and GrailSort.currBlockLen != 0:
+                    GrailSort.grailSmartLazyMerge(array, currBlock, GrailSort.currBlockLen, GrailSort.currBlockOrigin, blockLen)
 
             nextBlock += blockLen
         
-        currBlock = nextBlock - self.currBlockLen
+        currBlock = nextBlock - GrailSort.currBlockLen
 
         if lastLen != 0:
-            if self.currBlockOrigin == Subarray.RIGHT:
+            if GrailSort.currBlockOrigin == Subarray.RIGHT:
                 currBlock            = nextBlock
-                self.currBlockLen    = blockLen * lastMergeBlocks
-                self.currBlockOrigin = Subarray.LEFT
+                GrailSort.currBlockLen    = blockLen * lastMergeBlocks
+                GrailSort.currBlockOrigin = Subarray.LEFT
             else:
-                self.currBlockLen += blockLen * lastMergeBlocks
+                GrailSort.currBlockLen += blockLen * lastMergeBlocks
 
-            self.grailSmartLazyMerge(array, currBlock, self.currBlockLen, lastLen)
+            GrailSort.grailSmartLazyMerge(array, currBlock, GrailSort.currBlockLen, lastLen)
 
-
-    def grailMergeBlocksOutOfPlace(self, array, firstKey, medianKey, start, blockCount, blockLen, lastMergeBlocks, lastLen):
+    @staticmethod
+    def grailMergeBlocksOutOfPlace(array, firstKey, medianKey, start, blockCount, blockLen, lastMergeBlocks, lastLen):
         nextBlock = start + blockLen
 
-        self.currBlockLen    = blockLen
-        self.currBlockOrigin = self.grailGetSubarray(array, firstKey, medianKey)
+        GrailSort.currBlockLen    = blockLen
+        GrailSort.currBlockOrigin = GrailSort.grailGetSubarray(array, firstKey, medianKey)
 
         for keyIndex in range(1, blockCount):
-            currBlock       = nextBlock - self.currBlockLen
-            nextBlockOrigin = self.grailGetSubarray(array, firstKey + keyIndex, medianKey)
+            currBlock       = nextBlock - GrailSort.currBlockLen
+            nextBlockOrigin = GrailSort.grailGetSubarray(array, firstKey + keyIndex, medianKey)
 
-            if nextBlockOrigin == self.currBlockOrigin:
+            if nextBlockOrigin == GrailSort.currBlockOrigin:
                 buffer = currBlock - blockLen
 
-                arrayCopy(array, currBlock, array, buffer, self.currBlockLen)
-                self.currBlockLen = blockLen
+                arrayCopy(array, currBlock, array, buffer, GrailSort.currBlockLen)
+                GrailSort.currBlockLen = blockLen
             else:
-                self.grailSmartMergeOutOfPlace(array, currBlock, self.currBlockLen, self.currBlockOrigin, blockLen, blockLen)
+                GrailSort.grailSmartMergeOutOfPlace(array, currBlock, GrailSort.currBlockLen, GrailSort.currBlockOrigin, blockLen, blockLen)
 
-        currBlock = nextBlock - self.currBlockLen
+        currBlock = nextBlock - GrailSort.currBlockLen
         buffer    = currBlock - blockLen
 
         if lastLen != 0:
-            if self.currBlockOrigin == Subarray.RIGHT:
-                arrayCopy(array, currBlock, array, buffer, self.currBlockLen)
+            if GrailSort.currBlockOrigin == Subarray.RIGHT:
+                arrayCopy(array, currBlock, array, buffer, GrailSort.currBlockLen)
 
-                currBlock            = nextBlock
-                self.currBlockLen    = blockLen * lastMergeBlocks
-                self.currBlockOrigin = Subarray.LEFT
+                currBlock                 = nextBlock
+                GrailSort.currBlockLen    = blockLen * lastMergeBlocks
+                GrailSort.currBlockOrigin = Subarray.LEFT
             else:
-                self.currBlockLen += blockLen * lastMergeBlocks
+                GrailSort.currBlockLen += blockLen * lastMergeBlocks
 
-            self.grailMergeOutOfPlace(array, currBlock, self.currBlockLen, lastLen, blockLen)
+            GrailSort.grailMergeOutOfPlace(array, currBlock, GrailSort.currBlockLen, lastLen, blockLen)
         else:
-            arrayCopy(array, currBlock, array, buffer, self.currBlockLen)
+            arrayCopy(array, currBlock, array, buffer, GrailSort.currBlockLen)
 
-    
-    def grailCombineInPlace(self, array, firstKey, start, length, subarrayLen, blockLen, mergeCount, lastSubarrays, buffer):
+    @staticmethod
+    def grailCombineInPlace(array, firstKey, start, length, subarrayLen, blockLen, mergeCount, lastSubarrays, buffer):
         fullMerge = 2 * subarrayLen
         blockCount = fullMerge // blockLen
 
         for mergeIndex in range(0, mergeCount):
             offset = start + (mergeIndex * fullMerge)
 
-            self.grailInsertSort(array, firstKey, blockCount)
+            GrailSort.grailInsertSort(array, firstKey, blockCount)
 
             medianKey = subarrayLen // blockLen
-            medianKey = self.grailBlockSelectSort(array, firstKey, offset, medianKey, blockCount, blockLen)
+            medianKey = GrailSort.grailBlockSelectSort(array, firstKey, offset, medianKey, blockCount, blockLen)
 
             if buffer:
-                self.grailMergeBlocks(array, firstKey, firstKey + medianKey, offset, blockCount, blockLen, 0, 0)
+                GrailSort.grailMergeBlocks(array, firstKey, firstKey + medianKey, offset, blockCount, blockLen, 0, 0)
             else:
-                self.grailLazyMergeBlocks(array, firstKey, firstKey + medianKey, offset, blockCount, blockLen, 0, 0)
+                GrailSort.grailLazyMergeBlocks(array, firstKey, firstKey + medianKey, offset, blockCount, blockLen, 0, 0)
 
         if lastSubarrays != 0:
             offset = start + (mergeCount * fullMerge)
             blockCount = lastSubarrays // blockLen
 
-            self.grailInsertSort(array, firstKey, blockCount + 1)
+            GrailSort.grailInsertSort(array, firstKey, blockCount + 1)
 
             medianKey = subarrayLen // blockLen
-            medianKey = self.grailBlockSelectSort(array, firstKey, offset, medianKey, blockCount, blockLen)
+            medianKey = GrailSort.grailBlockSelectSort(array, firstKey, offset, medianKey, blockCount, blockLen)
 
             lastFragment = lastSubarrays - (blockCount * blockLen)
             if lastFragment != 0:
-                lastMergeBlocks = self.grailCountLastMergeBlocks(array, offset, blockCount, blockLen)
+                lastMergeBlocks = GrailSort.grailCountLastMergeBlocks(array, offset, blockCount, blockLen)
             else: lastMergeBlocks = 0
 
             smartMerges = blockCount - lastMergeBlocks
@@ -683,21 +688,21 @@ class GrailSort:
                 leftLen = lastMergeBlocks * blockLen
 
                 if buffer:
-                    self.grailMergeForwards(array, offset, leftLen, lastFragment, blockLen)
+                    GrailSort.grailMergeForwards(array, offset, leftLen, lastFragment, blockLen)
                 else:
-                    self.grailLazyMerge(array, offset, leftLen, lastFragment)
+                    GrailSort.grailLazyMerge(array, offset, leftLen, lastFragment)
             else:
                 if buffer:
-                    self.grailMergeBlocks(array, firstKey, firstKey + medianKey, offset, smartMerges, blockLen, lastMergeBlocks, lastFragment)
+                    GrailSort.grailMergeBlocks(array, firstKey, firstKey + medianKey, offset, smartMerges, blockLen, lastMergeBlocks, lastFragment)
                 else:
-                    self.grailLazyMergeBlocks(array, firstKey, firstKey + medianKey, offset, smartMerges, blockLen, lastMergeBlocks, lastFragment)
+                    GrailSort.grailLazyMergeBlocks(array, firstKey, firstKey + medianKey, offset, smartMerges, blockLen, lastMergeBlocks, lastFragment)
             
             if buffer:
-                self.grailInPlaceBufferReset(array, start, length, blockLen)
+                GrailSort.grailInPlaceBufferReset(array, start, length, blockLen)
 
-        
-    def grailCombineOutOfPlace(self, array, firstKey, start, length, subarrayLen, blockLen, mergeCount, lastSubarrays):
-        arrayCopy(array, start - blockLen, self.extBuffer, 0, blockLen)
+    @staticmethod   
+    def grailCombineOutOfPlace(array, firstKey, start, length, subarrayLen, blockLen, mergeCount, lastSubarrays):
+        arrayCopy(array, start - blockLen, GrailSort.extBuffer, 0, blockLen)
 
         fullMerge = 2 * subarrayLen
         blockCount = fullMerge // blockLen
@@ -705,25 +710,25 @@ class GrailSort:
         for mergeIndex in range(0, mergeCount):
             offset = start + (mergeIndex * fullMerge)
 
-            self.grailInsertSort(array, firstKey, blockCount)
+            GrailSort.grailInsertSort(array, firstKey, blockCount)
 
             medianKey = subarrayLen // blockLen
-            medianKey = self.grailBlockSelectSort(array, firstKey, offset, medianKey, blockCount, blockLen)
+            medianKey = GrailSort.grailBlockSelectSort(array, firstKey, offset, medianKey, blockCount, blockLen)
 
-            self.grailMergeBlocksOutOfPlace(array, firstKey, firstKey + medianKey, offset, blockCount, blockLen, 0, 0)
+            GrailSort.grailMergeBlocksOutOfPlace(array, firstKey, firstKey + medianKey, offset, blockCount, blockLen, 0, 0)
 
         if lastSubarrays != 0:
             offset = start + (mergeCount * fullMerge)
             blockCount = lastSubarrays // blockLen
             
-            self.grailInsertSort(array, firstKey, blockCount + 1)
+            GrailSort.grailInsertSort(array, firstKey, blockCount + 1)
 
             medianKey = subarrayLen // blockLen
-            medianKey = self.grailBlockSelectSort(array, firstKey, offset, medianKey, blockCount, blockLen)
+            medianKey = GrailSort.grailBlockSelectSort(array, firstKey, offset, medianKey, blockCount, blockLen)
 
             lastFragment = lastSubarrays - (blockCount * blockLen)
             if lastFragment != 0:
-                lastMergeBlocks = self.grailCountLastMergeBlocks(array, offset, blockCount, blockLen)
+                lastMergeBlocks = GrailSort.grailCountLastMergeBlocks(array, offset, blockCount, blockLen)
             else: lastMergeBlocks = 0
 
             smartMerges = blockCount - lastMergeBlocks
@@ -731,42 +736,41 @@ class GrailSort:
             if smartMerges == 0:
                 leftLen = lastMergeBlocks * blockLen
 
-                self.grailMergeOutOfPlace(array, offset, leftLen, lastFragment, blockLen)
+                GrailSort.grailMergeOutOfPlace(array, offset, leftLen, lastFragment, blockLen)
             else:
-                self.grailMergeBlocksOutOfPlace(array, firstKey, firstKey + medianKey, offset, smartMerges, blockLen, lastMergeBlocks, lastFragment)
+                GrailSort.grailMergeBlocksOutOfPlace(array, firstKey, firstKey + medianKey, offset, smartMerges, blockLen, lastMergeBlocks, lastFragment)
 
-        self.grailOutOfPlaceBufferReset(array, start, length, blockLen)
-        arrayCopy(self.extBuffer, 0, array, start - blockLen, blockLen)
+        GrailSort.grailOutOfPlaceBufferReset(array, start, length, blockLen)
+        arrayCopy(GrailSort.extBuffer, 0, array, start - blockLen, blockLen)
 
-
-    def grailCombineBlocks(self, array, firstKey, start, length, subarrayLen, blockLen, buffer):
+    @staticmethod
+    def grailCombineBlocks(array, firstKey, start, length, subarrayLen, blockLen, buffer):
         fullMerge    = 2 * subarrayLen
         mergeCount   = length // fullMerge
         lastSubarrays = length - (fullMerge * mergeCount)
 
         if lastSubarrays <= subarrayLen:
             length -= lastSubarrays
-            lastSubarray = 0
+            lastSubarrays = 0
 
-        if buffer and blockLen <= self.extBufferLen:
-            self.grailCombineOutOfPlace(array, firstKey, start, length, subarrayLen, blockLen, mergeCount, lastSubarrays)
+        if buffer and blockLen <= GrailSort.extBufferLen:
+            GrailSort.grailCombineOutOfPlace(array, firstKey, start, length, subarrayLen, blockLen, mergeCount, lastSubarrays)
         else:
-            self.grailCombineInPlace(array, firstKey, start, length, subarrayLen, blockLen, mergeCount, lastSubarrays, buffer)
+            GrailSort.grailCombineInPlace(array, firstKey, start, length, subarrayLen, blockLen, mergeCount, lastSubarrays, buffer)
     
-
-    def grailLazyMerge(self, array, start, leftLen, rightLen):
+    @staticmethod
+    def grailLazyMerge(array, start, leftLen, rightLen):
         if leftLen < rightLen:
             middle = start + leftLen
 
             while leftLen != 0:
-                mergeLen = self.grailBinarySearchLeft(array, middle, rightLen, array[start])
+                mergeLen = GrailSort.grailBinarySearchLeft(array, middle, rightLen, array[start])
 
                 if mergeLen != 0:
-                    self.grailRotate(array, start, leftLen, mergeLen)
+                    GrailSort.grailRotate(array, start, leftLen, mergeLen)
                     start    += mergeLen
                     rightLen -= mergeLen
-
-                middle += mergeLen
+                    middle   += mergeLen
 
                 if rightLen == 0: break
                 else:
@@ -778,10 +782,10 @@ class GrailSort:
         else:
             end = start + leftLen + rightLen - 1
             while rightLen != 0:
-                mergeLen = self.grailBinarySearchRight(array, start, leftLen, array[end])
+                mergeLen = GrailSort.grailBinarySearchRight(array, start, leftLen, array[end])
 
                 if mergeLen != leftLen:
-                    self.grailRotate(array, start + mergeLen, leftLen - mergeLen, rightLen)
+                    GrailSort.grailRotate(array, start + mergeLen, leftLen - mergeLen, rightLen)
                     end     -= leftLen - mergeLen
                     leftLen  = mergeLen
 
@@ -794,50 +798,50 @@ class GrailSort:
                         end -= 1
                         condition = rightLen != 0 and array[middle - 1] <= array[end]
 
-                
-    def grailLazyStableSort(self, array, start, length):
+    @staticmethod            
+    def grailLazyStableSort(array, start, length):
         for index in range(1, length, 2):
-            left = start + index - 1
+            left  = start + index - 1
             right = start + index
 
             if array[left] > array[right]:
-                self.grailSwap(array, left, right)
+                GrailSort.grailSwap(array, left, right)
 
         mergeLen = 2
         while mergeLen < length:
             fullMerge = 2 * mergeLen
 
-            mergeEnd = length -fullMerge
+            mergeEnd = length - fullMerge
 
             mergeIndex = 0
             while mergeIndex <= mergeEnd:
-                self.grailLazyMerge(array, start + mergeIndex, mergeLen, mergeLen)
+                GrailSort.grailLazyMerge(array, start + mergeIndex, mergeLen, mergeLen)
                 mergeIndex += fullMerge
 
             leftOver = length - mergeIndex
             if leftOver > mergeLen:
-                self.grailLazyMerge(array, start + mergeIndex, mergeLen, leftOver - mergeLen)
+                GrailSort.grailLazyMerge(array, start + mergeIndex, mergeLen, leftOver - mergeLen)
             mergeLen *= 2
 
-
-    def grailCommonSort(self, array, start, length, extBuffer, extBufferLen):
+    @staticmethod
+    def grailCommonSort(array, start, length, extBuffer, extBufferLen):
         if length < 16:
-            self.grailInsertSort(array, start, length)
+            GrailSort.grailInsertSort(array, start, length)
             return
         else:
             blockLen = 1
 
             while (blockLen ** 2) < length: blockLen *= 2
 
-            keyLen = ((length - 1) / blockLen) + 1
+            keyLen = ((length - 1) // blockLen) + 1
 
             idealKeys = keyLen + blockLen
 
-            keysFound = self.grailCollectKeys(array, start, length, idealKeys)
+            keysFound = GrailSort.grailCollectKeys(array, start, length, idealKeys)
 
             if keysFound < idealKeys:
                 if keysFound < 4:
-                    self.grailLazyStableSort(array, start, length)
+                    GrailSort.grailLazyStableSort(array, start, length)
                     return
                 else:
                     keyLen = blockLen
@@ -854,10 +858,10 @@ class GrailSort:
             else:           subarrayLen = keyLen
 
             if idealBuffer and extBuffer != None:
-                self.extBuffer = extBuffer
-                self.extBufferLen = extBufferLen
+                GrailSort.extBuffer = extBuffer
+                GrailSort.extBufferLen = extBufferLen
 
-            self.grailBuildBlocks(array, start + bufferEnd, length - bufferEnd, subarrayLen)
+            GrailSort.grailBuildBlocks(array, start + bufferEnd, length - bufferEnd, subarrayLen)
 
             while (length - bufferEnd) > (2 * subarrayLen):
                 subarrayLen *= 2
@@ -866,33 +870,33 @@ class GrailSort:
                 scrollingBuffer = idealBuffer
 
                 if not idealBuffer:
-                    halfKeyLen = keyLen // 2
-                    if halfKeyLen ** 2 >= 2 * subarrayLen:
-                        currentBlockLen = halfKeyLen
+                    keyBuffer = keyLen // 2
+                    if keyBuffer >= (2 * subarrayLen) // keyBuffer:
+                        currentBlockLen = keyBuffer
                         scrollingBuffer = True
 
                     else:
-                        currentBlockLen = (2 * subarrayLen) / keyLen
+                        currentBlockLen = (2 * subarrayLen) // keyLen
 
-                self.grailCombineBlocks(array, start, start + bufferEnd, length - bufferEnd, subarrayLen, currentBlockLen, scrollingBuffer)
+                GrailSort.grailCombineBlocks(array, start, start + bufferEnd, length - bufferEnd, subarrayLen, currentBlockLen, scrollingBuffer)
 
-            self.grailInsertSort(array, start, bufferEnd)
-            self.grailLazyMerge(array, start, bufferEnd, length - bufferEnd)
+            GrailSort.grailInsertSort(array, start, bufferEnd)
+            GrailSort.grailLazyMerge(array, start, bufferEnd, length - bufferEnd)
 
+    @staticmethod
+    def grailSortInPlace(array, start, length):
+        GrailSort.grailCommonSort(array, start, length, None, 0)
 
-    def grailSortInPlace(self, array, start, length):
-        self.grailCommonSort(array, start, length, None, 0)
+    @staticmethod
+    def grailSortStaticOOP(array, start, length):
+        buffer = [0 for _ in range (GrailSort.GRAIL_STATIC_EXT_BUF_LEN)]
+        GrailSort.grailCommonSort(array, start, length, buffer, GrailSort.GRAIL_STATIC_EXT_BUF_LEN)
 
-
-    def grailSortStaticOOP(self, array, start, length):
-        buffer = [0 for _ in range (self.GRAIL_STATIC_EXT_BUF_LEN)]
-        self.grailCommonSort(array, start, length, buffer, self.GRAIL_STATIC_EXT_BUF_LEN)
-
-
-    def grailSortDynamicOOP(self, array, start, length):
+    @staticmethod
+    def grailSortDynamicOOP(array, start, length):
         bufferLen = 1
         while (bufferLen ** 2) < length: bufferLen *= 2
 
         buffer = [0 for _ in range(bufferLen)]
 
-        self.grailCommonSort(array, start, length, buffer, bufferLen)
+        GrailSort.grailCommonSort(array, start, length, buffer, bufferLen)
