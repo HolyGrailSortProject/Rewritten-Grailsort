@@ -1,10 +1,10 @@
 # additional functions
+
 def compareVal(a, b):
     return (a > b) - (a < b) 
 
 def arrayCopy(fromArray, fromIndex, toArray, toIndex, length):   # thanks to Bee Sort for improving readability on this function
     toArray[toIndex:toIndex + length] = fromArray[fromIndex:fromIndex + length]
-
 
  #
  # MIT License
@@ -36,16 +36,20 @@ def arrayCopy(fromArray, fromIndex, toArray, toIndex, length):   # thanks to Bee
  # Project Contributors: 666666t
  #                       Anonymous0726
  #                       aphitorite
+ #                       Control
  #                       dani_dlg
+ #                       DeveloperSort
  #                       EilrahcF
  #                       Enver
+ #                       Gaming32
  #                       lovebuny
  #                       Morwenn
  #                       MP
  #                       phoenixbound
+ #                       Spex_guy
  #                       thatsOven
- #                       Bee sort
  #                       _fluffyy
+ #                       
  #                       
  #                       
  # Special thanks to "The Studio" Discord community!
@@ -58,7 +62,7 @@ def arrayCopy(fromArray, fromIndex, toArray, toIndex, length):   # thanks to Bee
 #
 # Primary author: thatsOven
 #
-# Current status: Not working
+# Current status: Working (Passing all tests) + Stable
 
 class Subarray:
     LEFT, RIGHT = 0, 1
@@ -612,7 +616,7 @@ class GrailSort:
             else:
                 GrailSort.currBlockLen += blockLen * lastMergeBlocks
 
-            GrailSort.grailSmartLazyMerge(array, currBlock, GrailSort.currBlockLen, lastLen)
+            GrailSort.grailLazyMerge(array, currBlock, GrailSort.currBlockLen, lastLen)
 
     @staticmethod
     def grailMergeBlocksOutOfPlace(array, firstKey, medianKey, start, blockCount, blockLen, lastMergeBlocks, lastLen):
@@ -632,7 +636,8 @@ class GrailSort:
                 GrailSort.currBlockLen = blockLen
             else:
                 GrailSort.grailSmartMergeOutOfPlace(array, currBlock, GrailSort.currBlockLen, GrailSort.currBlockOrigin, blockLen, blockLen)
-
+            nextBlock += blockLen
+        
         currBlock = nextBlock - GrailSort.currBlockLen
         buffer    = currBlock - blockLen
 
@@ -697,8 +702,8 @@ class GrailSort:
                 else:
                     GrailSort.grailLazyMergeBlocks(array, firstKey, firstKey + medianKey, offset, smartMerges, blockLen, lastMergeBlocks, lastFragment)
             
-            if buffer:
-                GrailSort.grailInPlaceBufferReset(array, start, length, blockLen)
+        if buffer:
+            GrailSort.grailInPlaceBufferReset(array, start, length, blockLen)
 
     @staticmethod   
     def grailCombineOutOfPlace(array, firstKey, start, length, subarrayLen, blockLen, mergeCount, lastSubarrays):
@@ -871,7 +876,7 @@ class GrailSort:
 
                 if not idealBuffer:
                     keyBuffer = keyLen // 2
-                    if keyBuffer >= (2 * subarrayLen) // keyBuffer:
+                    if keyBuffer >= ((2 * subarrayLen) // keyBuffer):
                         currentBlockLen = keyBuffer
                         scrollingBuffer = True
 
@@ -885,18 +890,21 @@ class GrailSort:
 
     @staticmethod
     def grailSortInPlace(array, start, length):
+        GrailSort.extBuffer = None
+        GrailSort.extBufferLen = 0
         GrailSort.grailCommonSort(array, start, length, None, 0)
 
     @staticmethod
     def grailSortStaticOOP(array, start, length):
-        buffer = [0 for _ in range (GrailSort.GRAIL_STATIC_EXT_BUF_LEN)]
-        GrailSort.grailCommonSort(array, start, length, buffer, GrailSort.GRAIL_STATIC_EXT_BUF_LEN)
+        GrailSort.extBuffer = [0 for _ in range (GrailSort.GRAIL_STATIC_EXT_BUF_LEN)]
+        GrailSort.extBufferLen = GrailSort.GRAIL_STATIC_EXT_BUF_LEN
+        GrailSort.grailCommonSort(array, start, length, GrailSort.extBuffer, GrailSort.GRAIL_STATIC_EXT_BUF_LEN)
 
     @staticmethod
     def grailSortDynamicOOP(array, start, length):
-        bufferLen = 1
-        while (bufferLen ** 2) < length: bufferLen *= 2
+        GrailSort.extBufferLen = 1
+        while (GrailSort.extBufferLen ** 2) < length: GrailSort.extBufferLen *= 2
 
-        buffer = [0 for _ in range(bufferLen)]
+        GrailSort.extBuffer = [0 for _ in range(GrailSort.extBufferLen)]
 
-        GrailSort.grailCommonSort(array, start, length, buffer, bufferLen)
+        GrailSort.grailCommonSort(array, start, length, GrailSort.extBuffer, GrailSort.extBufferLen)
