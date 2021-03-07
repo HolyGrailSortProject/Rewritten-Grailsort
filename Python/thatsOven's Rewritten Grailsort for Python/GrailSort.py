@@ -601,8 +601,7 @@ class GrailSort:
             if nextBlockOrigin == GrailSort.currBlockOrigin:
                 GrailSort.currBlockLen = blockLen
             else:
-                if blockLen != 0 and GrailSort.currBlockLen != 0:
-                    GrailSort.grailSmartLazyMerge(array, currBlock, GrailSort.currBlockLen, GrailSort.currBlockOrigin, blockLen)
+                GrailSort.grailSmartLazyMerge(array, currBlock, GrailSort.currBlockLen, GrailSort.currBlockOrigin, blockLen)
 
             nextBlock += blockLen
         
