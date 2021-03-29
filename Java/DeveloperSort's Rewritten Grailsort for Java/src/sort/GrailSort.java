@@ -456,14 +456,14 @@ final public class GrailSort<K> {
                 //     externLen *= 2;
                 // }
                 // Optimized version:
-                extLen = (int) Math.ceil((double) Math.log(extBufferLen) / Math.log(2) - 1);
-                extLen = (int) Math.pow(2,extLen);
-                // Line 442 Original Version:
-                // if (Math.log(externalBufferLen) / Math.log(2) % 1 == 0){ externLen *= 2;}
-                // Newer version (takes up O(1) memory, surely the garbage collector will know this):
-                double checked = Math.log(extBufferLen) / Math.log(2);
-                if (checked == ((int) checked)){ extLen *= 2;} // check if externalBufferLen is a power of 2
-                if (extBufferLen == 0 || extBufferLen == 1) {extLen = 1;}
+                // find max power of 8, then max power of 2
+                extLen = 1;
+                while((extLen << 3) <= this.extBufferLen) {
+                    extLen = extLen << 3;
+                }
+                while((extLen << 1) <= this.extBufferLen) { // how about i do anyway?
+                    extLen = extLen << 1;
+                }
                 }
 
             this.grailBuildOutOfPlace(array, start, length, bufferLen, extLen, cmp);
