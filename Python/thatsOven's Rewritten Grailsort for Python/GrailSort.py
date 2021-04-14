@@ -1,12 +1,12 @@
 # additional functions
 
-def compareVal(a, b):
+def compare(a, b):
     return (a > b) - (a < b) 
 
 def arrayCopy(fromArray, fromIndex, toArray, toIndex, length):   # thanks to Bee Sort for improving readability on this function
     toArray[toIndex:toIndex + length] = fromArray[fromIndex:fromIndex + length]
 
- #
+
  # MIT License
  # 
  # Copyright (c) 2013 Andrey Astrelin
@@ -99,8 +99,8 @@ class GrailSort:
         for item in range(1, length):
             left  = start + item - 1
             right = start + item
-
-            while left >= start and array[left] > array[right]:
+            
+            while left >= start and compare(array[left], array[right]) > 0:
                 GrailSort.grailSwap(array, left, right)
                 left  -= 1
                 right -= 1
@@ -113,7 +113,7 @@ class GrailSort:
         while left < right:
             middle = left + ((right - left) // 2)
 
-            if array[start + middle] < target:
+            if compare(array[start + middle], target) < 0: 
                 left = middle + 1
             else: 
                 right = middle
@@ -128,7 +128,7 @@ class GrailSort:
         while left < right:
             middle = left + ((right - left) // 2)
 
-            if array[start + middle] > target:
+            if compare(array[start + middle], target) > 0:
                 right = middle
             else:
                 left = middle + 1
@@ -145,7 +145,7 @@ class GrailSort:
 
             insertPos = GrailSort.grailBinarySearchLeft(array, start + firstKey, keysFound, array[start + currKey])
 
-            if insertPos == keysFound or array[start + currKey] != array[start + firstKey + insertPos]:
+            if insertPos == keysFound or compare(array[start + currKey], array[start + firstKey + insertPos]) != 0: 
 
                 GrailSort.grailRotate(array, start + firstKey, keysFound, currKey - (firstKey + keysFound))
 
@@ -167,7 +167,7 @@ class GrailSort:
             left  = start + index - 1
             right = start + index
 
-            if array[left] > array[right]:
+            if compare(array[left], array[right]) > 0: 
                 GrailSort.grailSwap(array,  left - 2, right)
                 GrailSort.grailSwap(array, right - 2,  left)
             else:
@@ -187,7 +187,7 @@ class GrailSort:
             left  = start + index - 1
             right = start + index
 
-            if array[left] > array[right]:
+            if compare(array[left], array[right]) > 0:
                 array[left - 2], array[right - 2] = array[right], array[left]
             else:
                 array[left - 2], array[right - 2] = array[left], array[right]
@@ -207,7 +207,7 @@ class GrailSort:
         buffer = start - bufferOffset
 
         while right < end:
-            if left == middle or array[left] > array[right]:
+            if left == middle or compare(array[left], array[right]) > 0:
                 GrailSort.grailSwap(array, buffer, right)
                 right += 1
             else:
@@ -227,7 +227,7 @@ class GrailSort:
         buffer = right + bufferOffset
 
         while left > end:
-            if right == middle or array[left] > array[right]:
+            if right == middle or compare(array[left], array[right]) > 0:
                 GrailSort.grailSwap(array, buffer, left)
                 left -= 1
             else:
@@ -250,7 +250,7 @@ class GrailSort:
         buffer = start - bufferOffset
         
         while right < end:
-            if left == middle or array[left] > array[right]:
+            if left == middle or compare(array[left], array[right]) > 0:
                 array[buffer] = array[right]
                 right += 1
             else:
@@ -356,10 +356,10 @@ class GrailSort:
             selectBlock = firstBlock
 
             for currBlock in range(firstBlock + 1, blockCount):
-                compare = compareVal(   array[start + (currBlock   * blockLen)],
+                compareval = compare(   array[start + (currBlock   * blockLen)],
                                         array[start + (selectBlock * blockLen)]     )
 
-                if compare < 0 or (compare == 0 and array[firstKey + currBlock] < array[firstKey + selectBlock]):
+                if compareval < 0 or (compareval == 0 and compare(array[firstKey + currBlock], array[firstKey + selectBlock]) < 0): 
                     selectBlock = currBlock
 
             if selectBlock != firstBlock:
@@ -416,7 +416,7 @@ class GrailSort:
         lastRightFrag = offset + (blockCount * blockLen)
         prevLeftBlock = lastRightFrag - blockLen
 
-        while (blocksToMerge < blockCount) and (array[lastRightFrag] < array[prevLeftBlock]):
+        while (blocksToMerge < blockCount) and (compare(array[lastRightFrag], array[prevLeftBlock]) < 0): 
             blocksToMerge += 1
             prevLeftBlock -= blockLen
 
@@ -432,7 +432,7 @@ class GrailSort:
 
         if leftOrigin == Subarray.LEFT:
             while (left < middle) and (right < end):
-                if array[left] <= array[right]:
+                if compare(array[left], array[right]) <= 0: 
                     GrailSort.grailSwap(array, buffer, left)
                     left += 1
                 else:
@@ -442,7 +442,7 @@ class GrailSort:
         
         else:
             while (left < middle) and (right < end):
-                if array[left] < array[right]:
+                if compare(array[left], array[right]) < 0:
                     GrailSort.grailSwap(array, buffer, left)
                     left += 1
                 else:
@@ -465,7 +465,7 @@ class GrailSort:
         middle = start + leftLen
 
         if leftOrigin == Subarray.LEFT:
-            if array[middle- 1] > array[middle]:
+            if compare(array[middle - 1], array[middle]) > 0:
                 while leftLen != 0:
                     mergeLen = GrailSort.grailBinarySearchLeft(array, middle, rightLen, array[start])
 
@@ -483,9 +483,9 @@ class GrailSort:
                         while condition:
                             start += 1
                             leftLen -= 1
-                            condition = (leftLen != 0) and array[start] <= array[middle]
+                            condition = leftLen != 0 and compare(array[start], array[middle]) <= 0
         else:
-            if array[middle - 1] >= array[middle]:
+            if compare(array[middle - 1], array[middle]) >= 0:
                 while leftLen != 0:
                     mergeLen = GrailSort.grailBinarySearchRight(array, middle, rightLen, array[start])
 
@@ -503,7 +503,7 @@ class GrailSort:
                         while condition:
                             start += 1
                             leftLen -= 1
-                            condition = (leftLen !=  0) and (array[start] < array[middle])
+                            condition = leftLen !=  0 and compare(array[start], array[middle]) < 0
         
         GrailSort.currBlockLen = rightLen
         if leftOrigin == Subarray.LEFT:
@@ -521,7 +521,7 @@ class GrailSort:
 
         if leftOrigin == Subarray.LEFT:
             while (left < middle) and (right < end):
-                if array[left] <= array[right]:
+                if compare(array[left], array[right]) <= 0:
                     array[buffer] = array[left]
                     left += 1
                 else:
@@ -531,7 +531,7 @@ class GrailSort:
 
         else:
             while (left < middle) and (right < end):
-                if array[left] < array[right]:
+                if compare(array[left], array[right]) < 0:
                     array[buffer] = array[left]
                     left += 1
                 else:
@@ -782,7 +782,7 @@ class GrailSort:
                     while condition:
                         start += 1
                         leftLen -= 1
-                        condition = leftLen != 0 and array[start] <= array[middle]
+                        condition = leftLen != 0 and compare(array[start], array[middle]) <= 0
         else:
             end = start + leftLen + rightLen - 1
             while rightLen != 0:
@@ -800,7 +800,7 @@ class GrailSort:
                     while condition:
                         rightLen -= 1
                         end -= 1
-                        condition = rightLen != 0 and array[middle - 1] <= array[end]
+                        condition = rightLen != 0 and compare(array[middle - 1], array[end]) <= 0 
 
     @staticmethod            
     def grailLazyStableSort(array, start, length):
@@ -808,7 +808,7 @@ class GrailSort:
             left  = start + index - 1
             right = start + index
 
-            if array[left] > array[right]:
+            if compare(array[left], array[right]) > 0: 
                 GrailSort.grailSwap(array, left, right)
 
         mergeLen = 2
