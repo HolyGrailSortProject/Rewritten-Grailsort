@@ -189,12 +189,12 @@ final public class GrailSort<K> {
                                                      array[start + firstKey + insertPos]) != 0) {
 
                 // Rotate the key-buffer over to currKey's immediate left...
-                // (this helps save a TON of swaps/writes!!!)
+                // (this helps save a ton of swaps/writes.)
                 grailRotate(array, start + firstKey, keysFound, currKey - (firstKey + keysFound));
 
                 firstKey = currKey - keysFound;
 
-                // Insert currKey to its spot in the key-buffer!
+                // Insert currKey to its spot in the key-buffer.
                 grailRotate(array, start + firstKey + insertPos, keysFound - insertPos, 1);
 
                 keysFound++;
@@ -487,7 +487,7 @@ final public class GrailSort<K> {
                 // Follow the 'medianKey' if it was swapped.
 
                 // ORIGINAL LOC: if(midkey==u-1 || midkey==p) midkey^=(u-1)^p;
-                // MASSIVE, MASSIVE credit to lovebuny for figuring this one out!
+                // Credits to lovebuny for figuring this one out.
                 if(medianKey == firstBlock) {
                     medianKey = selectBlock;
                 }
@@ -548,7 +548,7 @@ final public class GrailSort<K> {
 
     // Rewinds Grailsort's out-of-place buffer to the left of any items belonging to the left subarray block
     // left over by a "smart merge". This is used to continue an ongoing merge that has run out of buffer space.
-    // Costs O(sqrt n) writes in the *absolute* worst-case.
+    // Costs O(sqrt n) writes in the absolute worst-case.
     //
     // BETTER ORDER, INCORRECT ORDER OF PARAMETERS BUG FIXED: leftOvers (leftBlock) should be
     //                                                        the middle, and `buffer` should be the end
@@ -829,7 +829,7 @@ final public class GrailSort<K> {
                 this.currBlockLen = blockLen;
             }
             else {
-                // These checks were included in the original code... but why???
+                // These checks were included in the original code, but why?
                 if(blockLen != 0 && this.currBlockLen != 0) {
                     this.grailSmartLazyMerge(array, currBlock, this.currBlockLen, this.currBlockOrigin,
                                              blockLen, cmp);
@@ -1047,8 +1047,8 @@ final public class GrailSort<K> {
     // IMPORTANT RENAME: 'lastSubarray' is now 'lastSubarrays' because it includes the length of the last left
     //                   subarray AND last right subarray (if there is a right subarray at all).
     //
-    //                   *Please also check everything surrounding 'if(lastSubarrays != 0)' inside
-    //                   'combine in-/out-of-place' methods for other renames!!*
+    //                   Please also check everything surrounding 'if(lastSubarrays != 0)' inside
+    //                   'combine in-/out-of-place' methods for other renames.
     private void grailCombineBlocks(K[] array, int firstKey, int start, int length,
                                                int subarrayLen, int blockLen, boolean buffer) {
         int     fullMerge = 2 * subarrayLen;
@@ -1248,7 +1248,7 @@ final public class GrailSort<K> {
             int currentBlockLen = blockLen;
             boolean scrollingBuffer = idealBuffer;
 
-            // Huge credit to Anonymous0726, phoenixbound, and DeveloperSort for their tireless efforts
+            // Credits to Anonymous0726, phoenixbound, and DeveloperSort for their tireless efforts
             // towards deconstructing this math.
             if(!idealBuffer) {
                 int keyBuffer = keyLen / 2;
@@ -1259,12 +1259,12 @@ final public class GrailSort<K> {
                     scrollingBuffer = true;
                 }
                 else {
-                    // This is a very recent discovery, and the math will be spelled out later, but this
-                    // "minKeys" calculation is *completely unnecessary*. "minKeys" would be less than
+                    // This is a recent discovery, and the math will be spelled out later, but this
+                    // "minKeys" calculation is completely unnecessary. "minKeys" would be less than
                     // "keyLen" iff ((keyBuffer >= (2 * subarrayLen)) / keyBuffer)... but this situation
-                    // is already covered by our scrolling buffer optimization right above!! Consequently,
-                    // "minKeys" will *always* be equal to "keyLen" when Grailsort resorts to smart lazy
-                    // merges. Removing this loop is by itself a decent optimization, as well!
+                    // is already covered by our scrolling buffer optimization right above. Consequently,
+                    // "minKeys" will always be equal to "keyLen" when Grailsort resorts to smart lazy
+                    // merges. Removing this loop is by itself a decent optimization, as well.
                     //
                     // Code still here for preservation purposes.
                     /*
