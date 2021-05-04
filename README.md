@@ -11,6 +11,7 @@ A diverse array of heavily refactored versions of Andrey Astrelin's GrailSort.h,
 * thatsOven's Rewritten Grailsort for **Python**
 * Enver's Rewritten Grailsort for **JavaScript**
 * Summer Dragonfly's *Simple* Rewritten Grailsort for **C**
+* Morwenn's adaptation of Summer Dragonfly's Java Rewritten Grailsort for **C++**
 * \_fluffyy's Rewritten Grailsort for **Python**
 * Gaming32's Rewritten Grailsort for **Cython**
 * SpexGuy's Rewritten Grailsort for **Zig**
