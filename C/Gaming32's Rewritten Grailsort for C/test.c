@@ -4,7 +4,7 @@
 #include "grail_sort.h"
 
 // #define ARRAY_LENGTH 65536
-#define ARRAY_LENGTH 15
+#define ARRAY_LENGTH 16
 #define RANDOM_SEED time(NULL)
 
 typedef struct {
