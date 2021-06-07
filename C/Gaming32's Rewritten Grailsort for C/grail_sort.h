@@ -12,17 +12,9 @@
 
 #define GRAIL_STATIC_EXT_BUFFER_LEN 512
 
-typedef int GRAILCMP (const void *a, const void *b);
+typedef int GRAILCMP(const void *a, const void *b);
 
-#define swap_two(array, swap)  \
-{  \
-	if (cmp(array, array + 1) > 0)  \
-	{  \
-		swap = array[1]; array[1] = array[0]; array[0] = swap;  \
-	}  \
-}
-
-#define swap(type, a, b) {type c = *(a); *(a) = *(b); *(b) = c;}
+#define grailSwap(a, b) {VAR c = *(a); *(a) = *(b); *(b) = c;}
 
 //////////////////////////////////////////////////////////
 //┌────────────────────────────────────────────────────┐//
@@ -108,6 +100,7 @@ typedef int GRAILCMP (const void *a, const void *b);
 
 #include "grail_sort.c"
 
+#ifndef _WIN32
 //////////////////////////////////////////////////////////
 //┌────────────────────────────────────────────────────┐//
 //│  ▄██┐  ██████┐  █████┐    ██████┐ ██████┐████████┐ │//
@@ -128,6 +121,7 @@ typedef int GRAILCMP (const void *a, const void *b);
 #define STRUCT(NAME) struct NAME##128
 
 #include "grail_sort.c"
+#endif
 
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -182,7 +176,7 @@ void grailSortStaticOOP(void *array, size_t nelements, size_t elemsize, GRAILCMP
     grailCommonSort(array, nelements, (void*)buffer, GRAIL_STATIC_EXT_BUFFER_LEN, elemsize, cmp);
 }
 
-void grailSortStaticOOP(void *array, size_t nelements, size_t elemsize, GRAILCMP *cmp) {
+void grailSortDynamicOOP(void *array, size_t nelements, size_t elemsize, GRAILCMP *cmp) {
     size_t bufferLen = 1;
     while (bufferLen * bufferLen < nelements) {
         bufferLen *= 2;
