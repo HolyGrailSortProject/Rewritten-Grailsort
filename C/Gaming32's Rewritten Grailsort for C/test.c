@@ -5,6 +5,11 @@
 
 // #define ARRAY_LENGTH 65536
 #define ARRAY_LENGTH 16
+
+// #define RANDOM_LIMIT ARRAY_LENGTH
+// #define RANDOM_LIMIT RAND_MAX
+#define RANDOM_LIMIT 3
+
 #define RANDOM_SEED time(NULL)
 
 typedef struct {
@@ -33,7 +38,7 @@ int main() {
 
     GrailPair* array = malloc(ARRAY_LENGTH * sizeof(GrailPair));
     for (size_t i = 0; i < ARRAY_LENGTH; i++) {
-        array[i].value = rand();
+        array[i].value = (int)(rand() / (double)RAND_MAX * RANDOM_LIMIT);
     }
 
     size_t* counts = malloc(RAND_MAX * sizeof(size_t));
