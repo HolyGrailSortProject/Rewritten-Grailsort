@@ -66,9 +66,8 @@ int main() {
     qsort(copy, ARRAY_LENGTH, sizeof(int), compare_qsort);
 
     // printGrailArray(array);
-    // grailSortInPlace(array, ARRAY_LENGTH, sizeof(GrailPair), compare_grailsort);
+    grailSortInPlace(array, ARRAY_LENGTH, sizeof(GrailPair), compare_grailsort);
     // printGrailArray(array);
-    grailSortStaticOOP(array, ARRAY_LENGTH, sizeof(GrailPair), compare_grailsort);
     printGrailArrayV(array);
 
     free(array);

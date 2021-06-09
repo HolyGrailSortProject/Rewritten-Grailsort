@@ -4,7 +4,7 @@ static inline void FUNC(grailSwap)(VAR* a, VAR* b) {
     *b = tmp;
 }
 
-static void FUNC(grailBlockSwap)(VAR* a, VAR* b, size_t blockLen) {
+static inline void FUNC(grailBlockSwap)(VAR* a, VAR* b, size_t blockLen) {
     VAR tmp;
     for (size_t i = 0; i < blockLen; i++) {
         tmp = *a;
@@ -13,7 +13,7 @@ static void FUNC(grailBlockSwap)(VAR* a, VAR* b, size_t blockLen) {
     }
 }
 
-static void FUNC(grailRotate)(VAR* start, size_t leftLen, size_t rightLen) {
+static inline void FUNC(grailRotate)(VAR* start, size_t leftLen, size_t rightLen) {
     while (leftLen > 0 && rightLen > 0) {
         if (leftLen <= rightLen) {
             FUNC(grailBlockSwap)(start, start + leftLen, leftLen);
@@ -350,12 +350,33 @@ static size_t FUNC(grailBlockSelectSort)(VAR* firstKey, VAR* start, size_t media
     return medianKey;
 }
 
-static void FUNC(grailOutOfPlaceBufferReset)(VAR* start, size_t length, size_t bufferOffset) {
-    VAR* buffer = start + length - 1;
+static inline void FUNC(grailInPlaceBufferReset)(VAR* start, size_t length, size_t bufferOffset) {
+    VAR* buffer =  start + length - 1;
+    VAR*  index = buffer - bufferOffset;
+
+    VAR tmp;
+    while (buffer >= start) {
+        tmp = *buffer;
+        *buffer-- = *index;
+        *index-- = tmp;
+    }
+}
+
+static inline void FUNC(grailOutOfPlaceBufferReset)(VAR* start, size_t length, size_t bufferOffset) {
+    VAR* buffer =  start + length - 1;
     VAR*  index = buffer - bufferOffset;
 
     while (buffer >= start) {
         *buffer-- = *index--;
+    }
+}
+
+static inline void FUNC(grailInPlaceBufferRewind)(VAR* start, VAR* leftBlock, VAR* buffer) {
+    VAR tmp;
+    while (leftBlock >= start) {
+        tmp = *buffer;
+        *buffer-- = *leftBlock;
+        *leftBlock-- = tmp;
     }
 }
 
@@ -385,6 +406,168 @@ static size_t FUNC(grailCountLastMergeBlocks)(VAR* offset, size_t blockCount, si
     }
 
     return blocksToMerge;
+}
+
+static void FUNC(grailSmartLazyMerge)(VAR* start, size_t leftLen, GrailSubarray leftOrigin, size_t rightLen, GrailState* state, GRAILCMP cmp) {
+    VAR* middle = start + leftLen;
+
+    if (leftOrigin == GRAIL_SUBARRAY_LEFT) {
+        if (cmp(middle - 1, middle) > 0) {
+            while (leftLen != 0) {
+                size_t mergeLen = FUNC(grailBinarySearchLeft)(middle, rightLen, start, cmp);
+
+                if (mergeLen != 0) {
+                    FUNC(grailRotate)(start, leftLen, mergeLen);
+
+                    start    += mergeLen;
+                    middle   += mergeLen;
+                    rightLen -= mergeLen;
+                }
+
+                if (rightLen == 0) {
+                    state->currBlockLen = leftLen;
+                    return;
+                } else {
+                    do {
+                        start++;
+                        leftLen--;
+                    } while (leftLen != 0 && cmp(start, middle) <= 0);
+                }
+            }
+        }
+    } else {
+        if (cmp(middle - 1, middle) >= 0) {
+            while (leftLen != 0) {
+                size_t mergeLen = FUNC(grailBinarySearchRight)(middle, rightLen, start, cmp);
+
+                if (mergeLen != 0) {
+                    FUNC(grailRotate)(start, leftLen, mergeLen);
+
+                    start    += mergeLen;
+                    middle   += mergeLen;
+                    rightLen -= mergeLen;
+                }
+
+                if (rightLen == 0) {
+                    state->currBlockLen = leftLen;
+                    return;
+                } else {
+                    do {
+                        start++;
+                        leftLen--;
+                    } while (leftLen != 0 && cmp(start, middle) < 0);
+                }
+            }
+        }
+    }
+
+    GrailState s = *state;
+    s.currBlockLen = rightLen;
+    if (leftOrigin == GRAIL_SUBARRAY_LEFT) {
+        s.currBlockOrigin = GRAIL_SUBARRAY_RIGHT;
+    } else {
+        s.currBlockOrigin = GRAIL_SUBARRAY_LEFT;
+    }
+    *state = s;
+}
+
+static void FUNC(grailLazyMerge)(VAR* start, size_t leftLen, size_t rightLen, GRAILCMP cmp) {
+    if (leftLen < rightLen) {
+        VAR* middle = start + leftLen;
+
+        while (leftLen != 0) {
+            size_t mergeLen = FUNC(grailBinarySearchLeft)(middle, rightLen, start, cmp);
+
+            if (mergeLen != 0) {
+                FUNC(grailRotate)(start, leftLen, mergeLen);
+
+                start    += mergeLen;
+                middle   += mergeLen;
+                rightLen -= mergeLen;
+            }
+
+            if (rightLen == 0) {
+                break;
+            } else {
+                do {
+                    start++;
+                    leftLen--;
+                } while (leftLen != 0 && cmp(start, middle) <= 0);
+            }
+        }
+    } else {
+        VAR* end = start + leftLen + rightLen - 1;
+
+        while (rightLen != 0) {
+            size_t mergeLen = FUNC(grailBinarySearchRight)(start, leftLen, end, cmp);
+
+            if (mergeLen != leftLen) {
+                FUNC(grailRotate)(start + mergeLen, leftLen - mergeLen, rightLen);
+
+                end    -= leftLen - mergeLen;
+                leftLen = mergeLen;
+            }
+
+            if (leftLen == 0) {
+                break;
+            } else {
+                VAR* middle = start + leftLen;
+                do {
+                    rightLen--;
+                    end--;
+                } while (rightLen != 0 && cmp(middle - 1, end) <= 0);
+            }
+        }
+    }
+}
+
+static void FUNC(grailSmartMerge)(VAR* start, size_t leftLen, GrailSubarray leftOrigin, size_t rightLen, size_t bufferOffset, GrailState* state, GRAILCMP cmp) {
+    VAR* buffer = start  - bufferOffset;
+    VAR*   left = start;
+    VAR* middle = start  + leftLen;
+    VAR*  right = middle;
+    VAR*    end = middle + rightLen;
+
+    VAR tmp;
+    if (leftOrigin == GRAIL_SUBARRAY_LEFT) {
+        while (left < middle && right < end) {
+            if (cmp(left, right) <= 0) {
+                tmp = *buffer;
+                *buffer++ = *left;
+                *left++ = tmp;
+            } else {
+                tmp = *buffer;
+                *buffer++ = *right;
+                *right++ = tmp;
+            }
+        }
+    } else {
+        while (left < middle && right < end) {
+            if (cmp(left, right) <  0) {
+                tmp = *buffer;
+                *buffer++ = *left;
+                *left++ = tmp;
+            } else {
+                tmp = *buffer;
+                *buffer++ = *right;
+                *right++ = tmp;
+            }
+        }
+    }
+
+    if (left < middle) {
+        state->currBlockLen = middle - left;
+        FUNC(grailInPlaceBufferRewind)(left, middle - 1, end - 1);
+    } else {
+        GrailState s = *state;
+        s.currBlockLen = end - right;
+        if (leftOrigin == GRAIL_SUBARRAY_LEFT) {
+            s.currBlockOrigin = GRAIL_SUBARRAY_RIGHT;
+        } else {
+            s.currBlockOrigin = GRAIL_SUBARRAY_LEFT;
+        }
+        *state = s;
+    }
 }
 
 static void FUNC(grailSmartMergeOutOfPlace)(VAR* start, size_t leftLen, GrailSubarray leftOrigin, size_t rightLen, size_t bufferOffset, GrailState* state, GRAILCMP cmp) {
@@ -425,6 +608,94 @@ static void FUNC(grailSmartMergeOutOfPlace)(VAR* start, size_t leftLen, GrailSub
         }
         *state = s;
     }
+}
+
+static void FUNC(grailMergeBlocks)(VAR* firstKey, VAR* medianKey, VAR* start, size_t blockCount, size_t blockLen, size_t lastMergeBlocks, size_t lastLen, GrailState* state, GRAILCMP cmp) {
+    VAR* buffer;
+
+    VAR* currBlock;
+    VAR* nextBlock = start + blockLen;
+
+    GrailState s = *state; // copy here for speed
+    s.currBlockLen    = blockLen;
+    s.currBlockOrigin = FUNC(grailGetSubarray)(firstKey, medianKey, cmp);
+
+    for (size_t keyIndex = 1; keyIndex < blockCount; keyIndex++, nextBlock += blockLen) {
+        GrailSubarray nextBlockOrigin;
+
+        currBlock = nextBlock - s.currBlockLen;
+        nextBlockOrigin = FUNC(grailGetSubarray)(firstKey + keyIndex, medianKey, cmp);
+
+        if (nextBlockOrigin == s.currBlockOrigin) {
+            buffer = currBlock - blockLen;
+
+            FUNC(grailBlockSwap)(buffer, currBlock, s.currBlockLen);
+            s.currBlockLen = blockLen;
+        } else {
+            FUNC(grailSmartMerge)(currBlock, s.currBlockLen, s.currBlockOrigin, blockLen, blockLen, &s, cmp);
+        }
+    }
+
+    currBlock = nextBlock - s.currBlockLen;
+    buffer    = currBlock - blockLen;
+
+    if (lastLen != 0) {
+        if (s.currBlockOrigin == GRAIL_SUBARRAY_RIGHT) {
+            FUNC(grailBlockSwap)(buffer, currBlock, s.currBlockLen);
+
+            currBlock         = nextBlock;
+            s.currBlockLen    = blockLen * lastMergeBlocks;
+            s.currBlockOrigin = GRAIL_SUBARRAY_LEFT;
+        } else {
+            s.currBlockLen += blockLen * lastMergeBlocks;
+        }
+
+        FUNC(grailMergeForwards)(currBlock, s.currBlockLen, lastLen, blockLen, cmp);
+    } else {
+        FUNC(grailBlockSwap)(buffer, currBlock, s.currBlockLen);
+    }
+
+    *state = s;
+}
+
+static void FUNC(grailLazyMergeBlocks)(VAR* firstKey, VAR* medianKey, VAR* start, size_t blockCount, size_t blockLen, size_t lastMergeBlocks, size_t lastLen, GrailState* state, GRAILCMP cmp) {
+    VAR* currBlock;
+    VAR* nextBlock = start + blockLen;
+
+    GrailState s = *state; // copy here for speed
+    s.currBlockLen    = blockLen;
+    s.currBlockOrigin = FUNC(grailGetSubarray)(firstKey, medianKey, cmp);
+
+    for (size_t keyIndex = 1; keyIndex < blockCount; keyIndex++, nextBlock += blockLen) {
+        GrailSubarray nextBlockOrigin;
+
+        currBlock = nextBlock - s.currBlockLen;
+        nextBlockOrigin = FUNC(grailGetSubarray)(firstKey + keyIndex, medianKey, cmp);
+
+        if (nextBlockOrigin == s.currBlockOrigin) {
+            s.currBlockLen = blockLen;
+        } else {
+            if (blockLen != 0 && s.currBlockLen != 0) {
+                FUNC(grailSmartLazyMerge)(currBlock, s.currBlockLen, s.currBlockOrigin, blockLen, &s, cmp);
+            }
+        }
+    }
+
+    currBlock = nextBlock - s.currBlockLen;
+
+    if (lastLen != 0) {
+        if (s.currBlockOrigin == GRAIL_SUBARRAY_RIGHT) {
+            currBlock         = nextBlock;
+            s.currBlockLen    = blockLen * lastMergeBlocks;
+            s.currBlockOrigin = GRAIL_SUBARRAY_LEFT;
+        } else {
+            s.currBlockLen += blockLen * lastMergeBlocks;
+        }
+
+        FUNC(grailLazyMerge)(currBlock, s.currBlockLen, lastLen, cmp);
+    }
+
+    *state = s;
 }
 
 static void FUNC(grailMergeBlocksOutOfPlace)(VAR* firstKey, VAR* medianKey, VAR* start, size_t blockCount, size_t blockLen, size_t lastMergeBlocks, size_t lastLen, GrailState* state, GRAILCMP cmp) {
@@ -475,10 +746,70 @@ static void FUNC(grailMergeBlocksOutOfPlace)(VAR* firstKey, VAR* medianKey, VAR*
     *state = s;
 }
 
+static void FUNC(grailCombineInPlace)(VAR* firstKey, VAR* start, size_t length, size_t subarrayLen, size_t blockLen, size_t mergeCount, size_t lastSubarrays, bool buffer, GrailState* state, GRAILCMP cmp) {
+    size_t fullMerge  = 2 * subarrayLen;
+    size_t blockCount = fullMerge / blockLen;
+
+    for (size_t mergeIndex = 0; mergeIndex < mergeCount; mergeIndex++) {
+        VAR* offset = start + (mergeIndex * fullMerge);
+
+        FUNC(grailInsertSort)(firstKey, firstKey + blockCount, cmp);
+
+        size_t medianKey = subarrayLen / blockLen;
+        medianKey = FUNC(grailBlockSelectSort)(firstKey, offset, medianKey, blockCount, blockLen, cmp);
+
+        if (buffer) {
+            FUNC(grailMergeBlocks)(firstKey, firstKey + medianKey, offset, blockCount, blockLen, 0, 0, state, cmp);
+        } else {
+            FUNC(grailLazyMergeBlocks)(firstKey, firstKey + medianKey, offset, blockCount, blockLen, 0, 0, state, cmp);
+        }
+    }
+
+    if (lastSubarrays != 0) {
+        VAR* offset = start + (mergeCount * fullMerge);
+        blockCount = lastSubarrays / blockLen;
+
+        FUNC(grailInsertSort)(firstKey, firstKey + blockCount + 1, cmp);
+
+        size_t medianKey = subarrayLen / blockLen;
+        medianKey = FUNC(grailBlockSelectSort)(firstKey, offset, medianKey, blockCount, blockLen, cmp);
+
+        size_t lastFragment = lastSubarrays - (blockCount * blockLen);
+        size_t lastMergeBlocks;
+        if (lastFragment != 0) {
+            lastMergeBlocks = FUNC(grailCountLastMergeBlocks)(offset, blockCount, blockLen, cmp);
+        } else {
+            lastMergeBlocks = 0;
+        }
+
+        size_t smartMerges = blockCount - lastMergeBlocks;
+
+        if (smartMerges == 0) {
+            size_t leftLen = lastMergeBlocks * blockLen;
+
+            if (buffer) {
+                FUNC(grailMergeForwards)(offset, leftLen, lastFragment, blockLen, cmp);
+            } else {
+                FUNC(grailLazyMerge)(offset, leftLen, lastFragment, cmp);
+            }
+        } else {
+            if (buffer) {
+                FUNC(grailMergeBlocks)(firstKey, firstKey + medianKey, offset, smartMerges, blockLen, lastMergeBlocks, lastFragment, state, cmp);
+            } else {
+                FUNC(grailLazyMergeBlocks)(firstKey, firstKey + medianKey, offset, smartMerges, blockLen, lastMergeBlocks, lastFragment, state, cmp);
+            }
+        }
+    }
+
+    if (buffer) {
+        FUNC(grailInPlaceBufferReset)(start, length, blockLen);
+    }
+}
+
 static void FUNC(grailCombineOutOfPlace)(VAR* firstKey, VAR* start, size_t length, size_t subarrayLen, size_t blockLen, size_t mergeCount, size_t lastSubarrays, VAR* extBuffer, GrailState* state, GRAILCMP cmp) {
     memcpy(extBuffer, start - blockLen, sizeof(VAR) * blockLen);
 
-    size_t fullMerge = 2 * subarrayLen;
+    size_t fullMerge  = 2 * subarrayLen;
     size_t blockCount = fullMerge / blockLen;
 
     for (size_t mergeIndex = 0; mergeIndex < mergeCount; mergeIndex++) {
@@ -536,56 +867,8 @@ static void FUNC(grailCombineBlocks)(VAR* firstKey, VAR* start, size_t length, s
 
     if (buffer && blockLen <= extBufferLen) {
         FUNC(grailCombineOutOfPlace)(firstKey, start, length, subarrayLen, blockLen, mergeCount, lastSubarrays, extBuffer, state, cmp);
-    }
-}
-
-static void FUNC(grailLazyMerge)(VAR* start, size_t leftLen, size_t rightLen, GRAILCMP cmp) {
-    if (leftLen < rightLen) {
-        VAR* middle = start + leftLen;
-
-        while (leftLen != 0) {
-            size_t mergeLen = FUNC(grailBinarySearchLeft)(middle, rightLen, start, cmp);
-
-            if (mergeLen != 0) {
-                FUNC(grailRotate)(start, leftLen, mergeLen);
-
-                start    += mergeLen;
-                middle   += mergeLen;
-                rightLen -= mergeLen;
-            }
-
-            if (rightLen == 0) {
-                break;
-            } else {
-                do {
-                    start++;
-                    leftLen--;
-                } while (leftLen != 0 && cmp(start, middle) <= 0);
-            }
-        }
     } else {
-        VAR* end = start + leftLen + rightLen - 1;
-
-        while (rightLen != 0) {
-            size_t mergeLen = FUNC(grailBinarySearchRight)(start, leftLen, end, cmp);
-
-            if (mergeLen != leftLen) {
-                FUNC(grailRotate)(start + mergeLen, leftLen - mergeLen, rightLen);
-
-                end    -= leftLen - mergeLen;
-                leftLen = mergeLen;
-            }
-
-            if (leftLen == 0) {
-                break;
-            } else {
-                VAR* middle = start + leftLen;
-                do {
-                    rightLen--;
-                    end--;
-                } while (rightLen != 0 && cmp(middle - 1, end) <= 0);
-            }
-        }
+        FUNC(grailCombineInPlace)(firstKey, start, length, subarrayLen, blockLen, mergeCount, lastSubarrays, buffer, state, cmp);
     }
 }
 
