@@ -966,4 +966,7 @@ static void FUNC(grailCommonSort)(VAR* start, size_t length, VAR* extBuffer, siz
 
         FUNC(grailCombineBlocks)(start, start + bufferEnd, length - bufferEnd, subarrayLen, currentBlockLen, scrollingBuffer, extBuffer, extBufferLen, &state, cmp);
     }
+
+    FUNC(grailInsertSort)(start, start + bufferEnd, cmp);
+    FUNC(grailLazyMerge)(start, bufferEnd, length - bufferEnd, cmp);
 }
