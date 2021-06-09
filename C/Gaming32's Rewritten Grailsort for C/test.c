@@ -4,7 +4,8 @@
 #include "grail_sort.h"
 
 // #define ARRAY_LENGTH 65536
-#define ARRAY_LENGTH 16
+// #define ARRAY_LENGTH 16
+#define ARRAY_LENGTH 128
 
 #define RANDOM_LIMIT ARRAY_LENGTH
 // #define RANDOM_LIMIT RAND_MAX
@@ -33,6 +34,14 @@ void printGrailArray(GrailPair* array) {
     printf("]\n");
 }
 
+void printGrailArrayV(GrailPair* array) {
+    printf("%i", array->value);
+    for (size_t i = 1; i < ARRAY_LENGTH; i++) {
+        printf(" %i", array[i].value);
+    }
+    printf("\n");
+}
+
 int main() {
     srand(RANDOM_SEED);
 
@@ -56,9 +65,11 @@ int main() {
     }
     qsort(copy, ARRAY_LENGTH, sizeof(int), compare_qsort);
 
-    printGrailArray(array);
-    grailSortInPlace(array, ARRAY_LENGTH, sizeof(GrailPair), compare_grailsort);
-    printGrailArray(array);
+    // printGrailArray(array);
+    // grailSortInPlace(array, ARRAY_LENGTH, sizeof(GrailPair), compare_grailsort);
+    // printGrailArray(array);
+    grailSortStaticOOP(array, ARRAY_LENGTH, sizeof(GrailPair), compare_grailsort);
+    printGrailArrayV(array);
 
     free(array);
     return 0;

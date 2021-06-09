@@ -16,7 +16,15 @@
 
 typedef int GRAILCMP(const void *a, const void *b);
 
-#define grailSwap(a, b) {VAR c = *(a); *(a) = *(b); *(b) = c;}
+typedef enum {
+	GRAIL_SUBARRAY_LEFT,
+	GRAIL_SUBARRAY_RIGHT
+} GrailSubarray;
+
+typedef struct {
+    size_t currBlockLen;
+	GrailSubarray currBlockOrigin;
+} GrailState;
 
 //////////////////////////////////////////////////////////
 //┌────────────────────────────────────────────────────┐//
