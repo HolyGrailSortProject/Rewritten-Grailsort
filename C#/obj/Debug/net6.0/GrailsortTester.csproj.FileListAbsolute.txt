@@ -1,0 +1,15 @@
+C:\Users\CDog2\source\repos\GrailsortTester\bin\Debug\net6.0\GrailsortTester.exe
+C:\Users\CDog2\source\repos\GrailsortTester\bin\Debug\net6.0\GrailsortTester.deps.json
+C:\Users\CDog2\source\repos\GrailsortTester\bin\Debug\net6.0\GrailsortTester.runtimeconfig.json
+C:\Users\CDog2\source\repos\GrailsortTester\bin\Debug\net6.0\GrailsortTester.dll
+C:\Users\CDog2\source\repos\GrailsortTester\bin\Debug\net6.0\ref\GrailsortTester.dll
+C:\Users\CDog2\source\repos\GrailsortTester\bin\Debug\net6.0\GrailsortTester.pdb
+C:\Users\CDog2\source\repos\GrailsortTester\obj\Debug\net6.0\GrailsortTester.csproj.AssemblyReference.cache
+C:\Users\CDog2\source\repos\GrailsortTester\obj\Debug\net6.0\GrailsortTester.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\CDog2\source\repos\GrailsortTester\obj\Debug\net6.0\GrailsortTester.AssemblyInfoInputs.cache
+C:\Users\CDog2\source\repos\GrailsortTester\obj\Debug\net6.0\GrailsortTester.AssemblyInfo.cs
+C:\Users\CDog2\source\repos\GrailsortTester\obj\Debug\net6.0\GrailsortTester.csproj.CoreCompileInputs.cache
+C:\Users\CDog2\source\repos\GrailsortTester\obj\Debug\net6.0\GrailsortTester.dll
+C:\Users\CDog2\source\repos\GrailsortTester\obj\Debug\net6.0\ref\GrailsortTester.dll
+C:\Users\CDog2\source\repos\GrailsortTester\obj\Debug\net6.0\GrailsortTester.pdb
+C:\Users\CDog2\source\repos\GrailsortTester\obj\Debug\net6.0\GrailsortTester.genruntimeconfig.cache
