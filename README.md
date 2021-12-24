@@ -65,7 +65,6 @@ Now, there *are* some glaring flaws with Grailsort, but they're now easier than 
    * aphitorite
    * Control
    * dani_dlg
-   * DeveloperSort
    * EilrahcF
    * Enver
    * Gaming32
