@@ -81,9 +81,6 @@ namespace GrailsortTester
 #nullable enable
     public class GrailSort
     {
-
-        //private object[]? extBuffer;
-        //private int extBufferLen;
         private int currBlockLen;
         private Subarray currBlockOrigin;
 
@@ -367,48 +364,6 @@ namespace GrailsortTester
             }
         }
 
-        // array[buffer .. start - 1] <=> "free space"    
-        //
-        // "free space" + array[start, middle - 1] + array[middle, end - 1]
-        // --> array[buffer, buffer + end - 1] + "free space"
-        //
-        /*private static void GrailMergeOutOfPlace(object[] array, int start, int leftLen, int rightLen,
-                                                                int bufferOffset, IComparer cmp)
-        {
-            int buffer = start - bufferOffset;
-            int left = start;
-            int middle = start + leftLen;
-            int right = middle;
-            int end = middle + rightLen;
-
-            while (right < end)
-            {
-                if (left == middle || cmp.Compare(array[left],
-                                                 array[right]) > 0)
-                {
-                    array[buffer] = array[right];
-                    right++;
-                }
-                else
-                {
-                    array[buffer] = array[left];
-                    left++;
-                }
-                buffer++;
-            }
-
-            if (buffer != left)
-            {
-                while (left < middle)
-                {
-                    array[buffer] = array[left];
-                    buffer++;
-                    left++;
-                }
-            }
-        }*/
-
-
         private static void GrailBuildInPlace(object[] array, int start, int length, int currentLen, int bufferLen, IComparer cmp)
         {
             for (int mergeLen = currentLen; mergeLen < bufferLen; mergeLen *= 2)
@@ -457,86 +412,14 @@ namespace GrailsortTester
             }
         }
 
-        /*private void GrailBuildOutOfPlace(object[] array, int start, int length, int bufferLen, int extLen, IComparer cmp)
-        {
-            Array.Copy(array, start - extLen, extBuffer, 0, extLen);
-
-            objectwiseWrites(array, start, length, cmp);
-            start -= 2;
-
-            int mergeLen;
-            for (mergeLen = 2; mergeLen < extLen; mergeLen *= 2)
-            {
-                int fullMerge = 2 * mergeLen;
-
-                int mergeIndex;
-                int mergeEnd = start + length - fullMerge;
-                int bufferOffset = mergeLen;
-
-                for (mergeIndex = start; mergeIndex <= mergeEnd; mergeIndex += fullMerge)
-                {
-                    GrailMergeOutOfPlace(array, mergeIndex, mergeLen, mergeLen, bufferOffset, cmp);
-                }
-
-                int leftOver = length - (mergeIndex - start);
-
-                if (leftOver > mergeLen)
-                {
-                    GrailMergeOutOfPlace(array, mergeIndex, mergeLen, leftOver - mergeLen, bufferOffset, cmp);
-                }
-                else
-                {
-                    Array.Copy(array, mergeIndex, array, mergeIndex - mergeLen, leftOver);
-                }
-
-                start -= mergeLen;
-            }
-
-            Array.Copy(this.extBuffer, 0, array, start + length, extLen);
-            GrailBuildInPlace(array, start, length, mergeLen, bufferLen, cmp);
-        }*/
-
+        
         // build blocks of length 'bufferLen'
         // input: [start - mergeLen, start - 1] elements are buffer
         // output: first 'bufferLen' elements are buffer, blocks (2 * bufferLen) and last subblock sorted
         private static void GrailBuildBlocks(object[] array, int start, int length, int bufferLen, IComparer cmp)
         {
-            /* if (this.extBuffer != null)
-             {
-                 int extLen;
-
-                 if (bufferLen < this.extBufferLen)
-                 {
-                     extLen = bufferLen;
-                 }
-                 else
-                 {
-                     //TODO: Test if this is faster than the original
-                     // max power of 2 -- just in case
-                     // Original version:
-                     // externLen = 1;
-                     // while((externLen * 2) <= this.externalBufferLen) {
-                     //     externLen *= 2;
-                     // }
-                     // Optimized version:
-                     extLen = 1;
-                     while ((extLen << 3) <= this.extBufferLen)
-                     {
-                         extLen <<= 3;
-                     }
-                     while ((extLen << 1) <= this.extBufferLen)
-                     {
-                         extLen <<= 1;
-                     }
-                 }
-
-                 this.GrailBuildOutOfPlace(array, start, length, bufferLen, extLen, cmp);
-             }
-             else
-             {*/
             GrailPairwiseSwaps(array, start, length, cmp);
             GrailBuildInPlace(array, start - 2, length, 2, bufferLen, cmp);
-            //}
         }
 
 
@@ -602,24 +485,6 @@ namespace GrailsortTester
             }
         }
 
-        // Shifts entire array over 'bufferOffset' spaces to move the out-of-place merging buffer back to
-        // the beginning of the array.
-        // Costs O(n) writes.
-        //
-        // Credit to 666666t for debugging
-        /*private static void GrailOutOfPlaceBufferReset(object[] array, int start, int length, int bufferOffset)
-        {
-            int buffer = start + length - 1;
-            int index = buffer - bufferOffset;
-
-            while (buffer >= start)
-            {
-                array[buffer] = array[index];
-                buffer--;
-                index--;
-            }
-        }*/
-
         // Rewinds Grailsort's "scrolling buffer" to the left of any items belonging to the left subarray block
         // left over by a "smart merge". This is used to continue an ongoing merge that has run out of buffer space.
         // Costs O(sqrt n) swaps in the *absolute* worst-case. 
@@ -635,23 +500,6 @@ namespace GrailsortTester
                 buffer--;
             }
         }
-
-        // Rewinds Grailsort's out-of-place buffer to the left of any items belonging to the left subarray block
-        // left over by a "smart merge". This is used to continue an ongoing merge that has run out of buffer space.
-        // Costs O(sqrt n) writes in the absolute worst-case.
-        //
-        // BETTER ORDER, INCORRECT ORDER OF PARAMETERS BUG FIXED: leftOvers (leftBlock) should be
-        //                                                        the middle, and `buffer` should be the end
-        /*private static void GrailOutOfPlaceBufferRewind(object[] array, int start, int leftBlock, int buffer)
-        {
-            while (leftBlock >= start)
-            {
-                array[buffer] = array[leftBlock];
-                leftBlock--;
-                buffer--;
-            }
-        }*/
-
 
         private static Subarray GrailGetSubarray(object[] array, int currentKey, int medianKey, IComparer cmp)
         {
@@ -833,71 +681,6 @@ namespace GrailsortTester
             }
         }
 
-        /*private void GrailSmartMergeOutOfPlace(object[] array, int start, int leftLen, Subarray leftOrigin,
-                                                                     int rightLen, int bufferOffset,
-                                                                     IComparer cmp)
-        {
-            int buffer = start - bufferOffset;
-            int left = start;
-            int middle = start + leftLen;
-            int right = middle;
-            int end = middle + rightLen;
-
-            if (leftOrigin == Subarray.LEFT)
-            {
-                while (left < middle && right < end)
-                {
-                    if (cmp.Compare(array[left], array[right]) <= 0)
-                    {
-                        array[buffer] = array[left];
-                        left++;
-                    }
-                    else
-                    {
-                        array[buffer] = array[right];
-                        right++;
-                    }
-                    buffer++;
-                }
-            }
-            else
-            {
-                while (left < middle && right < end)
-                {
-                    if (cmp.Compare(array[left], array[right]) < 0)
-                    {
-                        array[buffer] = array[left];
-                        left++;
-                    }
-                    else
-                    {
-                        array[buffer] = array[right];
-                        right++;
-                    }
-                    buffer++;
-                }
-            }
-
-            if (left < middle)
-            {
-                currBlockLen = middle - left;
-                GrailOutOfPlaceBufferRewind(array, left, middle - 1, end - 1);
-            }
-            else
-            {
-                currBlockLen = end - right;
-                if (leftOrigin == Subarray.LEFT)
-                {
-                    currBlockOrigin = Subarray.RIGHT;
-                }
-                else
-                {
-                    currBlockOrigin = Subarray.LEFT;
-                }
-            }
-        }*/
-
-
         // Credit to Anonymous0726 for better variable names such as "nextBlock"
         private void GrailMergeBlocks(object[] array, int firstKey, int medianKey, int start,
                                                  int blockCount, int blockLen, int lastMergeBlocks,
@@ -1009,66 +792,6 @@ namespace GrailsortTester
             }
         }
 
-        /*private void GrailMergeBlocksOutOfPlace(object[] array, int firstKey, int medianKey, int start,
-                                                           int blockCount, int blockLen, int lastMergeBlocks,
-                                                           int lastLen, IComparer cmp)
-        {
-            int buffer;
-
-            int currBlock;
-            int nextBlock = start + blockLen;
-
-            currBlockLen = blockLen;
-            currBlockOrigin = GrailGetSubarray(array, firstKey, medianKey, cmp);
-
-            for (int keyIndex = 1; keyIndex < blockCount; keyIndex++, nextBlock += blockLen)
-            {
-                Subarray nextBlockOrigin;
-
-                currBlock = nextBlock - currBlockLen;
-                nextBlockOrigin = GrailGetSubarray(array, firstKey + keyIndex, medianKey, cmp);
-
-                if (nextBlockOrigin == currBlockOrigin)
-                {
-                    buffer = currBlock - blockLen;
-
-                    Array.Copy(array, currBlock, array, buffer, currBlockLen);
-                    currBlockLen = blockLen;
-                }
-                else
-                {
-                    GrailSmartMergeOutOfPlace(array, currBlock, currBlockLen, currBlockOrigin,
-                                                   blockLen, blockLen, cmp);
-                }
-            }
-
-            currBlock = nextBlock - currBlockLen;
-            buffer = currBlock - blockLen;
-
-            if (lastLen != 0)
-            {
-                if (currBlockOrigin == Subarray.RIGHT)
-                {
-                    Array.Copy(array, currBlock, array, buffer, currBlockLen);
-
-                    currBlock = nextBlock;
-                    currBlockLen = blockLen * lastMergeBlocks;
-                    currBlockOrigin = Subarray.LEFT;
-                }
-                else
-                {
-                    currBlockLen += blockLen * lastMergeBlocks;
-                }
-
-                GrailMergeOutOfPlace(array, currBlock, currBlockLen, lastLen, blockLen, cmp);
-            }
-            else
-            {
-                Array.Copy(array, currBlock, array, buffer, currBlockLen);
-            }
-        }*/
-
-
         //TODO: Double-check "Merge Blocks" arguments
         private void GrailCombineInPlace(object[] array, int firstKey, int start, int length,
                                                     int subarrayLen, int blockLen,
@@ -1160,72 +883,7 @@ namespace GrailsortTester
             }
         }
 
-        /*private void GrailCombineOutOfPlace(object[] array, int firstKey, int start, int length,
-                                                       int subarrayLen, int blockLen,
-                                                       int mergeCount, int lastSubarrays)
-        {
-            IComparer cmp = this.cmp; // local variable for performance à la Timsort
-            Array.Copy(array, start - blockLen, extBuffer, 0, blockLen);
-
-            int fullMerge = 2 * subarrayLen;
-            int blockCount = fullMerge / blockLen;
-
-            for (int mergeIndex = 0; mergeIndex < mergeCount; mergeIndex++)
-            {
-                int offset = start + (mergeIndex * fullMerge);
-
-                GrailInsertSort(array, firstKey, blockCount, cmp);
-
-                int medianKey = subarrayLen / blockLen;
-                medianKey = GrailBlockSelectSort(array, firstKey, offset, medianKey, blockCount, blockLen, cmp);
-
-                GrailMergeBlocksOutOfPlace(array, firstKey, firstKey + medianKey, offset,
-                                                blockCount, blockLen, 0, 0, cmp);
-            }
-
-            // INCORRECT CONDITIONAL/PARAMETER BUG FIXED: Credit to 666666t for debugging.
-            if (lastSubarrays != 0)
-            {
-                int offset = start + (mergeCount * fullMerge);
-                blockCount = lastSubarrays / blockLen;
-
-                GrailInsertSort(array, firstKey, blockCount + 1, cmp);
-
-                int medianKey = subarrayLen / blockLen;
-                medianKey = GrailBlockSelectSort(array, firstKey, offset, medianKey, blockCount, blockLen, cmp);
-
-                // MISSING BOUNDS CHECK BUG FIXED: `lastFragment` *can* be 0 if the last two subarrays are evenly
-                //                                 divided into blocks. This prevents Grailsort from going out-of-bounds.
-                int lastFragment = lastSubarrays - (blockCount * blockLen);
-                int lastMergeBlocks;
-                if (lastFragment != 0)
-                {
-                    lastMergeBlocks = GrailCountLastMergeBlocks(array, offset, blockCount, blockLen, cmp);
-                }
-                else
-                {
-                    lastMergeBlocks = 0;
-                }
-
-                int smartMerges = blockCount - lastMergeBlocks;
-
-                if (smartMerges == 0)
-                {
-                    int leftLen = lastMergeBlocks * blockLen;
-
-                    GrailMergeOutOfPlace(array, offset, leftLen, lastFragment, blockLen, cmp);
-                }
-                else
-                {
-                    GrailMergeBlocksOutOfPlace(array, firstKey, firstKey + medianKey, offset,
-                                                    smartMerges, blockLen, lastMergeBlocks, lastFragment, cmp);
-                }
-            }
-
-            GrailOutOfPlaceBufferReset(array, start, length, blockLen);
-            Array.Copy(extBuffer, 0, array, start - blockLen, blockLen);
-        }*/
-
+        
         // 'keys' are on the left side of array. Blocks of length 'subarrayLen' combined. We'll combine them in pairs
         // 'subarrayLen' is a power of 2. (2 * subarrayLen / blockLen) keys are guaranteed
         //
