@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -69,8 +68,7 @@ namespace GrailsortTester
     //
     // Editor: AceOfSpadesProduc100, from DeveloperSort's Java version
     //
-    // Current status: EVERY VERSION PASSING ALL TESTS / POTENTIALLY FIXED as of
-    //                 10/23/20
+    // Current status: Changed from object to angle bracket generics in 4/28/2022. Only ints tested.
 
     //Credit to phoenixbound for this clever idea
     enum Subarray
@@ -79,27 +77,27 @@ namespace GrailsortTester
         RIGHT
     }
 #nullable enable
-    public class GrailSort
+    public class GrailSort<K>
     {
         private int currBlockLen;
         private Subarray currBlockOrigin;
 
 
-        public readonly IComparer cmp;
 
-        public GrailSort(IComparer cmp)
+        public readonly IComparer<K> cmp;
+
+        public GrailSort(IComparer<K> cmp)
         {
             this.cmp = cmp;
         }
 
-        private static void GrailSwap(object[] array, int a, int b)
+        private static void GrailSwap(K[] array, int a, int b)
         {
-            object temp = array[a];
-            array[a] = array[b];
-            array[b] = temp;
+            (array[b], array[a]) = (array[a], array[b]);
+            Program.swaps++;
         }
 
-        private static void GrailBlockSwap(object[] array, int a, int b, int blockLen)
+        private static void GrailBlockSwap(K[] array, int a, int b, int blockLen)
         {
             for (int i = 0; i < blockLen; i++)
             {
@@ -109,7 +107,7 @@ namespace GrailsortTester
 
         // Swaps the order of two adjacent blocks whose lengths may or may not be equal.
         // Variant of the Gries-Mills algorithm, which is basically recursive block swaps.
-        private static void GrailRotate(object[] array, int start, int leftLen, int rightLen)
+        private static void GrailRotate(K[] array, int start, int leftLen, int rightLen)
         {
             while (leftLen > 0 && rightLen > 0)
             {
@@ -130,7 +128,7 @@ namespace GrailsortTester
 
         // Variant of Insertion Sort that utilizes swaps instead of overwrites.
         // Also known as "Optimized Gnomesort".
-        private static void GrailInsertSort(object[] array, int start, int length, IComparer cmp)
+        private static void GrailInsertSort(K[] array, int start, int length, IComparer<K> cmp)
         {
             for (int item = 1; item < length; item++)
             {
@@ -148,7 +146,7 @@ namespace GrailsortTester
         }
 
 
-        private static int GrailBinarySearchLeft(object[] array, int start, int length, object target, IComparer cmp)
+        private static int GrailBinarySearchLeft(K[] array, int start, int length, K target, IComparer<K> cmp)
         {
             int left = 0;
             int right = length;
@@ -171,7 +169,7 @@ namespace GrailsortTester
         }
 
         // Credit to Anonymous0726 for debugging
-        private static int GrailBinarySearchRight(object[] array, int start, int length, object target, IComparer cmp)
+        private static int GrailBinarySearchRight(K[] array, int start, int length, K target, IComparer<K> cmp)
         {
             int left = 0;
             int right = length;
@@ -195,7 +193,7 @@ namespace GrailsortTester
 
 
         // cost: 2 * length + idealKeys^2 / 2
-        private static int GrailCollectKeys(object[] array, int start, int length, int idealKeys, IComparer cmp)
+        private static int GrailCollectKeys(K[] array, int start, int length, int idealKeys, IComparer<K> cmp)
         {
             int keysFound = 1; // by itself, the first item in the array is our first unique key
             int firstKey = 0; // the first item in the array is at the first position in the array
@@ -237,7 +235,7 @@ namespace GrailsortTester
         }
 
 
-        private static void GrailPairwiseSwaps(object[] array, int start, int length, IComparer cmp)
+        private static void GrailPairwiseSwaps(K[] array, int start, int length, IComparer<K> cmp)
         {
             int index;
             for (index = 1; index < length; index += 2)
@@ -264,40 +262,13 @@ namespace GrailsortTester
             }
         }
 
-        private static void GrailPairwiseWrites(object[] array, int start, int length, IComparer cmp)
-        {
-            int index;
-            for (index = 1; index < length; index += 2)
-            {
-                int leftt = start + index - 1;
-                int right = start + index;
-
-                if (cmp.Compare(array[leftt], array[right]) > 0)
-                {
-                    array[leftt - 2] = array[right];
-                    array[right - 2] = array[leftt];
-                }
-                else
-                {
-                    array[leftt - 2] = array[leftt];
-                    array[right - 2] = array[right];
-                }
-            }
-
-            int left = start + index - 1;
-            if (left < start + length)
-            {
-                array[left - 2] = array[left];
-            }
-        }
-
 
         // array[buffer .. start - 1] <=> "scrolling buffer"
         // 
         // "scrolling buffer" + array[start, middle - 1] + array[middle, end - 1]
         // --> array[buffer, buffer + end - 1] + "scrolling buffer"
-        private static void GrailMergeForwards(object[] array, int start, int leftLen, int rightLen,
-                                                              int bufferOffset, IComparer cmp)
+        private static void GrailMergeForwards(K[] array, int start, int leftLen, int rightLen,
+                                                              int bufferOffset, IComparer<K> cmp)
         {
             int buffer = start - bufferOffset;
             int left = start;
@@ -328,8 +299,8 @@ namespace GrailsortTester
         }
 
         // credit to 666666t for thorough bug-checking/fixing
-        private static void GrailMergeBackwards(object[] array, int start, int leftLen, int rightLen,
-                                                               int bufferOffset, IComparer cmp)
+        private static void GrailMergeBackwards(K[] array, int start, int leftLen, int rightLen,
+                                                               int bufferOffset, IComparer<K> cmp)
         {
             int end = start - 1;
             int left = end + leftLen;
@@ -364,7 +335,7 @@ namespace GrailsortTester
             }
         }
 
-        private static void GrailBuildInPlace(object[] array, int start, int length, int currentLen, int bufferLen, IComparer cmp)
+        private static void GrailBuildInPlace(K[] array, int start, int length, int currentLen, int bufferLen, IComparer<K> cmp)
         {
             for (int mergeLen = currentLen; mergeLen < bufferLen; mergeLen *= 2)
             {
@@ -412,11 +383,11 @@ namespace GrailsortTester
             }
         }
 
-        
+
         // build blocks of length 'bufferLen'
         // input: [start - mergeLen, start - 1] elements are buffer
         // output: first 'bufferLen' elements are buffer, blocks (2 * bufferLen) and last subblock sorted
-        private static void GrailBuildBlocks(object[] array, int start, int length, int bufferLen, IComparer cmp)
+        private static void GrailBuildBlocks(K[] array, int start, int length, int bufferLen, IComparer<K> cmp)
         {
             GrailPairwiseSwaps(array, start, length, cmp);
             GrailBuildInPlace(array, start - 2, length, 2, bufferLen, cmp);
@@ -425,8 +396,8 @@ namespace GrailsortTester
 
         // Returns the final position of 'medianKey'.
         // MINOR CHANGES: Change comparison order to emphasize "less-than" relation; fewer variables (Credit to Anonymous0726 for better variable names!)
-        private static int GrailBlockSelectSort(object[] array, int firstKey, int start, int medianKey,
-                                                               int blockCount, int blockLen, IComparer cmp)
+        private static int GrailBlockSelectSort(K[] array, int firstKey, int start, int medianKey,
+                                                               int blockCount, int blockLen, IComparer<K> cmp)
         {
             for (int firstBlock = 0; firstBlock < blockCount; firstBlock++)
             {
@@ -472,7 +443,7 @@ namespace GrailsortTester
         // Costs O(n) swaps.
         //
         // Credit to 666666t for debugging
-        private static void GrailInPlaceBufferReset(object[] array, int start, int length, int bufferOffset)
+        private static void GrailInPlaceBufferReset(K[] array, int start, int length, int bufferOffset)
         {
             int buffer = start + length - 1;
             int index = buffer - bufferOffset;
@@ -491,7 +462,7 @@ namespace GrailsortTester
         //
         // BETTER ORDER-OF-OPERATIONS, NAMING IMPROVED: the leftover items (leftBlock) are in the
         //                                              middle of the merge while the buffer is at the end
-        private static void GrailInPlaceBufferRewind(object[] array, int start, int leftBlock, int buffer)
+        private static void GrailInPlaceBufferRewind(K[] array, int start, int leftBlock, int buffer)
         {
             while (leftBlock >= start)
             {
@@ -501,7 +472,7 @@ namespace GrailsortTester
             }
         }
 
-        private static Subarray GrailGetSubarray(object[] array, int currentKey, int medianKey, IComparer cmp)
+        private static Subarray GrailGetSubarray(K[] array, int currentKey, int medianKey, IComparer<K> cmp)
         {
             if (cmp.Compare(array[currentKey], array[medianKey]) < 0)
             {
@@ -515,7 +486,7 @@ namespace GrailsortTester
 
 
         // Last/final left blocks are used to calculate the length of the final merge
-        private static int GrailCountLastMergeBlocks(object[] array, int offset, int blockCount, int blockLen, IComparer cmp)
+        private static int GrailCountLastMergeBlocks(K[] array, int offset, int blockCount, int blockLen, IComparer<K> cmp)
         {
             int blocksToMerge = 0;
 
@@ -533,9 +504,9 @@ namespace GrailsortTester
         }
 
 
-        private void GrailSmartMerge(object[] array, int start, int leftLen, Subarray leftOrigin,
+        private void GrailSmartMerge(K[] array, int start, int leftLen, Subarray leftOrigin,
                                                            int rightLen, int bufferOffset,
-                                                           IComparer cmp)
+                                                           IComparer<K> cmp)
         {
             int buffer = start - bufferOffset;
             int left = start;
@@ -597,7 +568,7 @@ namespace GrailsortTester
             }
         }
 
-        private void GrailSmartLazyMerge(object[] array, int start, int leftLen, Subarray leftOrigin, int rightLen, IComparer cmp)
+        private void GrailSmartLazyMerge(K[] array, int start, int leftLen, Subarray leftOrigin, int rightLen, IComparer<K> cmp)
         {
             int middle = start + leftLen;
 
@@ -682,9 +653,9 @@ namespace GrailsortTester
         }
 
         // Credit to Anonymous0726 for better variable names such as "nextBlock"
-        private void GrailMergeBlocks(object[] array, int firstKey, int medianKey, int start,
+        private void GrailMergeBlocks(K[] array, int firstKey, int medianKey, int start,
                                                  int blockCount, int blockLen, int lastMergeBlocks,
-                                                 int lastLen, IComparer cmp)
+                                                 int lastLen, IComparer<K> cmp)
         {
             int buffer;
 
@@ -741,9 +712,9 @@ namespace GrailsortTester
             }
         }
 
-        private void GrailLazyMergeBlocks(object[] array, int firstKey, int medianKey, int start,
+        private void GrailLazyMergeBlocks(K[] array, int firstKey, int medianKey, int start,
                                                      int blockCount, int blockLen, int lastMergeBlocks,
-                                                     int lastLen, IComparer cmp)
+                                                     int lastLen, IComparer<K> cmp)
         {
             int currBlock;
             int nextBlock = start + blockLen;
@@ -793,12 +764,12 @@ namespace GrailsortTester
         }
 
         //TODO: Double-check "Merge Blocks" arguments
-        private void GrailCombineInPlace(object[] array, int firstKey, int start, int length,
+        private void GrailCombineInPlace(K[] array, int firstKey, int start, int length,
                                                     int subarrayLen, int blockLen,
                                                     int mergeCount, int lastSubarrays,
                                                     bool buffer)
         { //TODO: Do collisions with hanging indents like these affect readability?
-            IComparer cmp = this.cmp; // local variable for performance à la Timsort
+            IComparer<K> cmp = this.cmp; // local variable for performance à la Timsort
 
             int fullMerge = 2 * subarrayLen;
             int blockCount = fullMerge / blockLen;
@@ -883,7 +854,7 @@ namespace GrailsortTester
             }
         }
 
-        
+
         // 'keys' are on the left side of array. Blocks of length 'subarrayLen' combined. We'll combine them in pairs
         // 'subarrayLen' is a power of 2. (2 * subarrayLen / blockLen) keys are guaranteed
         //
@@ -892,7 +863,7 @@ namespace GrailsortTester
         //
         //                   Please also check everything surrounding 'if(lastSubarrays != 0)' inside
         //                   'combine in-/out-of-place' methods for other renames.
-        private void GrailCombineBlocks(object[] array, int firstKey, int start, int length,
+        private void GrailCombineBlocks(K[] array, int firstKey, int start, int length,
                                                    int subarrayLen, int blockLen, bool buffer)
         {
             int fullMerge = 2 * subarrayLen;
@@ -924,7 +895,7 @@ namespace GrailsortTester
         //
         // cost: min(leftLen, rightLen)^2 + max(leftLen, rightLen)
         // MINOR CHANGES: better naming -- 'insertPos' is now 'mergeLen' -- and "middle"/"end" calculations simplified
-        private static void GrailLazyMerge(object[] array, int start, int leftLen, int rightLen, IComparer cmp)
+        private static void GrailLazyMerge(K[] array, int start, int leftLen, int rightLen, IComparer<K> cmp)
         {
             if (leftLen < rightLen)
             {
@@ -993,7 +964,7 @@ namespace GrailsortTester
             }
         }
 
-        private static void GrailLazyStableSort(object[] array, int start, int length, IComparer cmp)
+        private static void GrailLazyStableSort(K[] array, int start, int length, IComparer<K> cmp)
         {
             for (int index = 1; index < length; index += 2)
             {
@@ -1044,7 +1015,7 @@ namespace GrailsortTester
          */
 
 
-        public void GrailCommonSort(object[] array, int start, int length, object[]? extBuffer, int extBufferLen)
+        public void GrailCommonSort(K[] array, int start, int length)
         {
             if (length < 16)
             {
@@ -1111,12 +1082,6 @@ namespace GrailsortTester
                 subarrayLen = keyLen;
             }
 
-            if (idealBuffer && extBuffer != null)
-            {
-                //this.extBuffer = extBuffer;
-                //this.extBufferLen = extBufferLen;
-            }
-
             GrailBuildBlocks(array, start + bufferEnd, length - bufferEnd, subarrayLen, cmp);
 
             while ((length - bufferEnd) > (2 * subarrayLen))
@@ -1170,9 +1135,9 @@ namespace GrailsortTester
         }
 
 
-        public void GrailSortInPlace(object[] array, int start, int length)
+        public void GrailSortInPlace(K[] array, int start, int length)
         {
-            GrailCommonSort(array, start, length, null, 0);
+            GrailCommonSort(array, start, length);
         }
     }
 }

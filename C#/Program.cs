@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace GrailsortTester
@@ -18,29 +17,30 @@ namespace GrailsortTester
     //
     // Current status: IComparers of types get conversion related errors. Only integers tested.
 
-    class GrailComparator : IComparer
+    internal class GrailComparator : IComparer<int>
     {
-        public int Compare(object x, object y)
+        public int comps;
+        public int Compare(int x, int y)
         {
-            return Convert.ToInt32(x) < Convert.ToInt32(y) ? -1 : Convert.ToInt32(x) > Convert.ToInt32(y) ? 1 : 0;
+            comps++;
+            return x < y ? -1 : x > y ? 1 : 0;
         }
     }
 
 
     internal static class Program
     {
+        public static int swaps;
         private static void Main()
         {
             GrailComparator gc = new();
-            GrailSort gs = new(gc);
-            int[] basearr = new int[50];
-            object[] arr = new object[basearr.Length];
-            for (int i = 0; i < basearr.Length; i++)
+            GrailSort<int> gs = new(gc);
+
+            int[] arr = new int[50];
+            for (int i = 0; i < arr.Length; i++)
             {
-                basearr[i] = i;
+                arr[i] = i;
             }
-            basearr.CopyTo(arr, 0);
-            //Array.Copy(basearr, arr, arr.Length);
             Console.WriteLine("Testing grailsort:");
             Console.WriteLine("------------------------------------------------");
             Console.WriteLine("Random input:");
@@ -51,6 +51,10 @@ namespace GrailsortTester
             Console.WriteLine("Sorted result:");
             gs.GrailSortInPlace(arr, 0, arr.Length);
             Console.WriteLine("[{0}]", string.Join(", ", arr));
+            Console.WriteLine("Comps: " + gc.comps);
+            Console.WriteLine("Swaps: " + swaps);
+            gc.comps = 0;
+            swaps = 0;
             Console.WriteLine("------------------------------------------------");
             Console.WriteLine("Reversed input:");
             Array.Reverse(arr);
@@ -59,13 +63,17 @@ namespace GrailsortTester
             Console.WriteLine("Sorted result:");
             gs.GrailSortInPlace(arr, 0, arr.Length);
             Console.WriteLine("[{0}]", string.Join(", ", arr));
+            Console.WriteLine("Comps: " + gc.comps);
+            Console.WriteLine("Swaps: " + swaps);
+            gc.comps = 0;
+            swaps = 0;
             Console.WriteLine("------------------------------------------------");
             Console.WriteLine("Random input with few unique (divided by 5):");
-            for (int i = 0; i < basearr.Length; i++)
+            for (int i = 0; i < arr.Length; i++)
             {
-                basearr[i] = (i + 1) / 5;
+                arr[i] = (i + 1) / 5;
             }
-            basearr.CopyTo(arr, 0);
+            arr.CopyTo(arr, 0);
             //Array.Copy(basearr, arr, arr.Length);
             Shuffle(rng, arr);
             Console.WriteLine("[{0}]", string.Join(", ", arr));
@@ -73,6 +81,10 @@ namespace GrailsortTester
             Console.WriteLine("Sorted result:");
             gs.GrailSortInPlace(arr, 0, arr.Length);
             Console.WriteLine("[{0}]", string.Join(", ", arr));
+            Console.WriteLine("Comps: " + gc.comps);
+            Console.WriteLine("Swaps: " + swaps);
+            gc.comps = 0;
+            swaps = 0;
         }
 
         public static void Shuffle<T>(this Random rng, T[] array)
@@ -81,9 +93,7 @@ namespace GrailsortTester
             while (n > 1)
             {
                 int k = rng.Next(n--);
-                T temp = array[n];
-                array[n] = array[k];
-                array[k] = temp;
+                (array[k], array[n]) = (array[n], array[k]);
             }
         }
     }

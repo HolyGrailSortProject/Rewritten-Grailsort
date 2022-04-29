@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\CDog2\\source\\repos\\GrailsortTester\\GrailsortTester.csproj",
+      "projectUniqueName": "C:\\Users\\CDog2\\OneDrive\\Rewritten-Grailsort\\C#\\GrailsortTester.csproj",
       "projectName": "GrailsortTester",
-      "projectPath": "C:\\Users\\CDog2\\source\\repos\\GrailsortTester\\GrailsortTester.csproj",
+      "projectPath": "C:\\Users\\CDog2\\OneDrive\\Rewritten-Grailsort\\C#\\GrailsortTester.csproj",
       "packagesPath": "C:\\Users\\CDog2\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\CDog2\\source\\repos\\GrailsortTester\\obj\\",
+      "outputPath": "C:\\Users\\CDog2\\OneDrive\\Rewritten-Grailsort\\C#\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -33,7 +33,6 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Users\\CDog2\\OneDrive\\Downloads": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -66,7 +65,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
       }
     }
   }
