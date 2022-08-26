@@ -43,7 +43,7 @@ private fun <T : Comparable<T>> MutableList<T>.insertSort(start: Int, length: In
     }
 }
 
-private fun <T : Comparable<T>> MutableList<T>.binarySearchLeft(start: Int, length: Int, target: T): Int {
+private fun <T : Comparable<T>> List<T>.binarySearchLeft(start: Int, length: Int, target: T): Int {
     var left = 0
     var right = length
 
@@ -60,7 +60,7 @@ private fun <T : Comparable<T>> MutableList<T>.binarySearchLeft(start: Int, leng
     return left
 }
 
-private fun <T : Comparable<T>> MutableList<T>.binarySearchRight(start: Int, length: Int, target: T): Int {
+private fun <T : Comparable<T>> List<T>.binarySearchRight(start: Int, length: Int, target: T): Int {
     var left = 0
     var right = length
 
@@ -97,6 +97,132 @@ internal fun <T : Comparable<T>> collectKeys(list: MutableList<T>, idealKeys: In
 
     list.rotate(0, firstKey, keysFound)
     return keysFound
+}
+
+private fun <T : Comparable<T>> pairwiseSwaps(list: MutableList<T>, start: Int, length: Int) {
+    var index = 1
+    while (index < length) {
+        val right = start + index
+        val left = right - 1
+
+        if (list[left] > list[right]) {
+            list.swap(left - 2, right)
+            list.swap(right - 2, left)
+        } else {
+            list.swap(left - 2, left)
+            list.swap(right - 2, right)
+        }
+
+        index += 2
+    }
+
+    val left = start + index - 1
+    if (left < start + length) {
+        list.swap(left - 2, left)
+    }
+}
+
+private fun <T : Comparable<T>> mergeForwards(
+    list: MutableList<T>,
+    start: Int,
+    leftLen: Int,
+    rightLen: Int,
+    bufferOffset: Int
+) {
+    var buffer = start - bufferOffset
+    var left = start
+    val middle = start + leftLen
+    var right = middle
+    val end = middle + rightLen
+
+    while (right < end) {
+        if (left == middle || list[left] > list[right]) {
+            list.swap(buffer++, right++)
+        } else {
+            list.swap(buffer++, left++)
+        }
+    }
+
+    if (buffer != left) {
+        list.blockSwap(buffer, left, middle - left)
+    }
+}
+
+private fun <T : Comparable<T>> mergeBackwards(
+    list: MutableList<T>,
+    start: Int,
+    leftLen: Int,
+    rightLen: Int,
+    bufferOffset: Int
+) {
+    val end = start - 1
+    var left = end + leftLen
+    val middle = left
+    var right = middle + rightLen
+    var buffer = right + bufferOffset
+
+    while (left > end) {
+        if (right == middle || list[left] > list[right]) {
+            list.swap(buffer--, left--)
+        } else {
+            list.swap(buffer--, right--)
+        }
+    }
+
+    if (right != buffer) {
+        while (right > middle) {
+            list.swap(buffer--, right--)
+        }
+    }
+}
+
+private fun <T : Comparable<T>> buildInPlace(
+    list: MutableList<T>,
+    start: Int,
+    length: Int,
+    currentLen: Int,
+    bufferLen: Int
+) {
+    var currentStart = start
+
+    var mergeLen = currentLen
+    while (mergeLen < bufferLen) {
+        val fullMerge = 2 * mergeLen
+
+        val mergeEnd = currentStart + length - fullMerge
+        val bufferOffset = mergeLen
+
+        var mergeIndex = currentStart
+        while (mergeIndex <= mergeEnd) {
+            mergeForwards(list, mergeIndex, mergeLen, mergeLen, bufferOffset)
+            mergeIndex += fullMerge
+        }
+
+        val leftOver = length - (mergeIndex - currentStart)
+
+        if (leftOver > mergeLen) {
+            mergeForwards(list, mergeIndex, mergeLen, leftOver - mergeLen, bufferOffset)
+        } else {
+            list.rotate(mergeIndex - mergeLen, mergeLen, leftOver)
+        }
+
+        currentStart -= mergeLen
+        mergeLen *= 2
+    }
+
+    val fullMerge = 2 * bufferLen
+    val lastBlock = length % fullMerge
+    val lastOffset = currentStart + length - lastBlock
+
+    if (lastBlock <= bufferLen) {
+        list.rotate(lastOffset, lastBlock, bufferLen)
+    } else {
+        mergeBackwards(list, lastOffset, bufferLen, lastBlock - bufferLen, bufferLen)
+    }
+
+    for (mergeIndex in (lastOffset - fullMerge) downTo start step fullMerge) {
+        mergeBackwards(list, mergeIndex, bufferLen, bufferLen, bufferLen)
+    }
 }
 
 private fun <T : Comparable<T>> lazyMerge(list: MutableList<T>, start: Int, leftLen: Int, rightLen: Int) {
@@ -153,11 +279,28 @@ private fun <T : Comparable<T>> lazyMerge(list: MutableList<T>, start: Int, left
 }
 
 class GrailSort<T : Comparable<T>> {
-    fun commonSort(list: MutableList<T>, buffer: Array<T?>?) {
-        if (buffer != null && buffer.size and (buffer.size - 1) != 0) {
-            throw IllegalArgumentException("Grailsort external buffer length must be a power of 2.")
-        }
+    private lateinit var extBuffer: Array<T?>
 
+    private fun <T : Comparable<T>> buildBlocks(list: MutableList<T>, start: Int, length: Int, bufferLen: Int) {
+        if (this::extBuffer.isInitialized) {
+            val extLen = if (bufferLen < extBuffer.size) {
+                bufferLen
+            } else {
+                var extLen = 1
+                while (extLen * 2 < extBuffer.size) {
+                    extLen *= 2
+                }
+                extLen
+            }
+
+            TODO("grailBuildOutOfPlace")
+        } else {
+            pairwiseSwaps(list, start, length)
+            buildInPlace(list, start - 2, length, 2, bufferLen)
+        }
+    }
+
+    fun commonSort(list: MutableList<T>, extBuffer: Array<T?>?) {
         if (list.size < 16) {
             list.insertSort(0, list.size)
             return
@@ -189,6 +332,19 @@ class GrailSort<T : Comparable<T>> {
         } else {
             idealBuffer = true
         }
+
+        val bufferEnd = blockLen + keyLen
+        val subarrayLen = if (idealBuffer) {
+            blockLen
+        } else {
+            keyLen
+        }
+
+        if (idealBuffer && extBuffer != null) {
+            this.extBuffer = extBuffer
+        }
+
+        buildBlocks(list, bufferEnd, list.size - bufferEnd, subarrayLen)
     }
 }
 
