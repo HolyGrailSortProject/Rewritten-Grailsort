@@ -1,4 +1,4 @@
-package io.github.holygralsortproject.rewrittengrailsort
+package io.github.holygrailsortproject.rewrittengrailsort
 
 import kotlin.math.min
 import kotlin.random.Random
@@ -23,6 +23,13 @@ class GrailSortTests {
         return -1
     }
 
+    private fun <T : Comparable<T>> assertMatching(list: List<T>, verifier: List<T>) {
+        val i = mismatchComparable(list, verifier)
+        if (i != -1) {
+            fail("list[$i] != verifier[$i]")
+        }
+    }
+
     private fun <T : Comparable<T>> List<T>.unorderedAt(): Int {
         for (i in 1 until size) {
             if (this[i - 1] > this[i]) {
@@ -30,13 +37,6 @@ class GrailSortTests {
             }
         }
         return -1
-    }
-
-    private fun <T : Comparable<T>> assertMatching(list: List<T>, verifier: List<T>) {
-        val i = mismatchComparable(list, verifier)
-        if (i != -1) {
-            fail("list[$i] != verifier[$i]")
-        }
     }
 
     private inline fun <T : Comparable<T>> testSort(
@@ -55,11 +55,15 @@ class GrailSortTests {
         if (list.size <= 32) {
             println("After: $list")
         }
+        val unordered = list.unorderedAt()
+        if (unordered != -1) {
+            fail("list[${unordered - 1}] > list[$unordered]")
+        }
         println("Took ${timeTaken.toDouble(DurationUnit.MILLISECONDS)}ms")
         assertMatching(list, copy)
     }
 
-    private fun createRandomArray(length: Int, unique: Int = length): MutableList<Int> {
+    private fun createRandomList(length: Int, unique: Int = length): MutableList<Int> {
         val result = mutableListOf<Int>()
         for (i in 1..length) {
             result.add(Random.nextInt(unique))
@@ -68,10 +72,22 @@ class GrailSortTests {
     }
 
     @Test
-    fun testSmallSort() =
-        testSort("testSmallSort", mutableListOf(11, 10, 15, 0, 0, 14, 3, 9, 12, 9, 4, 0, 13, 2, 4)) {
+    fun testSmallGrailSort() =
+        testSort("testSmallGrailSort", mutableListOf(11, 10, 15, 0, 0, 14, 3, 9, 12, 9, 4, 0, 13, 2, 4)) {
             grailSort()
         }
+
+    @Test
+    fun testMediumGrailSort() =
+        testSort("testMediumGrailSort", createRandomList(1 shl 14)) { grailSort() }
+
+    @Test
+    fun testGrailSort() =
+        testSort("testGrailSort", createRandomList(1 shl 20)) { grailSort() }
+
+    @Test
+    fun testStrategy3() =
+        testSort("testStrategy3", createRandomList(1 shl 20, 3)) { grailSort() }
 
     @Test
     fun testCollectKeys() {
@@ -100,5 +116,5 @@ class GrailSortTests {
 
     @Test
     fun testBigLazyStableSort() =
-        testSort("testBigLazyStableSort", createRandomArray(32768)) { lazyStableSort() }
+        testSort("testBigLazyStableSort", createRandomList(16384)) { lazyStableSort() }
 }
