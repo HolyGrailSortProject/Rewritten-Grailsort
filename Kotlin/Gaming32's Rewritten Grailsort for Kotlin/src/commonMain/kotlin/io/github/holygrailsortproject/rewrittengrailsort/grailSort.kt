@@ -1,7 +1,5 @@
 package io.github.holygrailsortproject.rewrittengrailsort
 
-import kotlin.jvm.JvmOverloads
-
 const val GRAIL_STATIC_EXT_BUFFER_LEN = 512
 
 private fun <T> MutableList<T>.swap(a: Int, b: Int) {
@@ -80,7 +78,7 @@ private fun <T : Comparable<T>> List<T>.binarySearchRight(start: Int, length: In
 internal fun <T : Comparable<T>> collectKeys(list: MutableList<T>, idealKeys: Int): Int {
     var keysFound = 1
     var firstKey = 0
-    var currKey = 0
+    var currKey = 1
 
     while (currKey < list.size && keysFound < idealKeys) {
         val insertPos = list.binarySearchLeft(firstKey, keysFound, list[currKey])
@@ -220,7 +218,7 @@ private fun <T : Comparable<T>> buildInPlace(
         mergeBackwards(list, lastOffset, bufferLen, lastBlock - bufferLen, bufferLen)
     }
 
-    for (mergeIndex in (lastOffset - fullMerge) downTo start step fullMerge) {
+    for (mergeIndex in lastOffset - fullMerge downTo currentStart step fullMerge) {
         mergeBackwards(list, mergeIndex, bufferLen, bufferLen, bufferLen)
     }
 }
@@ -315,7 +313,7 @@ private fun <T : Comparable<T>> lazyMerge(list: MutableList<T>, start: Int, left
                 do {
                     currentStart++
                     currentLeft--
-                } while (currentLeft != 0 && list[start] <= list[middle])
+                } while (currentLeft != 0 && list[currentStart] <= list[middle])
             }
         }
     } else {
@@ -324,7 +322,7 @@ private fun <T : Comparable<T>> lazyMerge(list: MutableList<T>, start: Int, left
         while (currentRight != 0) {
             val mergeLen = list.binarySearchRight(start, currentLeft, list[end])
 
-            if (mergeLen != leftLen) {
+            if (mergeLen != currentLeft) {
                 list.rotate(start + mergeLen, currentLeft - mergeLen, currentRight)
 
                 end -= currentLeft - mergeLen
@@ -782,7 +780,6 @@ fun <T : Comparable<T>> MutableList<T>.lazyStableSort() {
     }
 }
 
-@JvmOverloads
 inline fun <reified T : Comparable<T>> MutableList<T>.grailSort(
     type: GrailSortType = GrailSortType.IN_PLACE
 ) = GrailSort<T>().commonSort(this, when (type) {
