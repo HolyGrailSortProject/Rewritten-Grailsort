@@ -28,6 +28,36 @@ private fun <T> MutableList<T>.rotate(start: Int, leftLen: Int, rightLen: Int) {
     }
 }
 
+private fun <T> Array<T>.copyInto(list: MutableList<T>, src: Int, dest: Int, length: Int) {
+    for (i in 0 until length) {
+        list[dest + i] = this[src + i]
+    }
+}
+
+private fun <T> Array<T?>.copyIntoUnsafe(other: MutableList<T>, src: Int, dest: Int, length: Int) {
+    // We assume that the caller knows all the elements we're copying have correct nullability
+    @Suppress("UNCHECKED_CAST")
+    (this as Array<T>).copyInto(other, src, dest, length)
+}
+
+private fun <T> List<T>.copyInto(array: Array<T>, src: Int, dest: Int, length: Int) {
+    for (i in 0 until length) {
+        array[dest + i] = this[src + i]
+    }
+}
+
+private fun <T> List<T>.copyInto(other: MutableList<T>, src: Int, dest: Int, length: Int) {
+    if (dest < src) {
+        for (i in 0 until length) {
+            other[dest + i] = this[src + i]
+        }
+    } else {
+        for (i in length - 1 downTo 0) {
+            other[dest + i] = this[src + i]
+        }
+    }
+}
+
 private fun <T : Comparable<T>> MutableList<T>.insertSort(start: Int, length: Int) {
     for (item in 1 until length) {
         var right = start + item
@@ -120,6 +150,29 @@ private fun <T : Comparable<T>> pairwiseSwaps(list: MutableList<T>, start: Int, 
     }
 }
 
+private fun <T : Comparable<T>> pairwiseWrites(list: MutableList<T>, start: Int, length: Int) {
+    var index = 1
+    while (index < length) {
+        val right = start + index
+        val left = right - 1
+
+        if (list[left] > list[right]) {
+            list[left - 2] = list[right]
+            list[right - 2] = list[left]
+        } else {
+            list[left - 2] = list[left]
+            list[right - 2] = list[right]
+        }
+
+        index += 2
+    }
+
+    val left = start + index - 1
+    if (left < start + length) {
+        list[left - 2] = list[left]
+    }
+}
+
 private fun <T : Comparable<T>> mergeForwards(
     list: MutableList<T>,
     start: Int,
@@ -170,6 +223,34 @@ private fun <T : Comparable<T>> mergeBackwards(
     if (right != buffer) {
         while (right > middle) {
             list.swap(buffer--, right--)
+        }
+    }
+}
+
+private fun <T : Comparable<T>> mergeOutOfPlace(
+    list: MutableList<T>,
+    start: Int,
+    leftLen: Int,
+    rightLen: Int,
+    bufferOffset: Int
+) {
+    var buffer = start - bufferOffset
+    var left = start
+    val middle = start + leftLen
+    var right = middle
+    val end = middle + rightLen
+
+    while (right < end) {
+        if (left == middle || list[left] > list[right]) {
+            list[buffer++] = list[right++]
+        } else {
+            list[buffer++] = list[left++]
+        }
+    }
+
+    if (buffer != left) {
+        while (left < middle) {
+            list[buffer++] = list[left++]
         }
     }
 }
@@ -259,7 +340,7 @@ private fun <T : Comparable<T>> blockSelectSort(
     return currentMedian
 }
 
-private fun <T : Comparable<T>> inPlaceBufferReset(list: MutableList<T>, start: Int, length: Int, bufferOffset: Int) {
+private fun <T> inPlaceBufferReset(list: MutableList<T>, start: Int, length: Int, bufferOffset: Int) {
     var buffer = start + length - 1
     var index = buffer - bufferOffset
     while (buffer >= start) {
@@ -267,11 +348,27 @@ private fun <T : Comparable<T>> inPlaceBufferReset(list: MutableList<T>, start: 
     }
 }
 
-private fun <T : Comparable<T>> inPlaceBufferRewind(list: MutableList<T>, start: Int, leftBlock: Int, buffer: Int) {
+private fun <T> outOfPlaceBufferReset(list: MutableList<T>, start: Int, length: Int, bufferOffset: Int) {
+    var buffer = start + length - 1
+    var index = buffer - bufferOffset
+    while (buffer >= start) {
+        list[buffer--] = list[index--]
+    }
+}
+
+private fun <T> inPlaceBufferRewind(list: MutableList<T>, start: Int, leftBlock: Int, buffer: Int) {
     var currentLeft = leftBlock
     var currentBuffer = buffer
     while (currentLeft >= start) {
         list.swap(currentBuffer--, currentLeft--)
+    }
+}
+
+private fun <T> outOfPlaceBufferRewind(list: MutableList<T>, start: Int, leftBlock: Int, buffer: Int) {
+    var currentBuffer = buffer
+    var currentLeft = leftBlock
+    while (currentLeft >= start) {
+        list[currentBuffer--] = list[currentLeft--]
     }
 }
 
@@ -342,28 +439,28 @@ private fun <T : Comparable<T>> lazyMerge(list: MutableList<T>, start: Int, left
     }
 }
 
-class GrailSort<T : Comparable<T>> {
-    companion object {
-        internal const val SUBARRAY_LEFT = false
-        internal const val SUBARRAY_RIGHT = true
+private typealias Subarray = Boolean
+private const val SUBARRAY_LEFT: Subarray = false
+private const val SUBARRAY_RIGHT: Subarray = true
 
-        private fun <T : Comparable<T>> getSubarray(list: List<T>, currentKey: Int, medianKey: Int) =
-            if (list[currentKey] < list[medianKey]) {
-                SUBARRAY_LEFT
-            } else {
-                SUBARRAY_RIGHT
-            }
+private fun <T : Comparable<T>> getSubarray(list: List<T>, currentKey: Int, medianKey: Int) =
+    if (list[currentKey] < list[medianKey]) {
+        SUBARRAY_LEFT
+    } else {
+        SUBARRAY_RIGHT
     }
+
+class GrailSort<T : Comparable<T>> {
 
     private lateinit var extBuffer: Array<T?>
     private var currBlockLen: Int = 0
-    private var currBlockOrigin: Boolean = false
+    private var currBlockOrigin: Subarray = false
 
     private fun smartMerge(
         list: MutableList<T>,
         start: Int,
         leftLen: Int,
-        leftOrigin: Boolean,
+        leftOrigin: Subarray,
         rightLen: Int,
         bufferOffset: Int
     ) {
@@ -400,7 +497,7 @@ class GrailSort<T : Comparable<T>> {
         }
     }
 
-    private fun smartLazyMerge(list: MutableList<T>, start: Int, leftLen: Int, leftOrigin: Boolean, rightLen: Int) {
+    private fun smartLazyMerge(list: MutableList<T>, start: Int, leftLen: Int, leftOrigin: Subarray, rightLen: Int) {
         var currentStart = start
         var currentLeft = leftLen
         var currentRight = rightLen
@@ -456,6 +553,47 @@ class GrailSort<T : Comparable<T>> {
 
         currBlockLen = currentRight
         currBlockOrigin = !leftOrigin
+    }
+
+    private fun smartMergeOutOfPlace(
+        list: MutableList<T>,
+        start: Int,
+        leftLen: Int,
+        leftOrigin: Subarray,
+        rightLen: Int,
+        bufferOffset: Int
+    ) {
+        var buffer = start - bufferOffset
+        var left = start
+        val middle = start + leftLen
+        var right = middle
+        val end = middle + rightLen
+
+        if (leftOrigin == SUBARRAY_LEFT) {
+            while (left < middle && right < end) {
+                if (list[left] <= list[right]) {
+                    list[buffer++] = list[left++]
+                } else {
+                    list[buffer++] = list[right++]
+                }
+            }
+        } else {
+            while (left < middle && right < end) {
+                if (list[left] < list[right]) {
+                    list[buffer++] = list[left++]
+                } else {
+                    list[buffer++] = list[right++]
+                }
+            }
+        }
+
+        if (left < middle) {
+            currBlockLen = middle - left
+            outOfPlaceBufferRewind(list, left, middle - 1, end - 1)
+        } else {
+            currBlockLen = end - right
+            currBlockOrigin = !leftOrigin
+        }
     }
 
     private fun mergeBlocks(
@@ -556,6 +694,116 @@ class GrailSort<T : Comparable<T>> {
         }
     }
 
+    private fun combineOutOfPlace(
+        list: MutableList<T>,
+        firstKey: Int,
+        start: Int,
+        length: Int,
+        subarrayLen: Int,
+        blockLen: Int,
+        mergeCount: Int,
+        lastSubarrays: Int
+    ) {
+        list.copyInto(extBuffer, start - blockLen, 0, blockLen)
+
+        val fullMerge = 2 * subarrayLen
+        var blockCount = fullMerge / blockLen
+
+        for (mergeIndex in 0 until mergeCount) {
+            val offset = start + mergeIndex * fullMerge
+
+            list.insertSort(firstKey, blockCount)
+
+            var medianKey = subarrayLen / blockLen
+            medianKey = blockSelectSort(list, firstKey, offset, medianKey, blockCount, blockLen)
+
+            mergeBlocksOutOfPlace(list, firstKey, firstKey + medianKey, offset, blockCount, blockLen, 0, 0)
+        }
+
+        if (lastSubarrays != 0) {
+            val offset = start + mergeCount * fullMerge
+            blockCount = lastSubarrays / blockLen
+
+            list.insertSort(firstKey, blockCount + 1)
+
+            var medianKey = subarrayLen / blockLen
+            medianKey = blockSelectSort(list, firstKey, offset, medianKey, blockCount, blockLen)
+
+            val lastFragment = lastSubarrays - blockCount * blockLen
+            val lastMergeBlocks = if (lastFragment != 0) {
+                countLastMergeBlocks(list, offset, blockCount, blockLen)
+            } else {
+                0
+            }
+
+            val smartMerges = blockCount - lastMergeBlocks
+
+            if (smartMerges == 0) {
+                val leftLen = lastMergeBlocks * blockLen
+
+                mergeOutOfPlace(list, offset, leftLen, lastFragment, blockLen)
+            } else {
+                mergeBlocksOutOfPlace(
+                    list, firstKey, firstKey + medianKey, offset, smartMerges, blockLen, lastMergeBlocks, lastFragment
+                )
+            }
+        }
+
+        outOfPlaceBufferReset(list, start, length, blockLen)
+        extBuffer.copyIntoUnsafe(list, 0, start - blockLen, blockLen)
+    }
+
+    private fun mergeBlocksOutOfPlace(
+        list: MutableList<T>,
+        firstKey: Int,
+        medianKey: Int,
+        start: Int,
+        blockCount: Int,
+        blockLen: Int,
+        lastMergeBlocks: Int,
+        lastLen: Int
+    ) {
+        var nextBlock = start + blockLen
+
+        currBlockLen = blockLen
+        currBlockOrigin = getSubarray(list, firstKey, medianKey)
+
+        for (keyIndex in 1 until blockCount) {
+            val currBlock = nextBlock - currBlockLen
+            val nextBlockOrigin = getSubarray(list, firstKey + keyIndex, medianKey)
+
+            if (nextBlockOrigin == currBlockOrigin) {
+                val buffer = currBlock - blockLen
+
+                list.copyInto(list, currBlock, buffer, currBlockLen)
+                currBlockLen = blockLen
+            } else {
+                smartMergeOutOfPlace(list, currBlock, currBlockLen, currBlockOrigin, blockLen, blockLen)
+            }
+
+            nextBlock += blockLen
+        }
+
+        var currBlock = nextBlock - currBlockLen
+        val buffer = currBlock - blockLen
+
+        if (lastLen != 0) {
+            if (currBlockOrigin == SUBARRAY_RIGHT) {
+                list.copyInto(list, currBlock, buffer, currBlockLen)
+
+                currBlock = nextBlock
+                currBlockLen = blockLen * lastMergeBlocks
+                currBlockOrigin = SUBARRAY_LEFT
+            } else {
+                currBlockLen += blockLen * lastMergeBlocks
+            }
+
+            mergeOutOfPlace(list, currBlock, currBlockLen, lastLen, blockLen)
+        } else {
+            list.copyInto(list, currBlock, buffer, currBlockLen)
+        }
+    }
+
     private fun combineInPlace(
         list: MutableList<T>,
         firstKey: Int,
@@ -652,10 +900,45 @@ class GrailSort<T : Comparable<T>> {
         }
 
         if (buffer && this::extBuffer.isInitialized && blockLen <= extBuffer.size) {
-            TODO("grailCombineOutOfPlace")
+            combineOutOfPlace(list, firstKey, start, length, subarrayLen, blockLen, mergeCount, lastSubarrays)
         } else {
             combineInPlace(list, firstKey, start, realLength, subarrayLen, blockLen, mergeCount, lastSubarrays, buffer)
         }
+    }
+
+    private fun buildOutOfPlace(list: MutableList<T>, start: Int, length: Int, bufferLen: Int, extLen: Int) {
+        list.copyInto(extBuffer, start - extLen, 0, extLen)
+
+        pairwiseWrites(list, start, length)
+        var currentStart = start - 2
+
+        var mergeLen = 2
+        while (mergeLen < extLen) {
+            val fullMerge = 2 * mergeLen
+
+            val mergeEnd = currentStart + length - fullMerge
+            val bufferOffset = mergeLen
+
+            var mergeIndex = currentStart
+            while (mergeIndex <= mergeEnd) {
+                mergeOutOfPlace(list, mergeIndex, mergeLen, mergeLen, bufferOffset)
+                mergeIndex += fullMerge
+            }
+
+            val leftOver = length - (mergeIndex - currentStart)
+
+            if (leftOver > mergeLen) {
+                mergeOutOfPlace(list, mergeIndex, mergeLen, leftOver - mergeLen, bufferOffset)
+            } else {
+                list.copyInto(list, mergeIndex, mergeIndex - mergeLen, leftOver)
+            }
+
+            currentStart -= mergeLen
+            mergeLen *= 2
+        }
+
+        extBuffer.copyIntoUnsafe(list, 0, currentStart + length, extLen)
+        buildInPlace(list, currentStart, length, mergeLen, bufferLen)
     }
 
     private fun buildBlocks(list: MutableList<T>, start: Int, length: Int, bufferLen: Int) {
@@ -670,7 +953,7 @@ class GrailSort<T : Comparable<T>> {
                 extLen
             }
 
-            TODO("grailBuildOutOfPlace")
+            buildOutOfPlace(list, start, length, bufferLen, extLen)
         } else {
             pairwiseSwaps(list, start, length)
             buildInPlace(list, start - 2, length, 2, bufferLen)

@@ -86,8 +86,36 @@ class GrailSortTests {
         testSort("testGrailSort", createRandomList(1 shl 20)) { grailSort() }
 
     @Test
+    fun testGrailSortNonPow2() =
+        testSort("testGrailSortNonPow2", createRandomList((1 shl 20) - 13)) { grailSort() }
+
+    @Test
     fun testStrategy3() =
         testSort("testStrategy3", createRandomList(1 shl 20, 3)) { grailSort() }
+
+    @Test
+    fun testStrategy3NonPow2() =
+        testSort("testStrategy3NonPow2", createRandomList((1 shl 20) - 13, 3)) { grailSort() }
+
+    @Test
+    fun testGrailSortStaticOOP() =
+        testSort("testGrailSortStaticOOP", createRandomList(1 shl 20)) { grailSort(GrailSortType.STATIC_OOP) }
+
+    @Test
+    fun testGrailSortStaticOOPNonPow2() =
+        testSort("testGrailSortStaticOOPNonPow2", createRandomList((1 shl 20) - 13)) {
+            grailSort(GrailSortType.STATIC_OOP)
+        }
+
+    @Test
+    fun testGrailSortDynamicOOP() =
+        testSort("testGrailSortDynamicOOP", createRandomList(1 shl 20)) { grailSort(GrailSortType.DYNAMIC_OOP) }
+
+    @Test
+    fun testGrailSortDynamicOOPNonPow2() =
+        testSort("testGrailSortDynamicOOPNonPow2", createRandomList((1 shl 20) - 13)) {
+            grailSort(GrailSortType.DYNAMIC_OOP)
+        }
 
     @Test
     fun testCollectKeys() {
@@ -117,4 +145,8 @@ class GrailSortTests {
     @Test
     fun testBigLazyStableSort() =
         testSort("testBigLazyStableSort", createRandomList(16384)) { lazyStableSort() }
+
+    @Test
+    fun testBigLazyStableSortNonPow2() =
+        testSort("testBigLazyStableSortNonPow2", createRandomList(16371)) { lazyStableSort() }
 }
