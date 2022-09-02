@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform") version "1.7.10"
+    `maven-publish`
 }
 
 group = "io.github.holygrailsortproject"
@@ -7,6 +8,18 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "gaming32"
+            credentials(PasswordCredentials::class)
+
+            val baseUri = "https://maven.jemnetworks.com"
+            url = uri(baseUri + if (version.toString().endsWith("-SNAPSHOT")) "/snapshots" else "/releases")
+        }
+    }
 }
 
 kotlin {

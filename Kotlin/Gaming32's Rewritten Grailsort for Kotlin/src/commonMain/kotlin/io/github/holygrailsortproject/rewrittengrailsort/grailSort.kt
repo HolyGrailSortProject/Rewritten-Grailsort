@@ -900,7 +900,7 @@ class GrailSort<T : Comparable<T>> {
         }
 
         if (buffer && this::extBuffer.isInitialized && blockLen <= extBuffer.size) {
-            combineOutOfPlace(list, firstKey, start, length, subarrayLen, blockLen, mergeCount, lastSubarrays)
+            combineOutOfPlace(list, firstKey, start, realLength, subarrayLen, blockLen, mergeCount, lastSubarrays)
         } else {
             combineInPlace(list, firstKey, start, realLength, subarrayLen, blockLen, mergeCount, lastSubarrays, buffer)
         }
