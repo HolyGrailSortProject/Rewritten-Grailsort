@@ -1398,9 +1398,9 @@ fn grail_lazy_stable_sort<T: Sortable, F: FnMut(&T, &T) -> Ordering>(
     let mut merge_len = 2;
     while merge_len < length {
         let mut merge_index = 0;
-        let merge_end = length - (2 * merge_len);
+        let merge_end: isize = length as isize - (2 * merge_len) as isize;
 
-        while merge_index <= merge_end {
+        while merge_index as isize <= merge_end {
             grail_lazy_merge(set, start + merge_index, merge_len, merge_len, cmp);
             merge_index += 2 * merge_len;
         }
@@ -1415,7 +1415,7 @@ fn grail_lazy_stable_sort<T: Sortable, F: FnMut(&T, &T) -> Ordering>(
                 cmp,
             );
         }
-
+    
         merge_len *= 2;
     }
 }
@@ -1604,7 +1604,7 @@ mod private_tests {
 
     #[test]
     fn build_blocks_random_sizes_random_values() {
-        for _ in 0..100 {
+        for _ in 0..500 {
             let mut rng = thread_rng();
             let len = rng.gen_range(2, 262144);
             let mut set: Vec<GrailPair> = (0..len)
@@ -1643,7 +1643,7 @@ mod private_tests {
             };
             let mut cursor = buffer_end + 1;
             while cursor < len {
-                if (cursor - buffer_end) % subarray_len != 0 {
+                if subarray_len != 0 && (cursor - buffer_end) % subarray_len != 0 {
                     assert!(
                         set[cursor] >= set[cursor - 1],
                         "Built Fragment Out Of Order: {:?}, {:?}, ({}, {})",
@@ -1754,6 +1754,45 @@ mod private_tests {
             }
         }
     }
+
+    
+    //These tests are here instead of tests.rs, as grail_lazy_stable_sort is internal
+    #[test]
+    fn lazy_stable_sort_many_unique() {
+        for _ in 0..12 {
+            let mut rng = thread_rng();
+            let len = rng.gen_range(17, 64);
+            let mut set: Vec<GrailPair> = (0..len)
+                .map(|x| GrailPair {
+                    key: rng.gen_range(0, len as isize),
+                    value: x as isize,
+                })
+                .collect();
+            grail_lazy_stable_sort(&mut set, 0, len, &mut |a: &GrailPair, b: &GrailPair| {
+                a.key.cmp(&b.key)
+            });
+            verify_sort(&set);
+        }
+    }
+    #[test]
+    fn lazy_stable_sort_few_unique() {
+        for _ in 0..12 {
+            let mut rng = thread_rng();
+            let len = rng.gen_range(17, 524288);
+            let baseline = rng.gen_range(1,256);
+            let mut set: Vec<GrailPair> = (0..len)
+                .map(|x| GrailPair {
+                    key: rng.gen_range(baseline, baseline + 3 as isize),
+                    value: x as isize,
+                })
+                .collect();
+            grail_lazy_stable_sort(&mut set, 0, len, &mut |a: &GrailPair, b: &GrailPair| {
+                a.key.cmp(&b.key)
+            });
+            verify_sort(&set);
+        }
+    }
+
 
     //NOTE: There is no test for the final grail_lazy_merge call,
     //as verifying such is equivalent to verifying the actual sort, which every other test does.
