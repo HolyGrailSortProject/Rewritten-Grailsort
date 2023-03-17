@@ -7,7 +7,11 @@ or, inside the folder:
 ```
 v run .
 ```
-
+you can also compile it using the `-prod` option for significantly better performance:
+```
+v -prod .
+./grailsort
+```
 # Usage
 ```v
 import grailsort
