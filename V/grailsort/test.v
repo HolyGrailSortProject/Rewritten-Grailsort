@@ -84,11 +84,7 @@ fn check(array []Value, reference []Value) bool {
 }
 
 fn prepare(len int) !grailsort.GrailSort[Value] {
-	mut array     := get_test_array(len)!
-	mut reference := []Value{len: array.len}
-	arrays.copy(mut reference, array)
-	reference.sort()
-
+	mut array := get_test_array(len)!
 	mut grail := grailsort.grailsort[Value]()
 	
 	println("Preparing...")
