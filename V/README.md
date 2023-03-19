@@ -19,7 +19,7 @@ import grailsort
 ...
 
 mut grail := grailsort.grailsort[Type]()
-grail.sort_inplace(mut anArray, start, stop)
-grail.sort_static_oop(mut anArray, start, stop)
-grail.sort_dynamic_oop(mut anArray, start, stop)
+grail.sort_inplace(mut anArray, start, length)
+grail.sort_static_oop(mut anArray, start, length)
+grail.sort_dynamic_oop(mut anArray, start, length)
 ```
