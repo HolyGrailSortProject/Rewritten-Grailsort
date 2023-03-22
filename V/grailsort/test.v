@@ -128,7 +128,7 @@ fn test(
     if check(test_array, reference) {
         println(bench.step_message_ok("Grail OOP with Static buffer"))
     } else {
-        panic(bench.step_message_fail("Grail In-Place"))
+        panic(bench.step_message_fail("Grail OOP with Static buffer"))
     }
 
     arrays.copy(mut test_array, array)
@@ -139,7 +139,7 @@ fn test(
     if check(test_array, reference) {
         println(bench.step_message_ok("Grail OOP with Dynamic buffer"))
     } else {
-        panic(bench.step_message_fail("Grail In-Place"))
+        panic(bench.step_message_fail("Grail OOP with Dynamic buffer"))
     }
 }
 
