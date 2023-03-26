@@ -2,11 +2,10 @@
 A diverse array of heavily refactored versions of Andrey Astrelin's GrailSort.h, aiming to be as readable and intuitive as possible. *Owned and maintained by The Holy Grail Sort Project.*
 
 ## Visit our **Discord guild** for **project updates** and **discussions**:
-[![Discord Banner 2](https://discordapp.com/api/guilds/592082838791127075/widget.png?style=banner2)](https://discord.com/invite/2xGkKC2)
+[![Discord Banner 2](https://discordapp.com/api/guilds/592082838791127075/widget.png?style=banner2)](https://discord.gg/thestudio)
 
 # Current implementations featured in our repo:
 * Summer Dragonfly et al.'s Rewritten Grailsort for **Java** (ALL TESTS PASSING / POTENTIALLY FIXED)
-  * DeveloperSort's Minor Edits to Summer... et al.'s Rewritten Grailsort for **Java**
 * 666666t's Rewritten Grailsort for **Rust**
 * thatsOven's Rewritten Grailsort for **Python**
 * Enver's Rewritten Grailsort for **JavaScript**
@@ -67,7 +66,6 @@ Now, there *are* some glaring flaws with Grailsort, but they're now easier than 
    * aphitorite
    * Control
    * dani_dlg
-   * DeveloperSort
    * EilrahcF
    * Enver
    * Gaming32
