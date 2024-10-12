@@ -1189,7 +1189,7 @@ namespace grailsort_detail
                 return;
             }
 
-            BufferIterator extBuffer = 0;
+            BufferIterator extBuffer{};
             int extBufferLen = 0;
 
             int blockLen = 1;
