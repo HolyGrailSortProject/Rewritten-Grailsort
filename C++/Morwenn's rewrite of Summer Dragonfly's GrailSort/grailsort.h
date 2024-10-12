@@ -133,7 +133,7 @@ namespace grailsort_detail
         }
 
         template<typename RandomAccessIterator, typename Compare, typename T>
-        static int BinarySearchLeft(RandomAccessIterator array, int start, int length, const T& target, Compare comp) {
+        static int BinarySearchLeft(RandomAccessIterator array, int start, int length, T&& target, Compare comp) {
             int left  = 0;
             int right = length;
 
@@ -153,7 +153,7 @@ namespace grailsort_detail
 
         // Credit to Anonymous0726 for debugging
         template<typename RandomAccessIterator, typename Compare, typename T>
-        static int BinarySearchRight(RandomAccessIterator array, int start, int length, const T& target, Compare comp) {
+        static int BinarySearchRight(RandomAccessIterator array, int start, int length, T&& target, Compare comp) {
             int left  = 0;
             int right = length;
 
