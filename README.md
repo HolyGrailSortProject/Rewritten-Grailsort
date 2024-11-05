@@ -14,6 +14,7 @@ A diverse array of heavily refactored versions of Andrey Astrelin's GrailSort.h,
 * \_fluffyy's Rewritten Grailsort for **Python**
 * Gaming32's Rewritten Grailsort for **Cython**
 * SpexGuy's Rewritten Grailsort for **Zig**
+* AceOfSpadesProduc100's Rewritten Grailsort for **C#**
 * *more to come!*
 
 # What is Grailsort?
@@ -75,6 +76,7 @@ Now, there *are* some glaring flaws with Grailsort, but they're now easier than 
    * Spex_guy
    * thatsOven
    * \_fluffyy
+   * AceOfSpadesProduc100
  * Special thanks to "The Studio" Discord community!
 
 # Dedicated to Mr. Andrey Astrelin, 1969 - 2017
