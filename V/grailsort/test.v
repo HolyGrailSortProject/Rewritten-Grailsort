@@ -4,20 +4,17 @@ import arrays
 import benchmark
 import grailsort
 
-const (
-    prepare_iters = 64
-    prepare_len   = 65536
-    n_tests       = 128
-    test_per_len  = 8
-    min_len       = 15
-    max_len       = 1 << 20
-)
+const prepare_iters = 64
+const prepare_len = 65536
+const n_tests = 128
+const test_per_len = 8
+const min_len = 15
+const max_len = 1 << 20
 
 pub struct Value {
-    pub:
+pub:
     value int
-
-    pub mut:
+pub mut:
     key int
 }
 
@@ -34,7 +31,7 @@ fn gen_array(len int, unique int) ![]Value {
 
     for i in 0 .. unique {
         for _ in 0 .. len / unique {
-            array << Value {
+            array << Value{
                 value: i
             }
         }
@@ -42,7 +39,7 @@ fn gen_array(len int, unique int) ![]Value {
 
     for i in 0 .. array.len {
         r := rand.int_in_range(i, array.len)!
-        tmp     := array[i]
+        tmp := array[i]
         array[i] = array[r]
         array[r] = tmp
     }
@@ -65,17 +62,17 @@ fn get_few_unique_test_array(len int) ![]Value {
 fn check(array []Value, reference []Value) bool {
     for i in 1 .. array.len {
         if array[i - 1] > array[i] {
-            println("Indices ${i - 1} and ${i} are out of order.")
+            println('Indices ${i - 1} and ${i} are out of order.')
             return false
-        } 
+        }
 
         if array[i - 1] == array[i] && array[i - 1].key > array[i].key {
-            println("Indices ${i - 1} and ${i} are unstable.")
+            println('Indices ${i - 1} and ${i} are unstable.')
             return false
         }
 
         if array[i] != reference[i] {
-            println("Index ${i} does not match reference.")
+            println('Index ${i} does not match reference.')
             return false
         }
     }
@@ -86,8 +83,8 @@ fn check(array []Value, reference []Value) bool {
 fn prepare(len int) !grailsort.GrailSort[Value] {
     mut array := get_test_array(len)!
     mut grail := grailsort.grailsort[Value]()
-    
-    println("Preparing...")
+
+    println('Preparing...')
     for _ in 0 .. prepare_iters {
         mut test_array := []Value{len: array.len}
 
@@ -104,20 +101,18 @@ fn prepare(len int) !grailsort.GrailSort[Value] {
     return grail
 }
 
-fn test(
-    mut bench &benchmark.Benchmark, mut array []Value, 
+fn test(mut bench benchmark.Benchmark, mut array []Value,
     mut test_array []Value, reference []Value,
-    mut grail &grailsort.GrailSort[Value]
-) {
+    mut grail grailsort.GrailSort[Value]) {
     arrays.copy(mut test_array, array)
     bench.step()
     grail.sort_inplace(mut test_array, 0, test_array.len)
     bench.ok()
 
     if check(test_array, reference) {
-        println(bench.step_message_ok("Grail In-Place"))
+        println(bench.step_message_ok('Grail In-Place'))
     } else {
-        panic(bench.step_message_fail("Grail In-Place"))
+        panic(bench.step_message_fail('Grail In-Place'))
     }
 
     arrays.copy(mut test_array, array)
@@ -126,9 +121,9 @@ fn test(
     bench.ok()
 
     if check(test_array, reference) {
-        println(bench.step_message_ok("Grail OOP with Static buffer"))
+        println(bench.step_message_ok('Grail OOP with Static buffer'))
     } else {
-        panic(bench.step_message_fail("Grail OOP with Static buffer"))
+        panic(bench.step_message_fail('Grail OOP with Static buffer'))
     }
 
     arrays.copy(mut test_array, array)
@@ -137,26 +132,24 @@ fn test(
     bench.ok()
 
     if check(test_array, reference) {
-        println(bench.step_message_ok("Grail OOP with Dynamic buffer"))
+        println(bench.step_message_ok('Grail OOP with Dynamic buffer'))
     } else {
-        panic(bench.step_message_fail("Grail OOP with Dynamic buffer"))
+        panic(bench.step_message_fail('Grail OOP with Dynamic buffer'))
     }
 }
 
-fn test_all(
-    mut bench &benchmark.Benchmark, mut array []Value,
-    mut grail &grailsort.GrailSort[Value]
-) {
-    println("------------------\nLength: ${array.len}")
+fn test_all(mut bench benchmark.Benchmark, mut array []Value,
+    mut grail grailsort.GrailSort[Value]) {
+    println('------------------\nLength: ${array.len}')
 
     mut test_array := []Value{len: array.len}
-    mut reference  := []Value{len: array.len}
+    mut reference := []Value{len: array.len}
 
     arrays.copy(mut reference, array)
     bench.step()
     reference.sort()
     bench.ok()
-    println(bench.step_message_ok("Default V sorter"))
+    println(bench.step_message_ok('Default V sorter'))
 
     for _ in 0 .. test_per_len {
         test(mut bench, mut array, mut test_array, reference, mut grail)
@@ -164,31 +157,25 @@ fn test_all(
 }
 
 fn main() {
-    mut grail := prepare(prepare_len) or {
-        panic(err)
-    }
+    mut grail := prepare(prepare_len) or { panic(err) }
 
     mut bench := benchmark.new_benchmark()
     mut array := []Value{}
 
     for _ in 0 .. n_tests {
         bench = benchmark.new_benchmark()
-        array = get_test_array(rand.int_in_range(min_len, max_len) or {
-            panic(err)
-        }) or {
+        array = get_test_array(rand.int_in_range(min_len, max_len) or { panic(err) }) or {
             panic(err)
         }
 
         test_all(mut bench, mut array, mut grail)
     }
 
-    println("Testing few unique.")
+    println('Testing few unique.')
 
     for _ in 0 .. n_tests {
         bench = benchmark.new_benchmark()
-        array = get_few_unique_test_array(rand.int_in_range(min_len, max_len) or {
-            panic(err)
-        }) or {
+        array = get_few_unique_test_array(rand.int_in_range(min_len, max_len) or { panic(err) }) or {
             panic(err)
         }
 

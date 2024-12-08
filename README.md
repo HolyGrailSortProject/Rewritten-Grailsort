@@ -7,13 +7,14 @@ A diverse array of heavily refactored versions of Andrey Astrelin's GrailSort.h,
 # Current implementations featured in our repo:
 * Summer Dragonfly et al.'s Rewritten Grailsort for **Java** (ALL TESTS PASSING / POTENTIALLY FIXED)
 * 666666t's Rewritten Grailsort for **Rust**
-* thatsOven's Rewritten Grailsort for **Python**
+* Amari Calipso's Rewritten Grailsort for **Python**
 * Enver's Rewritten Grailsort for **JavaScript**
 * Summer Dragonfly's *Simple* Rewritten Grailsort for **C**
 * Morwenn's adaptation of Summer Dragonfly's Java Rewritten Grailsort for **C++**
 * \_fluffyy's Rewritten Grailsort for **Python**
 * Gaming32's Rewritten Grailsort for **Cython**
 * SpexGuy's Rewritten Grailsort for **Zig**
+* Amari Calipso's Rewritten Grailsort for **V**
 * *more to come!*
 
 # What is Grailsort?
@@ -61,6 +62,7 @@ Now, there *are* some glaring flaws with Grailsort, but they're now easier than 
    * Summer Dragonfly / MusicTheorist
  * Project Contributors:
    * 666666t
+   * Amari Calipso
    * Anonymous0726
    * aphitorite
    * Control
@@ -73,7 +75,6 @@ Now, there *are* some glaring flaws with Grailsort, but they're now easier than 
    * MP
    * phoenixbound
    * Spex_guy
-   * thatsOven
    * \_fluffyy
  * Special thanks to "The Studio" Discord community!
 

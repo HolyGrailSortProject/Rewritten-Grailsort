@@ -43,11 +43,11 @@
  #
 # Editor : DeveloperSort
 
-# importing Python\thatsOven's Rewritten Grailsort for Python\GrailSort.py
+# importing Python\Amari Calipso's Rewritten Grailsort for Python\GrailSort.py
 # i know, it looks messy.
 import sys
 originalPath = sys.path[0]
-sys.path[0] += "\\..\\thatsOven's Rewritten Grailsort for Python\\"
+sys.path[0] += "\\..\\Amari Calipso's Rewritten Grailsort for Python\\"
 import GrailSort
 sys.path[0] = originalPath
 

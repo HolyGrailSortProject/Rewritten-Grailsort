@@ -34,6 +34,7 @@ def arrayCopy(fromArray, fromIndex, toArray, toIndex, length):   # thanks to Bee
  # The Holy Grail Sort Project
  # Project Manager:      Summer Dragonfly
  # Project Contributors: 666666t
+ #                       Amari Calipso
  #                       Anonymous0726
  #                       aphitorite
  #                       Control
@@ -47,7 +48,6 @@ def arrayCopy(fromArray, fromIndex, toArray, toIndex, length):   # thanks to Bee
  #                       MP
  #                       phoenixbound
  #                       Spex_guy
- #                       thatsOven
  #                       _fluffyy
  #                       
  #                       
@@ -60,7 +60,7 @@ def arrayCopy(fromArray, fromIndex, toArray, toIndex, length):   # thanks to Bee
 #
 # ** Written and maintained by The Holy Grail Sort Project
 #
-# Primary author: thatsOven
+# Primary author: Amari Calipso
 #
 # Current status: Working (Passing all tests) + Stable
 
